@@ -23,11 +23,14 @@ void JinxModes::Combo()
 
 	auto eunit = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, Jinx::Spells->E->Range());
 
-	if (Jinx::Menu->ComboE->Enabled())
+	if (eunit != nullptr && eunit->IsValidTarget())
 	{
-		auto mana = Jinx::Menu->SaveMana->Enabled() ? 20 : 0;
+		if (Jinx::Menu->ComboE->Enabled())
+		{
+			auto mana = Jinx::Menu->SaveMana->Enabled() ? 20 : 0;
 
-		Jinx::UseE(eunit, mana);
+			Jinx::UseE(eunit, mana);
+		}
 	}
 }
 
@@ -36,17 +39,19 @@ void JinxModes::Harass()
 {
 	auto wunit = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, Jinx::Spells->W->Range());
 
-
-	if (Jinx::Spells->Q->IsReady())
+	if (wunit != nullptr && wunit->IsValidTarget())
 	{
-		auto mana = Jinx::Menu->HarassQMana->GetInteger();
-		Jinx::UseQ(wunit, Jinx::Player->GetSpellBook()->GetToggleState(kSlotQ) == 2, true, mana);
-	}
+		if (Jinx::Spells->Q->IsReady())
+		{
+			auto mana = Jinx::Menu->HarassQMana->GetInteger();
+			Jinx::UseQ(wunit, Jinx::Player->GetSpellBook()->GetToggleState(kSlotQ) == 2, true, mana);
+		}
 
-	if (Jinx::Spells->W->IsReady())
-	{
-		auto mana = Jinx::Menu->HarassWMana->GetInteger();
-		Jinx::UseW(wunit, mana);
+		if (Jinx::Spells->W->IsReady())
+		{
+			auto mana = Jinx::Menu->HarassWMana->GetInteger();
+			Jinx::UseW(wunit, mana);
+		}
 	}
 }
 
@@ -67,7 +72,7 @@ void JinxModes::Auto()
 {
     auto unit = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, Jinx::Spells->E->Range());
 
-	if (Jinx::Spells->E->IsReady() && unit != nullptr)
+	if (Jinx::Spells->E->IsReady() && unit != nullptr && unit->IsValidTarget())
 	{
 		auto output = new AdvPredictionOutput();
 
@@ -111,7 +116,7 @@ void JinxModes::Auto()
 				{
 					if (Jinx::Spells->R->RunPrediction(s, true, kCollidesWithNothing, pred))
 					{
-						if (pred->HitChance >= kHitChanceMedium)
+						if (pred->HitChance >= kHitChanceHigh)
 						{
 							Jinx::Spells->R->CastOnPosition(pred->CastPosition);
 						}

@@ -2,7 +2,6 @@
 #include "JinxMenu.h"
 #include "PluginSDK.h"
 #include "Jinx.h"
-#include <algorithm>
 
 PluginSetup("SuzuJinx"); 
 

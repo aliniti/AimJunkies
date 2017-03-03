@@ -1,15 +1,15 @@
 #pragma once
+#include "JinxMenu.h"
+#include "JinxSpells.h"
 #include "JinxExtensions.h"
 #include "JinxModes.h"
-#include "JinxSpells.h"
-#include "JinxMenu.h"
-
 
 class Jinx
 {
 public:
 	~Jinx();
 
+	static void OnDraw();
 	static void GetHeroes();
 	static int RocketRange();
 
@@ -24,10 +24,16 @@ public:
 
 	static void UseQ(IUnit* unit, bool rockets, bool minion, int mana);
 	static void UseW(IUnit* unit, int mana);
+	static void UseE(IUnit* unit, int mana);
 
 	static bool CanUlt(IUnit* unit);
 	static float UltDamage(IUnit* unit);
 };
+
+inline void Jinx::OnDraw()
+{
+	
+}
 
 inline void Jinx::GetHeroes()
 {
@@ -67,10 +73,10 @@ inline void Jinx::UseQ(IUnit* unit, bool rockets, bool minion, int mana)
 			{
 				if (Ex->Dist2D(unit) > 525)
 				{
-					/* todo: check minion
-
-
-					*/
+					/* todo: get minion
+					 * 
+					 * 
+					 */
 
 					Spells->Q->CastOnPlayer();
 				}
@@ -143,6 +149,28 @@ inline void Jinx::UseW(IUnit* unit, int mana)
 					if (pred->HitChance >= kHitChanceHigh)
 					{
 						Spells->W->CastOnPosition(pred->CastPosition);
+					}
+				}
+			}
+		}
+	}
+}
+
+inline void Jinx::UseE(IUnit* unit, int mana)
+{
+	if (Spells->E->IsReady() && !Player->IsWindingUp())
+	{
+		if (Player->ManaPercent() > mana)
+		{
+			if (unit != nullptr && unit->IsValidTarget())
+			{
+				auto pred = new AdvPredictionOutput();
+
+				if (Spells->E->RunPrediction(unit, true, kCollidesWithNothing, pred))
+				{
+					if (pred->HitChance >= kHitChanceVeryHigh)
+					{
+						Spells->E->CastOnPosition(pred->CastPosition);
 					}
 				}
 			}
@@ -260,3 +288,4 @@ inline float Jinx::UltDamage(IUnit* unit)
 
 	return dmg;
 }
+

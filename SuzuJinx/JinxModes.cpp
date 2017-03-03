@@ -2,95 +2,51 @@
 #include "Jinx.h"
 #include "JinxModes.h"
 
-
 void JinxModes::Combo()
 {
-	auto unit = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, Jinx::Spells->W->Range());
+	auto wunit = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, Jinx::Spells->W->Range());
 
-	if (unit != nullptr && unit->IsValidTarget())
+	if (wunit != nullptr && wunit->IsValidTarget())
 	{
 		auto mana = Jinx::Menu->SaveMana->Enabled() ? 20 : 0;
 
 		if (Jinx::Menu->ComboQ->Enabled())
-		{
-			
-			Jinx::UseQ(unit, Jinx::Player->GetSpellBook()->GetToggleState(kSlotQ) == 2, false, mana);
+		{		
+			Jinx::UseQ(wunit, Jinx::Player->GetSpellBook()->GetToggleState(kSlotQ) == 2, false, mana);
 		}
 
 		if (Jinx::Menu->ComboW->Enabled())
 		{
-			Jinx::UseW(unit, mana);
+			Jinx::UseW(wunit, mana);
 		}
 	}
-	
-	if (Jinx::Spells->W->IsReady() && unit != nullptr)
+
+	auto eunit = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, Jinx::Spells->E->Range());
+
+	if (Jinx::Menu->ComboE->Enabled())
 	{
-		if (unit->IsValidTarget())
-		{
-			auto output = new AdvPredictionOutput();
+		auto mana = Jinx::Menu->SaveMana->Enabled() ? 20 : 0;
 
-			if (!Jinx::Player->IsWindingUp() && Jinx::Player->ManaPercent() > 25)
-			{
-				if (Jinx::Ex->Dist2D(unit) <= 565 && Jinx::Player->ManaPercent() > 20)
-				{
-					if (Jinx::Player->HasBuff("JinxPassiveKillAttackSpeed") && Jinx::Player->GetAutoAttack().Damage_ * 4 > unit->GetHealth())
-					{
-						return;
-					}
-				}
-
-				if (Jinx::Ex->Dist2D(unit) > 500)
-				{
-					if (Jinx::Player->HasBuff("JinxPassiveKillAttackSpeed") && Jinx::Player->GetAutoAttack().Damage_ * 4 > unit->GetHealth())
-					{
-						return;
-					}
-
-					if (Jinx::Spells->W->RunPrediction(unit, false, kCollidesWithNothing, output))
-					{
-						Jinx::Spells->W->CastOnPosition(unit->ServerPosition());            
-					}
-				}
-			}
-		}
+		Jinx::UseE(eunit, mana);
 	}
 }
 
+
 void JinxModes::Harass()
 {
-	auto unit = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, Jinx::Spells->W->Range());
+	auto wunit = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, Jinx::Spells->W->Range());
 
-	if (Jinx::Player->ManaPercent() > Jinx::Menu->HarassQMana->GetInteger())
+
+	if (Jinx::Spells->Q->IsReady())
 	{
-		if (Jinx::Spells->W->IsReady() && unit != nullptr)
-		{
-			if (unit->IsValidTarget())
-			{
-				auto output = new AdvPredictionOutput();
+		auto mana = Jinx::Menu->HarassQMana->GetInteger();
+		Jinx::UseQ(wunit, Jinx::Player->GetSpellBook()->GetToggleState(kSlotQ) == 2, true, mana);
+	}
 
-				if (!Jinx::Player->IsWindingUp() && Jinx::Player->ManaPercent() > 25)
-				{
-					if (Jinx::Ex->Dist2D(unit) <= 600 && Jinx::Player->ManaPercent() > 20)
-					{
-						if (Jinx::Player->HasBuff("JinxPassiveKillAttackSpeed") && Jinx::Player->GetAutoAttack().Damage_ * 4 > unit->GetHealth())
-						{
-							return;
-						}
-					}
-
-					if (Jinx::Ex->Dist2D(unit) > 600)
-					{
-						if (Jinx::Spells->W->RunPrediction(unit, false, kCollidesWithHeroes, output))
-						{
-							if (output->HitChance >= kHitChanceVeryHigh)
-							{
-								Jinx::Spells->W->CastOnPosition(output->CastPosition);
-							}
-						}
-					}
-				}
-			}
-		}
+	if (Jinx::Spells->W->IsReady())
+	{
+		auto mana = Jinx::Menu->HarassWMana->GetInteger();
+		Jinx::UseW(wunit, mana);
 	}
 }
 
@@ -164,4 +120,19 @@ void JinxModes::Auto()
 			}
 		}
 	}
+}
+
+void JinxModes::OnGapcloser(GapCloserSpell args)
+{
+	
+}
+
+void JinxModes::Interrupter(InterruptibleSpell args)
+{
+	
+}
+
+void JinxModes::BeforeAttack(IUnit* target)
+{
+	
 }

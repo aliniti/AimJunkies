@@ -12,7 +12,7 @@ void JinxSpells::CreateSpells()
 
 void JinxSpells::SetPrediction() 
 {
-	this->E->SetSkillshot(1.2, 120, 2300, 900);
+	this->E->SetSkillshot(1.2, 120, 2300, 885);
 	this->W->SetSkillshot(0.6, 60, 3300, 1500);
 	this->R->SetSkillshot(0.6, 180, 1700, 3000);
 }

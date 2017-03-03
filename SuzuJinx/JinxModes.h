@@ -11,4 +11,7 @@ public:
 	void JungleClear();
 	void Flee();
 	void Auto();
+	void OnGapcloser(GapCloserSpell args);
+	void Interrupter(InterruptibleSpell args);
+	void BeforeAttack(IUnit* target);
 };

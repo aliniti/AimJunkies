@@ -4,7 +4,7 @@
 class JinxMenu
 {
 public:
-	JinxMenu();
+	~JinxMenu();
 	JinxMenu(IMenu *menu);
 
 	IMenu *Menu;
@@ -63,11 +63,6 @@ public:
 
 	IMenuOption *Debug;
 };
-
-inline JinxMenu::JinxMenu()
-{
-
-}
 
 inline JinxMenu::JinxMenu(IMenu *initMenu)
 {

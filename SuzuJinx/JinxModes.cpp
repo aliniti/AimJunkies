@@ -129,15 +129,38 @@ void JinxModes::Auto()
 
 void JinxModes::OnGapcloser(GapCloserSpell args)
 {
-	
+	if (Jinx::Spells->E->IsReady() && Jinx::Menu->GapCloser->Enabled())
+	{
+		if (args.Sender != nullptr && args.Sender->IsValidTarget())
+		{
+			if (Jinx::Ex->Dist2D(args.Sender) <= 350)
+			{
+				Jinx::Spells->E->CastOnPosition(args.EndPosition);
+			}
+		}
+	}
 }
 
 void JinxModes::Interrupter(InterruptibleSpell args)
 {
-	
+	if (Jinx::Spells->E->IsReady() && Jinx::Menu->Interrupt->Enabled())
+	{
+
+	}
 }
 
 void JinxModes::BeforeAttack(IUnit* target)
 {
-	
+	if (target != nullptr && target->UnitFlags() == FL_CREEP)
+	{
+		auto rockets = Jinx::Player->GetSpellBook()->GetToggleState(kSlotQ) == 2;
+
+		if (target->IsValidTarget())
+		{
+			if (GOrbwalking->GetOrbwalkingMode() == kModeMixed)
+			{
+
+			}
+		}
+	}
 }

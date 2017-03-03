@@ -106,6 +106,9 @@ inline JinxMenu::JinxMenu(IMenu *initMenu)
 	this->GapCloser = menuat->CheckBox("Auto E Gapcloser", true);
 	this->AutoRKillable = menuat->CheckBox("Auto R!", true);
 
+	auto menuev = this->Menu->AddMenu("Events");
+	this->Interrupt = menuev->CheckBox("Interrupt", true);
+
 	auto menudr = this->Menu->AddMenu("Draw");
 	this->DrawQ = menudr->CheckBox("Draw Q", true);
 	this->DrawQ = menudr->CheckBox("Draw W", false);

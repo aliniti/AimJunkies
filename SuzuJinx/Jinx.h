@@ -3,6 +3,8 @@
 #include "JinxSpells.h"
 #include "JinxExtensions.h"
 #include "JinxModes.h"
+#include <algorithm>
+#include <string>
 
 class Jinx
 {
@@ -10,7 +12,6 @@ public:
 	~Jinx();
 
 	static void OnDraw();
-	static void GetHeroes();
 	static int RocketRange();
 
 	static IUnit* Player;
@@ -21,6 +22,9 @@ public:
 
 	static std::vector<IUnit*> Allies;
 	static std::vector<IUnit*> Enemies;
+	static std::vector<IUnit*> EnemyMinions;
+	static std::vector<IUnit*> AllyMinions;
+	static std::vector<IUnit*> NeutralMinions;
 
 	static void UseQ(IUnit* unit, bool rockets, bool minion, int mana);
 	static void UseW(IUnit* unit, int mana);
@@ -28,38 +32,17 @@ public:
 
 	static bool CanUlt(IUnit* unit);
 	static float UltDamage(IUnit* unit);
+
+	static IUnit* BestFarmUnit(int mana, bool killable, bool combo);
+	static void GetHeroes();
+
+
 };
 
 inline void Jinx::OnDraw()
 {
 	
 }
-
-inline void Jinx::GetHeroes()
-{
-	for (auto entry : GEntityList->GetAllUnits())
-	{
-		if (entry->UnitFlags() == FL_HERO && entry->GetTeam() != Player->GetTeam())
-		{
-			Enemies.push_back(entry);
-		}
-	}
-
-	for (auto entry : GEntityList->GetAllUnits())
-	{
-		if (entry->UnitFlags() == FL_HERO && entry->GetTeam() == Player->GetTeam())
-		{
-			Allies.push_back(entry);
-		}
-	}
-}
-
-inline int Jinx::RocketRange()
-{
-	int xtradist[6] = {75, 75, 100, 125, 150, 175};
-	return xtradist[Player->GetSpellBook()->GetLevel(kSlotQ)];
-}
-
 
 inline void Jinx::UseQ(IUnit* unit, bool rockets, bool minion, int mana)
 {
@@ -73,7 +56,7 @@ inline void Jinx::UseQ(IUnit* unit, bool rockets, bool minion, int mana)
 			{
 				if (Ex->Dist2D(unit) > 525)
 				{
-					/* todo: get minion
+					/* todo: get minion 
 					 * 
 					 * 
 					 */
@@ -117,11 +100,11 @@ inline void Jinx::UseW(IUnit* unit, int mana)
 	{
 		if (Player->ManaPercent() > mana || GDamage->GetSpellDamage(Player, unit, kSlotW, 0) >= unit->GetHealth())
 		{  
-			if (Ex->Dist2D(unit) > 500 + RocketRange())
+			if (Ex->Dist2D(unit) > 500)
 			{
 				if (Player->GetAutoAttack().Damage_ * 3 > unit->GetHealth())
 				{
-					if (Ex->Dist2D(unit) <= 525 + RocketRange())
+					if (Ex->Dist2D(unit) <= 525 + Player->HasBuff("JinxPassiveKillAttackSpeed") ? RocketRange() : 0)
 					{
 						return;
 					}
@@ -187,7 +170,7 @@ inline bool Jinx::CanUlt(IUnit* unit)
 	}
 
 	// common valid checks
-	if (unit->IsInvulnerable() || unit->IsValidTarget() == false || unit->IsValidObject())
+	if (unit->IsInvulnerable() || unit->IsValidTarget() == false || !unit->IsValidObject())
 	{
 		return false;
 	}
@@ -202,14 +185,22 @@ inline bool Jinx::CanUlt(IUnit* unit)
 	// target can die to zap
 	if (Ex->Dist2D(unit) <= Spells->W->Range() && Spells->W->IsReady())
 	{
-		if (GDamage->GetSpellDamage(Player, unit, kSlotW, 0) >= unit->GetHealth())
+		auto pred = new AdvPredictionOutput();
+
+		if (Spells->W->RunPrediction(unit, false, kCollidesWithMinions, pred))
 		{
-			return false;
+			if (pred->HitChance >= kHitChanceHigh)
+			{
+				if (GDamage->GetSpellDamage(Player, unit, kSlotW, 0) >= unit->GetHealth())
+				{
+					return false;
+				}
+			}
 		}
 	}
 
 	// target will die in few autos
-	if (Ex->Dist2D(unit) <= 535 + RocketRange())
+	if (Ex->Dist2D(unit) <= 525 + RocketRange())
 	{
 		if (Player->GetAutoAttack().Damage_ * 2 >= unit->GetHealth())
 		{
@@ -217,23 +208,13 @@ inline bool Jinx::CanUlt(IUnit* unit)
 		}
 	}
 
-	// dont ult if we go zoooooooooooom
-	if (Player->HasBuff("JinxPassiveKillAttackSpeed"))
-	{
-		if (Ex->Dist2D(unit) <= 525 + RocketRange())
-		{
-			// ult if below 50%
-			if (Player->HealthPercent() > 50)
-			{
-				return false;
-			}
-		}
-	}
+	// mistaked for W
+	// not ult
 
 	for (auto i : Allies)
 	{
 		// check if valid
-		if (!i->IsDead() && i->IsValidObject())
+		if (!i->IsDead() && i->IsValidObject() && i->GetNetworkId() != Player->GetNetworkId())
 		{
 			// check if ally near target and ally is safe
 			if (Ex->Dist2D(i, unit) <= 500 && i->HealthPercent() > unit->HealthPercent())
@@ -254,10 +235,9 @@ inline bool Jinx::CanUlt(IUnit* unit)
 
 inline float Jinx::UltDamage(IUnit* unit)
 {
-	float dmg = 0;
-
 	if (unit != nullptr && Spells->R->IsReady())
 	{
+		float dmg = 1;
 		auto units = std::vector<IUnit*>();
 		auto maxdist = Ex->Dist2D(unit) > 750;
 		auto maxrdist = Menu->MaxUltRange->GetInteger() * 2;
@@ -283,9 +263,52 @@ inline float Jinx::UltDamage(IUnit* unit)
 			dmg = maxdist ? GDamage->GetSpellDamage(Player, unit, kSlotR, 1) : GDamage->GetSpellDamage(Player, unit, kSlotR, 0);
 		}
 
-		return dmg;
+		return dmg * 0.843; // damage is off
 	}
 
-	return dmg;
+	return 0;
 }
 
+inline IUnit* Jinx::BestFarmUnit(int mana, bool killable = false, bool combo = false)
+{
+	/* todo: finish dis shit
+	 * 
+	 */
+
+	auto minions = GEntityList->GetAllMinions(false, true, true);
+
+	std::sort(minions.begin(), minions.end(), [&](IUnit *a, IUnit *b)
+		{ return Ex->Dist2D(a, Player) <= 800 && Ex->Dist2D(b, Player) <= 800; });
+
+	if (!minions.empty())
+	{
+		return minions.back();
+	}
+
+	return nullptr;
+}
+
+inline void Jinx::GetHeroes()
+{
+	for (auto entry : GEntityList->GetAllUnits())
+	{
+		if (entry->UnitFlags() == FL_HERO && entry->GetTeam() != Player->GetTeam())
+		{
+			Enemies.push_back(entry);
+		}
+	}
+
+	for (auto entry : GEntityList->GetAllUnits())
+	{
+		if (entry->UnitFlags() == FL_HERO && entry->GetTeam() == Player->GetTeam())
+		{
+			Allies.push_back(entry);
+		}
+	}
+}
+
+inline int Jinx::RocketRange()
+{
+	int xtradist[6] = { 75, 75, 100, 125, 150, 175 };
+	return xtradist[Player->GetSpellBook()->GetLevel(kSlotQ)];
+}

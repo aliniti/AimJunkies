@@ -1,6 +1,7 @@
 #pragma once
 #include "Jinx.h"
 #include "JinxModes.h"
+#include <string>
 
 void JinxModes::Combo()
 {
@@ -34,7 +35,6 @@ void JinxModes::Combo()
 	}
 }
 
-
 void JinxModes::Harass()
 {
 	auto wunit = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, Jinx::Spells->W->Range());
@@ -57,6 +57,7 @@ void JinxModes::Harass()
 
 void JinxModes::WaveClear()
 {
+
 }
 
 void JinxModes::JungleClear()
@@ -151,15 +152,72 @@ void JinxModes::Interrupter(InterruptibleSpell args)
 
 void JinxModes::BeforeAttack(IUnit* target)
 {
+	return;
+
 	if (target != nullptr && target->UnitFlags() == FL_CREEP)
 	{
-		auto rockets = Jinx::Player->GetSpellBook()->GetToggleState(kSlotQ) == 2;
-
-		if (target->IsValidTarget())
+		if (target->IsValidTarget() && Jinx::Ex->Dist2D(target) > 500 && Jinx::Ex->Dist2D(target) <= 1300)
 		{
-			if (GOrbwalking->GetOrbwalkingMode() == kModeMixed)
+			if (GOrbwalking->GetOrbwalkingMode() == kModeMixed && !Jinx::Player->IsWindingUp())
 			{
+				if (Jinx::Menu->HarassQMinion->Enabled() && Jinx::Spells->Q->IsReady())
+				{
+					for (auto minion : GEntityList->GetAllMinions(false, true, true))
+					{
+						if (minion != nullptr && minion->IsValidTarget())
+						{
+							if (Jinx::Ex->Dist2D(minion, target) <= Jinx::Player->HasItemId(3085) ? 200 : 100)
+							{
+								if (Jinx::Player->GetSpellBook()->GetToggleState(kSlotQ) != 2)
+								{
+									Jinx::Spells->Q->CastOnPlayer();
+								}
+							}
+						}
+					}
+				}
+			}
 
+			if (GOrbwalking->GetOrbwalkingMode() == kModeCombo)
+			{
+				if (Jinx::Spells->Q->IsReady() && !Jinx::Player->IsWindingUp())
+				{
+					for (auto minion : GEntityList->GetAllMinions(false, true, true))
+					{
+						if (minion != nullptr && minion->IsValidTarget())
+						{
+							if (Jinx::Ex->Dist2D(minion, target) <= Jinx::Player->HasItemId(3085) ? 200 : 100)
+							{
+								if (Jinx::Player->GetSpellBook()->GetToggleState(kSlotQ) != 2)
+								{
+									Jinx::Spells->Q->CastOnPlayer();
+								}
+							}
+						}
+					}
+				}
+
+				return;
+			}
+
+			if (Jinx::Menu->AutoHarass->Enabled() && Jinx::Player->ManaPercent() > Jinx::Menu->AutoHarassMana->GetInteger())
+			{
+				if (Jinx::Spells->Q->IsReady() && !Jinx::Player->IsWindingUp())
+				{
+					for (auto minion : GEntityList->GetAllMinions(false, true, true))
+					{
+						if (minion != nullptr && minion->IsValidTarget())
+						{
+							if (Jinx::Ex->Dist2D(minion, target) <= Jinx::Player->HasItemId(3085) ? 200 : 100)
+							{
+								if (Jinx::Player->GetSpellBook()->GetToggleState(kSlotQ) != 2)
+								{
+									Jinx::Spells->Q->CastOnPlayer();
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}

@@ -15,12 +15,14 @@ Vec3 JinxExtensions::To3D(Vec2 p)
 
 float JinxExtensions::Dist(IUnit *to)
 {
-	return (Jinx::Player->ServerPosition() - to->ServerPosition()).Length() - (Jinx::Player->BoundingRadius() + to->BoundingRadius());
+	return (Jinx::Player->ServerPosition() - to->ServerPosition()).Length() 
+			- (Jinx::Player->BoundingRadius() + to->BoundingRadius());
 }
 
 float JinxExtensions::Dist2D(IUnit *to)
 {
-	return (Jinx::Player->ServerPosition() - to->ServerPosition()).Length2D()  - (Jinx::Player->BoundingRadius() + to->BoundingRadius());
+	return (Jinx::Player->ServerPosition() - to->ServerPosition()).Length2D()  
+			- (Jinx::Player->BoundingRadius() + to->BoundingRadius());
 }
 
 float JinxExtensions::Dist(IUnit *from, IUnit *to)
@@ -53,7 +55,6 @@ bool JinxExtensions::IsKeyDown(IMenuOption *menuOption)
 	return (GetAsyncKeyState(menuOption->GetInteger()) & 0x8000) != 0;
 }
 
-// units in range from trees<333
 std::vector<IUnit*> UnitsInRange(IUnit* unit, float range, std::vector<IUnit*> collection)
 {
 	std::vector<IUnit*> units;
@@ -65,7 +66,7 @@ std::vector<IUnit*> UnitsInRange(IUnit* unit, float range, std::vector<IUnit*> c
 
 	for (auto i : collection)
 	{
-		if (Jinx::Ex->Dist2D(i) <= range)
+		if (Jinx::Ex->Dist2D(unit, i) <= range - (unit->BoundingRadius() + i->BoundingRadius()))
 		{
 			units.push_back(i);
 		}
@@ -74,7 +75,21 @@ std::vector<IUnit*> UnitsInRange(IUnit* unit, float range, std::vector<IUnit*> c
 	return units;
 }
 
-// units in range from trees<333
+std::vector<IUnit*> JinxExtensions::EnemyMinionsInRange(IUnit *unit, float range)
+{
+	return UnitsInRange(unit, range, Jinx::EnemyMinions);
+}
+
+std::vector<IUnit*> JinxExtensions::AllyMinionsInRange(IUnit *unit, float range)
+{
+	return UnitsInRange(unit, range, Jinx::AllyMinions);
+}
+
+std::vector<IUnit*> JinxExtensions::NeutralMinionsInRange(IUnit *unit, float range)
+{
+	return UnitsInRange(unit, range, Jinx::NeutralMinions);
+}
+
 std::vector<IUnit*> JinxExtensions::GetEnemiesInRange(IUnit *unit, float range)
 {
 	return UnitsInRange(unit, range, Jinx::Enemies);
@@ -84,6 +99,7 @@ std::vector<IUnit*> JinxExtensions::GetAlliesInRange(IUnit *unit, float range)
 {
 	return UnitsInRange(unit, range, Jinx::Allies);
 }
+
 
 int JinxExtensions::CountEnemiesInRange(IUnit *unit, float range)
 {
@@ -98,6 +114,21 @@ int JinxExtensions::CountAlliesInRange(IUnit *unit, float range)
 int JinxExtensions::CountInRange(IUnit *unit, float range, std::vector<IUnit*> units)
 {
 	return UnitsInRange(unit, range, units).size();
+}
+
+int JinxExtensions::CountEnemyMinionsInRange(IUnit *unit, float range)
+{
+	return CountInRange(unit, range, Jinx::EnemyMinions);
+}
+
+int JinxExtensions::CountAllyMinionsInRange(IUnit *unit, float range)
+{
+	return CountInRange(unit, range, Jinx::AllyMinions);
+}
+
+int JinxExtensions::CountNeutralMinionsInRange(IUnit *unit, float range)
+{
+	return CountInRange(unit, range, Jinx::NeutralMinions);
 }
 
 // check if hero on line quick idea from trees <33
@@ -141,7 +172,7 @@ int JinxExtensions::UnitsInR(IUnit *me, IUnit *second, float width, float range,
 	}
 
 	units = gathered;
-	return gathered.size();
+	return min (0, gathered.size() - 1); // minus me
 }
 
 

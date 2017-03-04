@@ -77,7 +77,7 @@ inline JinxMenu::JinxMenu(IMenu *initMenu)
 
 	auto menucb = this->Menu->AddMenu("Combo");
 	this->ComboQ = menucb->CheckBox("Use Q", true);
-	this->ComboQMinion = menucb->CheckBox("-> On Minion", false);
+	//this->ComboQMinion = menucb->CheckBox("-> On Minion", false);
 	this->ComboW = menucb->CheckBox("Use W", true);
 	this->ComboE = menucb->CheckBox("Use E", false);
 	this->ComboR = menucb->CheckBox("Use R", true);
@@ -86,19 +86,19 @@ inline JinxMenu::JinxMenu(IMenu *initMenu)
 	this->HarassQ = menuhr->CheckBox("Use Q", true);
 	this->HarassQMinion = menuhr->CheckBox("-> On Minion", true);
 	this->HarassQMana = menuhr->AddInteger("Minimum Mana %", 0, 100, 65);
-	this->HarassW= menuhr->CheckBox("Use W", true);
-	this->HarassWMana = menuhr->AddInteger("Minimum Mana %", 0, 100, 55);
+	this->HarassW = menuhr->CheckBox("Use W", true);
+	this->HarassWMana = menuhr->AddInteger("-> Minimum Mana %", 0, 100, 55);
 	this->AutoHarass = menuhr->CheckBox("Auto Q Minion Harass", true);
-	this->AutoHarass = menuhr->AddInteger("Minimum Mana %", 0, 100, 45);
+	this->AutoHarass = menuhr->AddInteger("-> Minimum Mana %", 0, 100, 45);
 
 	auto menufm = this->Menu->AddMenu("Farming");
-	this->FarmQ = menufm->CheckBox("Use Q", true);
-	this->SwapBackQ = menufm->CheckBox("Auto Swap to Minigun", true);
-	this->MinimumQFarm = menufm->AddInteger("Minimum minion count", 2, 6, 3);
-	this->ManaNoEnemies = menufm->AddInteger("Minimum Mana % No Enemies", 0, 100, 45);
-	this->ManaNearEnemy = menufm->AddInteger("Minimum Mana % Near Enemies", 0, 100, 75);
+	//this->FarmQ = menufm->CheckBox("Use Q", true);
+	//this->MinimumQFarm = menufm->AddInteger("Minimum minion count", 2, 6, 3);
+	//this->ManaNoEnemies = menufm->AddInteger("Minimum Mana % No Enemies", 0, 100, 45);
+	//this->ManaNearEnemy = menufm->AddInteger("Minimum Mana % Near Enemies", 0, 100, 75);
 
 	auto menuat = this->Menu->AddMenu("Mechanics");
+	this->SwapBackQ = menuat->CheckBox("Auto Swap to Minigun", true);
 	this->MaxUltRange = menuat->AddInteger("Max Ult Range", 100, 2000, 1300);
 	this->SaveMana = menuat->CheckBox("Conserve Mana", true);
 	this->AutoEImmobile = menuat->CheckBox("Auto E Immobile", true);
@@ -110,7 +110,7 @@ inline JinxMenu::JinxMenu(IMenu *initMenu)
 	this->Interrupt = menuev->CheckBox("Interrupt", true);
 
 	auto menudr = this->Menu->AddMenu("Draw");
-	this->DrawQ = menudr->CheckBox("Draw Q", true);
-	this->DrawQ = menudr->CheckBox("Draw W", false);
+	//this->DrawQ = menudr->CheckBox("Draw Q", true);
+	//this->DrawQ = menudr->CheckBox("Draw W", false);
 	this->Debug = menudr->CheckBox("DEBUG", false);
 }

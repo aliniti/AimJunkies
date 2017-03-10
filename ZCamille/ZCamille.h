@@ -229,21 +229,20 @@ inline void ZCamille::UseE(Vec3 pos, bool combo = true) {
             if (Ex->IsValid(vec) != false) {
                 if (Ex->Dist2D(Ex->To3D(vec), Player->ServerPosition()) <= E->Range() && Ex->Dist2D(Ex->To3D(vec), pos) <= E->Range()) {
                     if (Ex->IsValid(vec)) {
-                        if (W->IsReady() && Menu->ExpirimentalCombo->Enabled() && combo) {
-                            int dashSpeedEst = 1450;
-                            int hookSpeedEst = 1250;
-                            float e1Time = 1000 * (Ex->Dist2D(vec, Player->ServerPosition()) - Player->BoundingRadius() / hookSpeedEst);
-                            float meToWall = e1Time + (1000 * (Ex->Dist2D(vec, Player->ServerPosition()) - Player->BoundingRadius() / dashSpeedEst));
-                            float wallToHero = (1000 * ((Ex->Dist2D(vec, pos) - Player->BoundingRadius() / dashSpeedEst)));
-                            auto travelTime = 250 + meToWall + wallToHero;
+                        //if (W->IsReady() && Menu->ExpirimentalCombo->Enabled() && combo) {
+                        //    int dashSpeedEst = 1450;
+                        //    int hookSpeedEst = 1250;
+                        //    float e1Time = 1000 * (Ex->Dist2D(vec, Player->ServerPosition()) - Player->BoundingRadius() / hookSpeedEst);
+                        //    float meToWall = e1Time + (1000 * (Ex->Dist2D(vec, Player->ServerPosition()) - Player->BoundingRadius() / dashSpeedEst));
+                        //    float wallToHero = (1000 * ((Ex->Dist2D(vec, pos) - Player->BoundingRadius() / dashSpeedEst)));
+                        //    auto travelTime = 250 + meToWall + wallToHero;
 
-                            if (travelTime >= 1250 && travelTime <= 1750) {
-                                W->CastOnPosition(pos); }
+                        //    if (travelTime >= 1250 && travelTime <= 1750) {
+                        //        W->CastOnPosition(pos); }
 
-                            if (travelTime > 1750) {
-                                auto delay = 100 + (travelTime - 1750);
-                                Delay.Add(static_cast<int>(std::round(delay)), [&]() { W->CastOnPosition(pos); }); } }
-
+                        //    if (travelTime > 1750) {
+                        //        auto delay = 100 + (travelTime - 1750);
+                        //        Delay.Add(static_cast<int>(std::round(delay)), [&]() { W->CastOnPosition(pos); }); } }
                         if (E->CastOnPosition(Ex->To3D(vec))) {
                             LastE = GGame->TickCount(); } } } } } } }
 

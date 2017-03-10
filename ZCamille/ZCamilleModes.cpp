@@ -149,12 +149,12 @@ void ZCamilleModes::OnRender() {
 
     if (ZCamille::Menu->DrawR->Enabled()) {
         Vec4 rr;
-        ZCamille::Menu->DrawWColor->GetColor(&rr);
+        ZCamille::Menu->DrawRColor->GetColor(&rr);
         GRender->DrawOutlinedCircle(GEntityList->Player()->GetPosition(), rr, ZCamille::R->Range()); }
 
     if (ZCamille::Menu->DrawE->Enabled()) {
         Vec4 ee;
-        ZCamille::Menu->DrawWColor->GetColor(&ee);
+        ZCamille::Menu->DrawEColor->GetColor(&ee);
         GRender->DrawOutlinedCircle(GEntityList->Player()->GetPosition(), ee, ZCamille::E->Range()); }
 
     if (ZCamille::Menu->DrawW->Enabled()) {
@@ -166,7 +166,7 @@ void ZCamilleModes::OnRender() {
 
     if (GGame->Projection(ZCamille::Player->GetPosition(), &pos)) {
         Vec4 ee;
-        ZCamille::Menu->DrawWColor->GetColor(&ee);
+        ZCamille::Menu->DrawRColor->GetColor(&ee);
         GRender->DrawTextW(Vec2(pos.x - 52, pos.y), ee,  ZCamille::Menu->DontEUnderTurret->Enabled() ? "E Under Turret: ON" : "E Under Turret: OFF"); } }
 
 

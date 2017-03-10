@@ -19,10 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{E26FE344-F9C3-4ADD-B0D3-070483B99408}</ProjectGuid>
+    <ProjectGuid>{56CB47F7-39D3-4BF3-81D0-8A9250CA113C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>SuzuJinx</RootNamespace>
+    <RootNamespace>ZCamille</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ProjectName>ZCamille</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -87,7 +88,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;SUZUJINX_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;ZZCamille_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
@@ -101,7 +102,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;SUZUJINX_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;ZZCamille_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
@@ -117,7 +118,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;SUZUJINX_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;ZZCamille_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
@@ -138,7 +139,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;SUZUJINX_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;ZCamille_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
@@ -147,26 +148,23 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
-    <PostBuildEvent>
-      <Command>echo | F xcopy "D:\Github\AimJunkies\Release\SuzuJinx.dll" "D:\Loader\Plugins\" /Y</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Jinx.h" />
-    <ClInclude Include="JinxExtensions.h" />
-    <ClInclude Include="JinxMenu.h" />
-    <ClInclude Include="JinxModes.h" />
-    <ClInclude Include="JinxSpells.h" />
+    <ClInclude Include="ZCamille.h" />
+    <ClInclude Include="ZCamilleAvoider.h" />
+    <ClInclude Include="ZCamilleExtensions.h" />
+    <ClInclude Include="ZCamilleMenu.h" />
+    <ClInclude Include="ZCamilleModes.h" />
     <ClInclude Include="LPPConstants.h" />
     <ClInclude Include="PluginData.h" />
     <ClInclude Include="PluginSDK.h" />
     <ClInclude Include="Vector3.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Jinx.cpp" />
-    <ClCompile Include="JinxExtensions.cpp" />
-    <ClCompile Include="JinxModes.cpp" />
-    <ClCompile Include="JinxSpells.cpp" />
+    <ClCompile Include="ZCamille.cpp" />
+    <ClCompile Include="ZCamilleAvoider.cpp" />
+    <ClCompile Include="ZCamilleExtensions.cpp" />
+    <ClCompile Include="ZCamilleModes.cpp" />
     <ClCompile Include="PluginSDK.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

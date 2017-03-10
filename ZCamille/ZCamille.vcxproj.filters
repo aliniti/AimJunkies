@@ -14,13 +14,10 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="Header Files\Core">
-      <UniqueIdentifier>{b007e1b4-0e95-4d8f-ba35-c930d22a0d49}</UniqueIdentifier>
+      <UniqueIdentifier>{5f979995-cdf3-43a0-8756-f6e7e1e29a70}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Vector3.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
     <ClInclude Include="LPPConstants.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
@@ -30,36 +27,39 @@
     <ClInclude Include="PluginSDK.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Jinx.h">
+    <ClInclude Include="Vector3.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Camille.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="JinxExtensions.h">
+    <ClInclude Include="CamilleMenu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="JinxMenu.h">
+    <ClInclude Include="CamilleExtensions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="JinxModes.h">
+    <ClInclude Include="CamilleModes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="JinxSpells.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="CamilleAvoider.h">
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PluginSDK.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Jinx.cpp">
+    <ClCompile Include="Camille.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="JinxExtensions.cpp">
+    <ClCompile Include="CamilleExtensions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="JinxModes.cpp">
+    <ClCompile Include="CamilleModes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="JinxSpells.cpp">
+    <ClCompile Include="CamilleAvoider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

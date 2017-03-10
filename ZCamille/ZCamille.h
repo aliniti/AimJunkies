@@ -251,8 +251,6 @@ inline void ZCamille::UseR(IUnit * unit, bool force = false) {
     if (R->IsReady() && force) {
         R->CastOnUnit(unit); }
 
-    GGame->PrintChat(std::to_string(CDmg(unit)).c_str());
-
     if (R->IsReady() && Ex->Dist2D(unit) <= R->Range()) {
         if (Menu->UltOnlySelected->Enabled()) {
             auto selected = GTargetSelector->GetFocusedTarget();

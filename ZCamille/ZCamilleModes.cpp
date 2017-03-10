@@ -5,8 +5,8 @@
 #include <string>
 
 void ZCamilleModes::OnUpdate() {
-    // turn off orbwalk attack while charging to allow movement
-    GOrbwalking->SetAttacksAllowed(!ZCamille::ChargingW());
+    auto ex = ZCamille::Ex;
+    auto menu = ZCamille::Menu;
 
     // remove invalid danger points
     for (auto entry : ZCamille::DangerPoints) {
@@ -23,28 +23,44 @@ void ZCamilleModes::OnUpdate() {
             ZCamille::DangerPoints.erase(key);
             break; } }
 
+    // turn off orbwalk attack while charging to allow movement
+    GOrbwalking->SetAttacksAllowed(!ZCamille::ChargingW());
+
     // force orbwalk lock on tethered target
-    if (ZCamille::Menu->ForceROrbwalk->Enabled()) {
+    if (menu->ForceROrbwalk->Enabled()) {
         for (auto i : GEntityList->GetAllHeros(false, true)) {
             if (i != nullptr && i->HasBuff("camillertether") && i->IsValidTarget()) {
                 GTargetSelector->SetOverrideFocusedTarget(i);
                 GOrbwalking->SetOverrideTarget(i); } } }
 
     if (GUtility->IsLeagueWindowFocused() && !GGame->IsChatOpen()) {
-        if (ZCamille::Ex->CanFlee()) {
+        if (ex->IsKeyDown(menu->DontEUnderTurretToggle)) {
+            if (!ZCamille::Menu->KeyState) {
+                if (menu->DontEUnderTurret->Enabled() == false) {
+                    menu->DontEUnderTurret->UpdateInteger(1); }
+
+                else {
+                    menu->DontEUnderTurret->UpdateInteger(0); }
+
+                ZCamille::Menu->KeyState = true; } }
+
+        else {
+            ZCamille::Menu->KeyState = false; }
+
+        if (ex->CanFlee()) {
             ZCamille::Modes->Flee(); }
 
         if (!ZCamille::IsDashing() && !ZCamille::OnWall() && !ZCamille::Player->IsDead()) {
-            if (ZCamille::Ex->CanCombo()) {
+            if (ex->CanCombo()) {
                 ZCamille::Modes->Combo(); }
 
-            if (ZCamille::Ex->CanHarass()) {
+            if (ex->CanHarass()) {
                 ZCamille::Modes->Harass(); }
 
-            if (ZCamille::Ex->CanJungleClear()) {
+            if (ex->CanJungleClear()) {
                 ZCamille::Modes->JungleClear(); }
 
-            if (ZCamille::Ex->CanWaveClear()) {
+            if (ex->CanWaveClear()) {
                 ZCamille::Modes->WaveClear(); } } } }
 
 void ZCamilleModes::Combo() {
@@ -144,7 +160,16 @@ void ZCamilleModes::OnRender() {
     if (ZCamille::Menu->DrawW->Enabled()) {
         Vec4 ww;
         ZCamille::Menu->DrawWColor->GetColor(&ww);
-        GRender->DrawOutlinedCircle(GEntityList->Player()->GetPosition(), ww, ZCamille::W->Range()); } }
+        GRender->DrawOutlinedCircle(GEntityList->Player()->GetPosition(), ww, ZCamille::W->Range()); }
+
+    Vec2 pos;
+
+    if (GGame->Projection(ZCamille::Player->GetPosition(), &pos)) {
+        Vec4 ee;
+        ZCamille::Menu->DrawWColor->GetColor(&ee);
+        GRender->DrawTextW(Vec2(pos.x - 52, pos.y), ee,  ZCamille::Menu->DontEUnderTurret->Enabled() ? "E Under Turret: ON" : "E Under Turret: OFF"); } }
+
+
 
 void ZCamilleModes::OnCreateObj(IUnit * source) {
     if (source != nullptr && strcmp(source->GetClassIdentifier(), "obj_GeneralParticleEmitter") == 0) {
@@ -263,7 +288,7 @@ bool ZCamilleModes::OnIssueOrder(IUnit * source, DWORD orderIdx, Vec3 position, 
                                 anyDangerousPos = true;
                                 break; } } }
 
-                    if (ex->UnderEnemyTurret(dashEndPos) && ZCamille::Menu->DontEUnderTurret->Enabled()) {
+                    if (ex->UnderEnemyTurret(dashEndPos) && menu->DontEUnderTurret->Enabled()) {
                         anyDangerousPos = true; }
 
                     if (anyDangerousPos) {

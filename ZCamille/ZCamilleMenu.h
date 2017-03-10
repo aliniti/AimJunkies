@@ -6,70 +6,48 @@ class ZCamilleMenu {
         ~ZCamilleMenu();
         ZCamilleMenu(IMenu * menu);
 
+        bool KeyState;
+
         IMenu * Menu;
-
-        // hotkeys
-
         IMenuOption * ComboKey;
         IMenuOption * HarassKey;
         IMenuOption * WaveClearKey;
         IMenuOption * JungleClearKey;
         IMenuOption * FleeKey;
-
-        // combo
         IMenuOption * ComboMana;
         IMenuOption * ComboQ;
         IMenuOption * ComboW;
         IMenuOption * ComboE;
         IMenuOption * ComboEPred;
         IMenuOption * ComboR;
-
-        // farming
         IMenuOption * FarmingWithItems;
         IMenuOption * FarmNearEnemies;
-
-        // wave clear
         IMenuOption * WaveClearMana;
         IMenuOption * WaveClearOverride;
         IMenuOption * WaveClearMinHit;
         IMenuOption * WaveClearQ;
         IMenuOption * WaveClearW;
-
-        // jungle clear
         IMenuOption * JungleClearMana;
         IMenuOption * JungleClearQ;
         IMenuOption * JungleClearW;
         IMenuOption * JungleClearE;
-
-        // flee
         IMenuOption * FleeE;
-
-        // harass
         IMenuOption * HarassMana;
         IMenuOption * HarassQ;
         IMenuOption * HarassW;
-
-        // magnet
-
         IMenuOption * MagnetW;
         IMenuOption * MagnetWCombo;
         IMenuOption * MagnetWHarass;
         IMenuOption * MagnetWClear;
-
-        // events
-
         IMenuOption * UseAntiGapcloser;
         IMenuOption * UseInterrupter;
-
-        // mechanics
         IMenuOption * DontEUnderTurret;
+        IMenuOption * DontEUnderTurretToggle;
         IMenuOption * MinimumERange;
         IMenuOption * EnhancedEPrecision;
         IMenuOption * UltOnlySelected;
         IMenuOption * ForceROrbwalk;
         IMenuOption * ExpirimentalCombo;
-
-        // draw
         IMenuOption * DrawW;
         IMenuOption * DrawWColor;
         IMenuOption * DrawE;
@@ -120,6 +98,7 @@ inline ZCamilleMenu::ZCamilleMenu(IMenu * menu) {
     this->UltOnlySelected = menumc->CheckBox("R Selected Target Only", false);
     this->MinimumERange = menumc->AddInteger("Minimum E Range", 0, 1100, 165);
     this->DontEUnderTurret = menumc->CheckBox("Dont E Into Turret/Danger", true);
+    this->DontEUnderTurretToggle = menumc->AddKey("- Toggle Key:", 'U');
     this->EnhancedEPrecision = menumc->CheckBox("Use Enhanced E Precision", false);
     this->ExpirimentalCombo = menumc->CheckBox("Use Expiremental Combo [W->E)", false);
     auto menumg = this->Menu->AddMenu("::Magnet-Lock");
@@ -134,5 +113,6 @@ inline ZCamilleMenu::ZCamilleMenu(IMenu * menu) {
     this->DrawEColor = menurd->AddColor("- Color", 121, 77, 255, 200);
     this->DrawR = menurd->CheckBox("Enabled R Drawings", true);
     this->DrawRColor = menurd->AddColor("- Color", 121, 77, 255, 200);
+    KeyState = false;
     //magnetMenu->CheckBox("Magnet Orbwalking", true);
 }

@@ -111,38 +111,34 @@ void ZCamilleModes::JungleClear() {
                     int numberHit;
                     ZCamille::W->FindBestCastPosition(true, false, pos, numberHit);
 
-                    if (menu->JungleClearW->Enabled()) {
-                        if (ex->IsValid(pos)) {
-                            if (menu->MagnetWClear->Enabled()) {
-                                ZCamille::LockW(pos); }
+                    if (numberHit < 6) {
+                        if (menu->JungleClearW->Enabled()) {
+                            if (ex->IsValid(pos)) {
+                                if (menu->MagnetWClear->Enabled()) {
+                                    ZCamille::LockW(pos); }
 
-                            if (numberHit > 0) {
-                                ZCamille::W->CastOnPosition(pos); } } }
+                                if (numberHit > 0) {
+                                    ZCamille::W->CastOnPosition(pos); } } }
 
-                    if (ZCamille::W->IsReady() == false || !menu->JungleClearW->Enabled()) {
-                        if (ZCamille::ChargingW() == false && menu->JungleClearE->Enabled()) {
-                            ZCamille::UseE(pos); } } } } } } }
+                        if (ZCamille::W->IsReady() == false || !menu->JungleClearW->Enabled()) {
+                            if (ZCamille::ChargingW() == false && menu->JungleClearE->Enabled()) {
+                                ZCamille::UseE(pos); } } } } } } } }
 
 void ZCamilleModes::WaveClear() {
-    auto ex = ZCamille::Ex;
-    auto player = ZCamille::Player;
     auto menu = ZCamille::Menu;
 
     if (!ZCamille::ChargingW() && ZCamille::W->IsReady() && menu->WaveClearW->Enabled()) {
+        auto player = ZCamille::Player;
+        auto ex = ZCamille::Ex;
+
         for (auto i : GEntityList->GetAllMinions(false, true, false)) {
             if (menu->FarmNearEnemies->Enabled() || ex->CountInRange(player, 1000, GEntityList->GetAllHeros(false, true)) < 1) {
                 if (i->IsValidObject() && i->IsCreep() && !i->IsDead() && i->IsVisible() && ex->Dist2D(i) <= 635) {
-                    Vec3 pos;
-                    int numberHit;
-                    ZCamille::W->FindBestCastPosition(true, false, pos, numberHit);
+                    if (menu->WaveClearW->Enabled() && ex->IsValid(i->ServerPosition())) {
+                        if (menu->MagnetWClear->Enabled()) {
+                            ZCamille::LockW(i->ServerPosition()); }
 
-                    if (menu->WaveClearW->Enabled()) {
-                        if (ex->IsValid(pos)) {
-                            if (menu->MagnetWClear->Enabled()) {
-                                ZCamille::LockW(pos); }
-
-                            if (numberHit > 0) {
-                                ZCamille::W->CastOnPosition(pos); } } } } } } } }
+                        ZCamille::W->CastOnPosition(i->ServerPosition()); } } } } } }
 
 void ZCamilleModes::OnRender() {
     if (ZCamille::Player->IsDead()) {

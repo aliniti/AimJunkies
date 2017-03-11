@@ -48,8 +48,8 @@ PLUGIN_EVENT(void) OnRender() {
 
 PLUGIN_API void OnLoad(IPluginSDK * sdk) {
     PluginSDKSetup(sdk);
-    ZCamille::CreateSpells();
     ZCamille::CreateItems();
+    ZCamille::CreateSpells();
 
     if (strcmp(ZCamille::Player->ChampionName(), "Camille") == 0) {
         ZCamille::Menu = new ZCamilleMenu(GPluginSDK->AddMenu("ZCamille"));

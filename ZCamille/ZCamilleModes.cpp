@@ -105,23 +105,23 @@ void ZCamilleModes::JungleClear() {
 
     for (auto i : GEntityList->GetAllMinions(false, false, true)) {
         if (ex->CountInRange(player, 1000, GEntityList->GetAllHeros(false, true)) < 1 || menu->FarmNearEnemies->Enabled()) {
-            if (i->IsValidObject() && i->IsJungleCreep() && !i->IsDead() && i->IsVisible() &&
-                    ex->Dist2D(i) <= 635) {
-                Vec3 pos;
-                int numberHit;
-                ZCamille::W->FindBestCastPosition(true, false, pos, numberHit);
+            if (i->IsValidObject() && i->IsJungleCreep() && !i->IsDead() && i->IsVisible() && ex->Dist2D(i) <= 635) {
+                if (!ZCamille::ChargingW()) {
+                    Vec3 pos;
+                    int numberHit;
+                    ZCamille::W->FindBestCastPosition(true, false, pos, numberHit);
 
-                if (menu->JungleClearW->Enabled()) {
-                    if (ex->IsValid(pos)) {
-                        if (menu->MagnetWClear->Enabled()) {
-                            ZCamille::LockW(pos); }
+                    if (menu->JungleClearW->Enabled()) {
+                        if (ex->IsValid(pos)) {
+                            if (menu->MagnetWClear->Enabled()) {
+                                ZCamille::LockW(pos); }
 
-                        if (numberHit > 0) {
-                            ZCamille::W->CastOnPosition(pos); } } }
+                            if (numberHit > 0) {
+                                ZCamille::W->CastOnPosition(pos); } } }
 
-                if (!ZCamille::W->IsReady() || !menu->JungleClearW->Enabled()) {
-                    if (!ZCamille::ChargingW() && menu->JungleClearE->Enabled()) {
-                        ZCamille::UseE(pos); } } } } } }
+                    if (!ZCamille::W->IsReady() || !menu->JungleClearW->Enabled()) {
+                        if (!ZCamille::ChargingW() && menu->JungleClearE->Enabled()) {
+                            ZCamille::UseE(pos); } } } } } } }
 
 void ZCamilleModes::WaveClear() {
     auto ex = ZCamille::Ex;
@@ -131,17 +131,18 @@ void ZCamilleModes::WaveClear() {
     for (auto i : GEntityList->GetAllMinions(false, true, false)) {
         if (ex->CountInRange(player, 1000, GEntityList->GetAllHeros(false, true)) < 1 || menu->FarmNearEnemies->Enabled()) {
             if (i->IsValidObject() && i->IsCreep() && !i->IsDead() && i->IsVisible() && ex->Dist2D(i) <= 635) {
-                Vec3 pos;
-                int numberHit;
-                ZCamille::W->FindBestCastPosition(true, false, pos, numberHit);
+                if (!ZCamille::ChargingW()) {
+                    Vec3 pos;
+                    int numberHit;
+                    ZCamille::W->FindBestCastPosition(true, false, pos, numberHit);
 
-                if (menu->WaveClearW->Enabled()) {
-                    if (ex->IsValid(pos)) {
-                        if (menu->MagnetWClear->Enabled()) {
-                            ZCamille::LockW(pos); }
+                    if (menu->WaveClearW->Enabled()) {
+                        if (ex->IsValid(pos)) {
+                            if (menu->MagnetWClear->Enabled()) {
+                                ZCamille::LockW(pos); }
 
-                        if (numberHit > 0) {
-                            ZCamille::W->CastOnPosition(pos); } } } } } } }
+                            if (numberHit > 0) {
+                                ZCamille::W->CastOnPosition(pos); } } } } } } } }
 
 void ZCamilleModes::OnRender() {
     if (ZCamille::Player->IsDead()) {

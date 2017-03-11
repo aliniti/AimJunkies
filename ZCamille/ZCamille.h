@@ -304,7 +304,11 @@ inline double ZCamille::CDmg(IUnit * unit) {
             return HardRotation(unit);
 
         case 4:
-            return SuperRotation(unit); } }
+            return SuperRotation(unit);
+
+        default: ; }
+
+    return 0; }
 
 
 inline double ZCamille::QDmg(IUnit * unit, bool bonus) {

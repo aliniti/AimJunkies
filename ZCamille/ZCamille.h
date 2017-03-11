@@ -79,10 +79,11 @@ inline void ZCamille::CreateItems() {
     Youmuus = GPluginSDK->CreateItemForId(3142, 900); }
 
 inline void ZCamille::CreateSpells() {
+    // hi im using estimated values :^)
     Q = GPluginSDK->CreateSpell2(kSlotQ, kTargetCast, false, false, kCollidesWithNothing);
     Q->SetOverrideRange(175);
     W = GPluginSDK->CreateSpell2(kSlotW, kConeCast, false, true, kCollidesWithNothing);
-    W->SetOverrideRange(625);
+    W->SetSkillshot(0.5, 200, 9999, 625);
     E = GPluginSDK->CreateSpell2(kSlotE, kLineCast, false, false, kCollidesWithNothing); // not using collision;
     E->SetSkillshot(0.125, Player->BoundingRadius(), 1750, 975);
     R = GPluginSDK->CreateSpell2(kSlotR, kTargetCast, false, false, kCollidesWithNothing);

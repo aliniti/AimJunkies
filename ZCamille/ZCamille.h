@@ -17,9 +17,8 @@ class ZCamille {
     public:
         ~ZCamille();
 
-        // events
-        static void Init();
-        static void OnDraw();
+        static void CreateItems();
+        static void CreateSpells();
 
         static IUnit * Player;
         static ZCamilleMenu * Menu;
@@ -34,6 +33,15 @@ class ZCamille {
         static DelayAction Delay;
         static std::map<std::string, ZCamilleAvoider *> DangerSpells;
         static std::map<float, ZCamilleAvoider *> DangerPoints;
+
+        // aura mechanics
+        static bool HasQ();
+        static bool HasQ2();
+        static bool ChargingW();;
+        static bool OnWall();
+        static bool IsDashing();
+        static bool KnockedBack(IUnit * unit);
+        static bool LethalTarget(IUnit * unit);
 
         // tick counts
         static int LastQ;
@@ -50,32 +58,27 @@ class ZCamille {
         static void UseE(Vec3 pos, bool combo);
         static void UseR(IUnit * unit, bool force);
 
-        // aura mechanics
-        static bool HasQ();
-        static bool HasQ2();
-        static bool ChargingW();;
-        static bool OnWall();
-        static bool IsDashing();
-        static bool KnockedBack(IUnit * unit);
-        static bool LethalTarget(IUnit * unit);
-
         // damage
         static double CDmg(IUnit * unit);
         static double QDmg(IUnit * unit, bool includeq2 = true);
         static double WDmg(IUnit * unit, bool bonus = false);
         static double EDmg(IUnit * unit);
-        static double RDmg(double dmg, IUnit * unit); };
+        static double RDmg(double dmg, IUnit * unit);
 
-inline void ZCamille::OnDraw() {
-    if (Player->IsDead()) {
-        return; } }
+        // combo damage dificulties
+        static double SuperRotation(IUnit * unit);
+        static double HardRotation(IUnit * unit);
+        static double StandardRotation(IUnit * unit);
+        static double EasyRotation(IUnit * unit); };
 
-inline void ZCamille::Init() {
+inline void ZCamille::CreateItems() {
     Player = GEntityList->Player();
     Tiamat = GPluginSDK->CreateItemForId(3077, 400);
     Hydra = GPluginSDK->CreateItemForId(3074, 400);
     Titanic = GPluginSDK->CreateItemForId(3748, 400);
-    Youmuus = GPluginSDK->CreateItemForId(3142, 900);
+    Youmuus = GPluginSDK->CreateItemForId(3142, 900); }
+
+inline void ZCamille::CreateSpells() {
     Q = GPluginSDK->CreateSpell2(kSlotQ, kTargetCast, false, false, kCollidesWithNothing);
     Q->SetOverrideRange(175);
     W = GPluginSDK->CreateSpell2(kSlotW, kConeCast, false, true, kCollidesWithNothing);
@@ -84,6 +87,27 @@ inline void ZCamille::Init() {
     E->SetSkillshot(0.125, Player->BoundingRadius(), 1750, 975);
     R = GPluginSDK->CreateSpell2(kSlotR, kTargetCast, false, false, kCollidesWithNothing);
     R->SetOverrideRange(465); }
+
+inline bool ZCamille::HasQ() {
+    return Player->HasBuff("camilleqprimingstart"); }
+
+inline bool ZCamille::HasQ2() {
+    return Player->HasBuff("camilleqprimingcomplete"); }
+
+inline bool ZCamille::ChargingW() {
+    return Player->HasBuff("camillewconeslashcharge"); }
+
+inline bool ZCamille::OnWall() {
+    return Player->HasBuff("camilleedashtoggle") || strcmp("CamilleE", Player->GetSpellName(kSlotE)) != 0; }
+
+inline bool ZCamille::IsDashing() {
+    return Player->HasBuff("camilleedash1") || Player->HasBuff("camilleedash2") || Player->IsDashing(); }
+
+inline bool ZCamille::KnockedBack(IUnit * unit) {
+    return unit != nullptr && unit->HasBuff("camilleeknockback2"); }
+
+inline bool ZCamille::LethalTarget(IUnit * unit) {
+    return CDmg(unit) / 1.65 >= unit->GetHealth(); }
 
 inline void ZCamille::UseQ(IUnit * unit) {
     if (Q->IsReady()) {
@@ -185,11 +209,11 @@ inline void ZCamille::UseE(Vec3 pos, bool combo = true) {
     while (posChecked < maxPosChecked) {
         radiusIndex++;
         auto curRadius = radiusIndex * (0x2 * posRadius);
-        auto curCurcleChecks = static_cast<int>(ceil((0x2 * M_PI * curRadius) / (0x2 * static_cast<double>(posRadius))));
+        auto curCurcleChecks = static_cast<int>(ceil((2 * M_PI * curRadius) / (2 * static_cast<double>(posRadius))));
 
         for (auto i = 1; i < curCurcleChecks; i++) {
             posChecked++;
-            auto cRadians = (0x2 * M_PI / (curCurcleChecks - 0x1)) * i;
+            auto cRadians = (2 * M_PI / (curCurcleChecks - 1)) * i;
             auto xPos = static_cast<float>(floor(pos.x + curRadius * cos(cRadians)));
             auto zPos = static_cast<float>(floor(pos.z + curRadius * sin(cRadians)));
             auto posFor2D = Vec2(xPos, zPos);
@@ -264,34 +288,22 @@ inline void ZCamille::UseR(IUnit * unit, bool force = false) {
         if (R->IsReady() && CDmg(unit) >= unit->GetHealth()) {
             R->CastOnUnit(unit); } } }
 
-inline bool ZCamille::HasQ() {
-    return Player->HasBuff("camilleqprimingstart"); }
-
-inline bool ZCamille::HasQ2() {
-    return Player->HasBuff("camilleqprimingcomplete"); }
-
-inline bool ZCamille::ChargingW() {
-    return Player->HasBuff("camillewconeslashcharge"); }
-
-inline bool ZCamille::OnWall() {
-    return Player->HasBuff("camilleedashtoggle") || strcmp("CamilleE", Player->GetSpellName(kSlotE)) != 0; }
-
-inline bool ZCamille::IsDashing() {
-    return Player->HasBuff("camilleedash1") || Player->HasBuff("camilleedash2") || Player->IsDashing(); }
-
-inline bool ZCamille::KnockedBack(IUnit * unit) {
-    return unit != nullptr && unit->HasBuff("camilleeknockback2"); }
-
-inline bool ZCamille::LethalTarget(IUnit * unit) {
-    return CDmg(unit) / 1.65 >= unit->GetHealth(); }
-
 inline double ZCamille::CDmg(IUnit * unit) {
     if (unit == nullptr) {
         return 0; }
 
-    // todo: fix/finish
-    auto aadmg = GDamage->GetAutoAttackDamage(Player, unit, true);
-    auto dmg = QDmg(unit, false) + WDmg(unit) + (RDmg(aadmg, unit) + EDmg(unit));  return dmg; }
+    switch (Menu->RLiability->GetInteger()) {
+        case 1:
+            return EasyRotation(unit);
+
+        case 2:
+            return StandardRotation(unit);
+
+        case 3:
+            return HardRotation(unit);
+
+        case 4:
+            return SuperRotation(unit); } }
 
 
 inline double ZCamille::QDmg(IUnit * unit, bool bonus) {
@@ -347,5 +359,25 @@ inline double ZCamille::RDmg(double dmg, IUnit * unit) {
         return dmg + xtra; }
 
     return dmg; }
+
+inline double ZCamille::SuperRotation(IUnit * unit) {
+    int a[] = { 5, 6, 7 };
+    return QDmg(unit, true) * a[min(18, Player->GetLevel()) / 6] + WDmg(unit, true) + EDmg(unit) + RDmg(GDamage->GetAutoAttackDamage(Player, unit, true) *
+            (a[min(18, Player->GetLevel()) / 6] * 0.75), unit); }
+
+inline double ZCamille::HardRotation(IUnit * unit) {
+    int a[] = { 3, 4, 5 };
+    return QDmg(unit, true) * a[min(18, Player->GetLevel()) / 6] + WDmg(unit, true) + EDmg(unit) + RDmg(GDamage->GetAutoAttackDamage(Player, unit, true) *
+            (a[min(18, Player->GetLevel()) / 6] * 0.75), unit); }
+
+inline double ZCamille::StandardRotation(IUnit * unit) {
+    int a[] = { 2, 3, 4 };
+    return QDmg(unit, true) * a[min(18, Player->GetLevel()) / 6] + WDmg(unit, true) + EDmg(unit) + RDmg(GDamage->GetAutoAttackDamage(Player, unit, true) *
+            (a[min(18, Player->GetLevel()) / 6] * 0.75), unit); }
+
+inline double ZCamille::EasyRotation(IUnit * unit) {
+    int a[] = { 1, 2, 3 };
+    return QDmg(unit, true) * a[min(18, Player->GetLevel()) / 6] + WDmg(unit, true) + EDmg(unit) + RDmg(GDamage->GetAutoAttackDamage(Player, unit, true) *
+            (a[min(18, Player->GetLevel()) / 6] * 0.75), unit); }
 
 

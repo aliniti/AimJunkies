@@ -169,8 +169,6 @@ void ZCamilleModes::OnRender() {
         ZCamille::Menu->DrawRColor->GetColor(&ee);
         GRender->DrawTextW(Vec2(pos.x - 52, pos.y), ee,  ZCamille::Menu->DontEUnderTurret->Enabled() ? "E Under Turret: ON" : "E Under Turret: OFF"); } }
 
-
-
 void ZCamilleModes::OnCreateObj(IUnit * source) {
     if (source != nullptr && strcmp(source->GetClassIdentifier(), "obj_GeneralParticleEmitter") == 0) {
         if (strcmp(source->GetObjectName(), "Camille_Base_R_Indicator_Edge.troy") == 0) {

@@ -10,7 +10,7 @@ bool ZCamilleExtensions::IsValid(Vec2 p) {
     return p.x != 0 && p.y != 0; }
 
 Vec2 ZCamilleExtensions::To2D(Vec3 p) {
-    return Vec2(p.x, p.y); }
+    return Vec2(p.x, p.z); }
 
 Vec3 ZCamilleExtensions::To3D(Vec2 p) {
     return GUtility->To3D(p); }

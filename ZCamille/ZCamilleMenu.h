@@ -20,6 +20,7 @@ class ZCamilleMenu {
         IMenuOption * ComboE;
         IMenuOption * ComboEPred;
         IMenuOption * ComboR;
+        IMenuOption * RLiability;
         IMenuOption * FarmingWithItems;
         IMenuOption * FarmNearEnemies;
         IMenuOption * WaveClearMana;
@@ -68,8 +69,9 @@ inline ZCamilleMenu::ZCamilleMenu(IMenu * menu) {
     this->ComboQ = menucb->CheckBox("Use Q", true);
     this->ComboW = menucb->CheckBox("Use W", true);
     this->ComboE = menucb->CheckBox("Use E", true);
-    this->ComboEPred = menucb->AddInteger("Use E Prediction [0 = Disabled]", 0, 1, 0);
+    this->ComboEPred = menucb->AddInteger("- Prediction [0 = Disabled]", 0, 1, 0);
     this->ComboR = menucb->CheckBox("Use R", true);
+    this->RLiability = menucb->AddInteger("- Liability", 1, 4, 3);
     auto menuhr = this->Menu->AddMenu("::Harass");
     this->HarassMana = menuhr->AddInteger("Minimum Mana %", 0, 100, 75);
     this->HarassQ = menuhr->CheckBox("Use Q", true);

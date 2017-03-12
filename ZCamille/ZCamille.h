@@ -293,7 +293,7 @@ inline double ZCamille::CDmg(IUnit * unit) {
     if (unit == nullptr) {
         return 0; }
 
-    switch (Menu->RLiability->GetInteger()) {
+    switch (Menu->RProbability->GetInteger()) {
         case 1:
             return EasyRotation(unit);
 

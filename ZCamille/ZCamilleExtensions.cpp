@@ -13,7 +13,7 @@ Vec2 ZCamilleExtensions::To2D(Vec3 p) {
     return Vec2(p.x, p.z); }
 
 Vec3 ZCamilleExtensions::To3D(Vec2 p) {
-    return GUtility->To3D(p); }
+    return Vec3(p.x, 0, p.y); }
 
 float ZCamilleExtensions::Dist(IUnit * to) {
     return (ZCamille::Player->ServerPosition() - to->ServerPosition()).Length() -

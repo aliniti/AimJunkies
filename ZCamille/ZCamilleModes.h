@@ -5,6 +5,7 @@ class ZCamilleModes {
     public:
 
         // my modes
+        void OnCastSpell(CastedSpell const & args);
         void OnUpdate();
         void Combo();
         void Harass();

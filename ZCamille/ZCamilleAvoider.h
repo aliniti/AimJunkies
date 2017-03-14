@@ -32,5 +32,5 @@ class ZCamilleAvoider {
             this->eType = type;
             this->ChampName = champname; }
 
-        void GenerateEvadeList(); };
+        static void GenerateAvoidList(); };
 

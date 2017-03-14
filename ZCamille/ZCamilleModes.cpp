@@ -4,6 +4,61 @@
 #include "ZCamilleAvoider.h"
 #include <string>
 
+void ZCamilleModes::OnCastSpell(CastedSpell const & args) {
+    if (args.Caster_ != nullptr) {
+        auto ex = ZCamille::Ex;
+        auto player = ZCamille::Player;
+
+        if (args.Caster_->IsHero() && args.Caster_->GetTeam() != ZCamille::Player->GetTeam()) {
+            auto bestTarget = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, ZCamille::R->Range());
+            auto sdataname = args.Name_;
+            auto i = 0;
+            char c;
+
+            while (sdataname[i]) {
+                c = sdataname[i];
+                putchar(tolower(c));
+                i++; }
+
+            if (bestTarget == nullptr) {
+                return; }
+
+            if (ZCamille::R->IsReady() && ZCamille::Menu->UseRAvoider->Enabled()) {
+                auto rrange = ZCamille::R->Range();
+
+                for (auto entry : ZCamille::AvoidList) {
+                    if (strcmp(entry.first.c_str(), sdataname) == 0) {
+                        if (entry.second->eType == Targeted) {
+                            if (args.Target_ != nullptr && args.Target_->GetNetworkId() == ZCamille::Player->GetNetworkId()) {
+                                ZCamille::UseR(bestTarget, true); } }
+
+                        if (entry.second->eType == SelfCast) {
+                            if (args.Target_ != nullptr && ex->Dist2D(args.Target_) <= entry.second->Radius) {
+                                ZCamille::UseR(bestTarget, true); }
+
+                            if (entry.second->eType == SkillshotCircle) {
+                                auto cStart = ex->To2D(args.Position_);
+                                auto cEnd = ex->To2D(args.EndPosition_);
+
+                                if (ex->Dist2D(cStart, cEnd) > ZCamille::R->Range()) {
+                                    cEnd = cStart + (cEnd - cStart).VectorNormalize() * rrange; }
+
+                                if (ex->Dist2D(cEnd, player->ServerPosition()) <= rrange) {
+                                    ZCamille::UseR(bestTarget, true); } }
+
+                            if (entry.second->eType == SkillshotLine) {
+                                auto lStart = ex->To2D(args.Position_);
+                                auto lEnd = ex->To2D(args.EndPosition_);
+
+                                if (ex->Dist2D(lStart, lEnd) < rrange) {
+                                    lEnd = lStart + (lEnd - lStart).VectorNormalize() * (rrange + 55); }
+
+                                if (ex->Dist2D(lStart, lEnd) > rrange) {
+                                    lEnd = lStart + (lEnd - lStart).VectorNormalize() * (rrange * 2); }
+
+                                if (ex->ProjectOn(ex->To2D(player->ServerPosition()), lStart, lEnd)->IsOnSegment) {
+                                    ZCamille::UseR(bestTarget, true); } } } } } } } } }
+
 void ZCamilleModes::OnUpdate() {
     auto ex = ZCamille::Ex;
     auto menu = ZCamille::Menu;
@@ -35,17 +90,17 @@ void ZCamilleModes::OnUpdate() {
 
     if (GUtility->IsLeagueWindowFocused() && !GGame->IsChatOpen()) {
         if (ex->IsKeyDown(menu->DontEUnderTurretToggle)) {
-            if (!ZCamille::Menu->KeyState) {
+            if (!ZCamille::KeyState) {
                 if (menu->DontEUnderTurret->Enabled() == false) {
                     menu->DontEUnderTurret->UpdateInteger(1); }
 
                 else {
                     menu->DontEUnderTurret->UpdateInteger(0); }
 
-                ZCamille::Menu->KeyState = true; } }
+                ZCamille::KeyState = true; } }
 
         else {
-            ZCamille::Menu->KeyState = false; }
+            ZCamille::KeyState = false; }
 
         if (ex->CanFlee()) {
             ZCamille::Modes->Flee(); }
@@ -103,26 +158,25 @@ void ZCamilleModes::JungleClear() {
     auto player = ZCamille::Player;
     auto menu = ZCamille::Menu;
 
-    for (auto i : GEntityList->GetAllMinions(false, false, true)) {
-        if (!ZCamille::ChargingW() && (ZCamille::W->IsReady() || ZCamille::E->IsReady())) {
+    if ((ZCamille::W->IsReady() || ZCamille::E->IsReady())) {
+        for (auto i : GEntityList->GetAllMinions(false, false, true)) {
             if (menu->FarmNearEnemies->Enabled() || ex->CountInRange(player, 1000, GEntityList->GetAllHeros(false, true)) < 1) {
                 if (i->IsValidObject() && i->IsJungleCreep() && !i->IsDead() && i->IsVisible() && ex->Dist2D(i) <= 635) {
                     Vec3 pos;
                     int numberHit;
                     ZCamille::W->FindBestCastPosition(true, false, pos, numberHit);
 
-                    if (numberHit < 6) {
-                        if (menu->JungleClearW->Enabled()) {
-                            if (ex->IsValid(pos)) {
-                                if (menu->MagnetWClear->Enabled()) {
-                                    ZCamille::LockW(pos); }
+                    if (menu->JungleClearW->Enabled()) {
+                        if (ex->IsValid(pos)) {
+                            if (menu->MagnetWClear->Enabled()) {
+                                ZCamille::LockW(pos); }
 
-                                if (numberHit > 0) {
-                                    ZCamille::W->CastOnPosition(pos); } } }
+                            if (numberHit > 0 && ZCamille::ChargingW() == false) {
+                                ZCamille::W->CastOnPosition(pos); } } }
 
-                        if (ZCamille::W->IsReady() == false || !menu->JungleClearW->Enabled()) {
-                            if (ZCamille::ChargingW() == false && menu->JungleClearE->Enabled()) {
-                                ZCamille::UseE(pos); } } } } } } } }
+                    if (ZCamille::W->IsReady() == false || !menu->JungleClearW->Enabled()) {
+                        if (ZCamille::ChargingW() == false && menu->JungleClearE->Enabled()) {
+                            ZCamille::UseE(pos); } } } } } } }
 
 void ZCamilleModes::WaveClear() {
     auto menu = ZCamille::Menu;
@@ -138,7 +192,8 @@ void ZCamilleModes::WaveClear() {
                         if (menu->MagnetWClear->Enabled()) {
                             ZCamille::LockW(i->ServerPosition()); }
 
-                        ZCamille::W->CastOnPosition(i->ServerPosition()); } } } } } }
+                        if (ZCamille::ChargingW() == false) {
+                            ZCamille::W->CastOnPosition(i->ServerPosition()); } } } } } } }
 
 void ZCamilleModes::OnRender() {
     if (ZCamille::Player->IsDead()) {
@@ -163,8 +218,8 @@ void ZCamilleModes::OnRender() {
 
     if (GGame->Projection(ZCamille::Player->GetPosition(), &pos)) {
         Vec4 ee;
-        ZCamille::Menu->DrawRColor->GetColor(&ee);
-        GRender->DrawTextW(Vec2(pos.x - 52, pos.y), ee,  ZCamille::Menu->DontEUnderTurret->Enabled() ? "E Under Turret: ON" : "E Under Turret: OFF"); } }
+        ZCamille::Menu->DrawEColor->GetColor(&ee);
+        GRender->DrawTextW(Vec2(pos.x - 52, pos.y), ee, ZCamille::Menu->DontEUnderTurret->Enabled() ? "E Under Turret: ON" : "E Under Turret: OFF"); } }
 
 void ZCamilleModes::OnCreateObj(IUnit * source) {
     if (source != nullptr && strcmp(source->GetClassIdentifier(), "obj_GeneralParticleEmitter") == 0) {

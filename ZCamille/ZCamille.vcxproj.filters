@@ -30,36 +30,39 @@
     <ClInclude Include="Vector3.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Camille.h">
+    <ClInclude Include="ZCamille.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CamilleMenu.h">
+    <ClInclude Include="ZCamilleAvoider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CamilleExtensions.h">
+    <ClInclude Include="ZCamilleExtensions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CamilleModes.h">
+    <ClInclude Include="ZCamilleMenu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CamilleAvoider.h">
-      <Filter>Header Files\Core</Filter>
+    <ClInclude Include="ZCamilleModes.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PluginSDK.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Camille.cpp">
+    <ClCompile Include="ZCamille.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CamilleExtensions.cpp">
+    <ClCompile Include="ZCamilleAvoider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CamilleModes.cpp">
+    <ClCompile Include="ZCamilleExtensions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CamilleAvoider.cpp">
+    <ClCompile Include="ZCamilleModes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ZCamilleMenu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

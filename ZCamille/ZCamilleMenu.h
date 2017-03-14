@@ -1,12 +1,13 @@
 #pragma once
 #include "PluginSDK.h"
+#include <map>
 
 class ZCamilleMenu {
     public:
         ~ZCamilleMenu();
         ZCamilleMenu(IMenu * menu);
 
-        bool KeyState;
+        const char * Identifier;
 
         IMenu * Menu;
         IMenuOption * ComboKey;
@@ -20,7 +21,7 @@ class ZCamilleMenu {
         IMenuOption * ComboE;
         IMenuOption * ComboEPred;
         IMenuOption * ComboR;
-        IMenuOption * RProbability;
+        IMenuOption * RWhen;
         IMenuOption * FarmingWithItems;
         IMenuOption * FarmNearEnemies;
         IMenuOption * WaveClearMana;
@@ -54,67 +55,9 @@ class ZCamilleMenu {
         IMenuOption * DrawE;
         IMenuOption * DrawEColor;
         IMenuOption * DrawR;
-        IMenuOption * DrawRColor; };
+        IMenuOption * DrawRColor;
+        IMenuOption * AvoidEventHorizon;
+        IMenuOption * AvoidR;
+        IMenuOption * UseRAvoider;
+        IMenuOption * AvoidSpell; };
 
-inline ZCamilleMenu::ZCamilleMenu(IMenu * menu) {
-    this->Menu = menu;
-    auto menuhk = this->Menu->AddMenu("::Hotkeys");
-    this->ComboKey = menuhk->AddKey("Combo [active]", 32);
-    this->HarassKey = menuhk->AddKey("Harass [active]", 'G');
-    this->WaveClearKey = menuhk->AddKey("WaveClear [active]", 'V');
-    this->JungleClearKey = menuhk->AddKey("JungleClear [active]", 'V');
-    this->FleeKey = menuhk->AddKey("Flee [active]", 'A');
-    auto menucb = this->Menu->AddMenu("::Combo");
-    this->ComboMana = menucb->AddInteger("Minimum Mana % ", 0, 100, 0);
-    this->ComboQ = menucb->CheckBox("Use Q", true);
-    this->ComboW = menucb->CheckBox("Use W", true);
-    this->ComboE = menucb->CheckBox("Use E", true);
-    this->ComboEPred = menucb->AddInteger("- Prediction [0 = Disabled]", 0, 1, 0);
-    this->ComboR = menucb->CheckBox("Use R", true);
-    this->RProbability = menucb->AddInteger("- Kill Probability", 1, 4, 3);
-    auto menuhr = this->Menu->AddMenu("::Harass");
-    this->HarassMana = menuhr->AddInteger("Minimum Mana %", 0, 100, 75);
-    this->HarassQ = menuhr->CheckBox("Use Q", true);
-    this->HarassW = menuhr->CheckBox("Use W", true);
-    auto menufl = this->Menu->AddMenu("::Flee");
-    this->FleeE = menufl->CheckBox("Use E", true);
-    auto menufm = this->Menu->AddMenu("::Farming");
-    this->FarmingWithItems = menufm->CheckBox("Farm With Items", true);
-    this->FarmNearEnemies = menufm->CheckBox("Farm Near Enemies", false);
-    this->WaveClearOverride = menufm->AddInteger(" - Minimum Mana Override %", 0, 100, 35);
-    auto menuwc = this->Menu->AddMenu("::WaveClear");
-    this->WaveClearMana = menuwc->AddInteger("Minimum Mana %", 0, 100, 65);
-    this->WaveClearQ = menuwc->CheckBox("Use Q", true);
-    this->WaveClearW = menuwc->CheckBox("Use W", true);
-    this->WaveClearMinHit = menuwc->AddInteger("- Min Hit >=", 1, 6, 3);
-    auto menujg = this->Menu->AddMenu("::JungleClear");
-    this->JungleClearMana = menujg->AddInteger("Minimum Mana %", 0, 100, 35);
-    this->JungleClearQ = menujg->CheckBox("Use Q", true);
-    this->JungleClearW = menujg->CheckBox("Use W", true);
-    this->JungleClearE = menujg->CheckBox("Use E", true);
-    //auto menuev = this->Menu->AddMenu("::Events");
-    //this->UseAntiGapcloser = menuev->CheckBox("Anti-Gapcloser", false);
-    //this->UseInterrupter = menuev->CheckBox("Use Interrupter", true);
-    auto menumc = this->Menu->AddMenu("::Mechanics");
-    this->ForceROrbwalk = menumc->CheckBox("Orbwalk Focus R Target", true);
-    this->UltOnlySelected = menumc->CheckBox("R Selected Target Only", false);
-    this->MinimumERange = menumc->AddInteger("Minimum E Range", 0, 1100, 165);
-    this->DontEUnderTurret = menumc->CheckBox("Dont E Into Turret/Danger", true);
-    this->DontEUnderTurretToggle = menumc->AddKey("- Toggle Key:", 'J');
-    this->EnhancedEPrecision = menumc->CheckBox("Use Enhanced E Precision", false);
-    //this->ExpirimentalCombo = menumc->CheckBox("Use Expiremental Combo [W->E)", false);
-    auto menumg = this->Menu->AddMenu("::Lock Target");
-    this->MagnetW = menumg->CheckBox("Lock W", true);
-    this->MagnetWCombo = menumg->CheckBox("- Combo", true);
-    this->MagnetWHarass = menumg->CheckBox("- Harass", true);
-    this->MagnetWClear = menumg->CheckBox("- Clear", true);
-    auto menurd = this->Menu->AddMenu("::Render");
-    this->DrawW = menurd->CheckBox("Enabled W Drawings", false);
-    this->DrawWColor = menurd->AddColor("- Color W", 121, 77, 255, 200);
-    this->DrawE = menurd->CheckBox("Enabled E Drawings", true);
-    this->DrawEColor = menurd->AddColor("- Color E", 121, 77, 255, 200);
-    this->DrawR = menurd->CheckBox("Enabled R Drawings", true);
-    this->DrawRColor = menurd->AddColor("- Color R", 255, 255, 255, 200);
-    KeyState = false;
-    //magnetMenu->CheckBox("Magnet Orbwalking", true);
-}

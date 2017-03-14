@@ -164,6 +164,7 @@
     <ClCompile Include="ZCamille.cpp" />
     <ClCompile Include="ZCamilleAvoider.cpp" />
     <ClCompile Include="ZCamilleExtensions.cpp" />
+    <ClCompile Include="ZCamilleMenu.cpp" />
     <ClCompile Include="ZCamilleModes.cpp" />
     <ClCompile Include="PluginSDK.cpp" />
   </ItemGroup>

@@ -30,8 +30,10 @@ class ZCamille {
         static IInventoryItem * Titanic;
         static ISpell2 * Q, *W, *E, *R;
 
+        static bool KeyState;
+
         static DelayAction Delay;
-        static std::map<std::string, ZCamilleAvoider *> DangerSpells;
+        static std::map<std::string, ZCamilleAvoider *> AvoidList;
         static std::map<float, ZCamilleAvoider *> DangerPoints;
 
         // aura mechanics
@@ -72,7 +74,6 @@ class ZCamille {
         static double EasyRotation(IUnit * unit); };
 
 inline void ZCamille::CreateItems() {
-    Player = GEntityList->Player();
     Tiamat = GPluginSDK->CreateItemForId(3077, 400);
     Hydra = GPluginSDK->CreateItemForId(3074, 400);
     Titanic = GPluginSDK->CreateItemForId(3748, 400);
@@ -293,17 +294,17 @@ inline double ZCamille::CDmg(IUnit * unit) {
     if (unit == nullptr) {
         return 0; }
 
-    switch (Menu->RProbability->GetInteger()) {
-        case 1:
+    switch (Menu->RWhen->GetInteger()) {
+        case 0:
             return EasyRotation(unit);
 
-        case 2:
+        case 1:
             return StandardRotation(unit);
 
-        case 3:
+        case 2:
             return HardRotation(unit);
 
-        case 4:
+        case 3:
             return SuperRotation(unit);
 
         default: ; }

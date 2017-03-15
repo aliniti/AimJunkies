@@ -53,13 +53,13 @@ PLUGIN_EVENT(void) OnRender() {
 PLUGIN_API void OnLoad(IPluginSDK * sdk) {
     PluginSDKSetup(sdk);
     ZCamille::Player = GEntityList->Player();
-    ZCamille::CreateItems();
-    ZCamille::CreateSpells();
+    ZCamille::SetupItems();
+    ZCamille::SetupSpells();
     ZCamilleAvoider::GenerateAvoidList();
 
     if (strcmp(ZCamille::Player->ChampionName(), "Camille") == 0) {
         ZCamille::Menu = new ZCamilleMenu(GPluginSDK->AddMenu("ZCamille"));
-        //GEventManager->AddEventHandler(kEventOnSpellCast, OnSpellCast);
+        GEventManager->AddEventHandler(kEventOnSpellCast, OnSpellCast);
         GEventManager->AddEventHandler(kEventOnGameUpdate, OnGameUpdate);
         GEventManager->AddEventHandler(kEventOnIssueOrder, OnIssueOrderEx);
         GEventManager->AddEventHandler(kEventOnDoCast, OnDoCast);
@@ -73,10 +73,11 @@ PLUGIN_API void OnUnload() {
         GOrbwalking->SetAttacksAllowed(true);
         GOrbwalking->SetMovementAllowed(true);
         // ->
-        //GEventManager->RemoveEventHandler(kEventOnSpellCast, OnSpellCast);
+        GEventManager->RemoveEventHandler(kEventOnSpellCast, OnSpellCast);
         GEventManager->RemoveEventHandler(kEventOnDoCast, OnDoCast);
         GEventManager->RemoveEventHandler(kEventOnGameUpdate, OnGameUpdate);
         GEventManager->RemoveEventHandler(kEventOnIssueOrder, OnIssueOrderEx);
         GEventManager->RemoveEventHandler(kEventOnCreateObject, OnCreateObject);
         GEventManager->RemoveEventHandler(kEventOnRender, OnRender);
+        // lists n shit ->
         ZCamille::Menu->Menu->Remove(); } }

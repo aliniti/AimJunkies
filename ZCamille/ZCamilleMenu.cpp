@@ -62,12 +62,11 @@ ZCamilleMenu::ZCamilleMenu(IMenu * menu) {
     this->DontEUnderTurret = menuav->CheckBox("Avoid E Into Turret", true);
     this->DontEUnderTurretToggle = menuav->AddKey("- Toggle Key:", 'J');
     this->AvoidEventHorizon = menuav->CheckBox("Avoid E Into Veigar", true);
-    /*    this->UseRAvoider = menuav->CheckBox("Use R Avoider", true);
+    this->UseRAvoider = menuav->CheckBox("R Avoider", true);
+    this->SpellsToAvoid = std::map<std::string, IMenuOption *>();
 
-        for (auto hero : GEntityList->GetAllHeros(false, true)) {
-            for (auto i : ZCamille::AvoidList) {
-                if (strcmp(hero->ChampionName(), i.second->ChampName.c_str()) == 0) {
-                    GGame->PrintChat(i.second->ChampName.c_str());
-                    this->Identifier = std::string("- ").append(i.second->ChampName).append(" R").c_str();
-                    this->AvoidSpell = menuav->CheckBox(this->Identifier, true); } } }*/
-}
+    for (auto hero : GEntityList->GetAllHeros(true, true)) {
+        for (auto i : ZCamille::AvoidList) {
+            if (strcmp(hero->ChampionName(), i.second->ChampName.c_str()) == 0) {
+                auto uniqueHero = std::string("- ").append(i.second->ChampName).append(" R");
+                this->SpellsToAvoid.insert(std::pair<std::string, IMenuOption *>(i.first, menuav->CheckBox(uniqueHero.c_str(), true))); } } } }

@@ -11,14 +11,13 @@ void ZCamilleModes::OnCastSpell(CastedSpell const & args) {
 
         if (args.Caster_->IsHero() && args.Caster_->GetTeam() != ZCamille::Player->GetTeam()) {
             auto bestTarget = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, ZCamille::R->Range());
-            auto sdataname = args.Name_;
-            auto i = 0;
-            char c;
+            auto name = args.Name_;
+            auto size = strlen(name);
+            auto nameToLower = static_cast<char *>(malloc(size + 1));
+            nameToLower[size] = 0;
 
-            while (sdataname[i]) {
-                c = sdataname[i];
-                putchar(tolower(c));
-                i++; }
+            for (auto i = 0; i < size; i++) {
+                nameToLower[i] = tolower(name[i]); }
 
             if (bestTarget == nullptr) {
                 return; }
@@ -27,14 +26,15 @@ void ZCamilleModes::OnCastSpell(CastedSpell const & args) {
                 auto rrange = ZCamille::R->Range();
 
                 for (auto entry : ZCamille::AvoidList) {
-                    if (strcmp(entry.first.c_str(), sdataname) == 0) {
-                        if (entry.second->eType == Targeted) {
-                            if (args.Target_ != nullptr && args.Target_->GetNetworkId() == ZCamille::Player->GetNetworkId()) {
-                                ZCamille::UseR(bestTarget, true); } }
+                    if (strcmp(entry.first.c_str(), nameToLower) == 0) {
+                        if (ZCamille::Menu->SpellsToAvoid.at(nameToLower)->Enabled()) {
+                            if (entry.second->eType == Targeted) {
+                                if (args.Target_ != nullptr && args.Target_->GetNetworkId() == player->GetNetworkId()) {
+                                    ZCamille::UseR(bestTarget, true); } }
 
-                        if (entry.second->eType == SelfCast) {
-                            if (args.Target_ != nullptr && ex->Dist2D(args.Target_) <= entry.second->Radius) {
-                                ZCamille::UseR(bestTarget, true); }
+                            if (entry.second->eType == SelfCast) {
+                                if (args.Target_ != nullptr && ex->Dist2D(args.Target_) <= entry.second->Radius) {
+                                    ZCamille::UseR(bestTarget, true); } }
 
                             if (entry.second->eType == SkillshotCircle) {
                                 auto cStart = ex->To2D(args.Position_);

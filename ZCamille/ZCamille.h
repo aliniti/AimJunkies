@@ -17,8 +17,8 @@ class ZCamille {
     public:
         ~ZCamille();
 
-        static void CreateItems();
-        static void CreateSpells();
+        static void SetupItems();
+        static void SetupSpells();
 
         static IUnit * Player;
         static ZCamilleMenu * Menu;
@@ -73,13 +73,13 @@ class ZCamille {
         static double StandardRotation(IUnit * unit);
         static double EasyRotation(IUnit * unit); };
 
-inline void ZCamille::CreateItems() {
+inline void ZCamille::SetupItems() {
     Tiamat = GPluginSDK->CreateItemForId(3077, 400);
     Hydra = GPluginSDK->CreateItemForId(3074, 400);
     Titanic = GPluginSDK->CreateItemForId(3748, 400);
     Youmuus = GPluginSDK->CreateItemForId(3142, 900); }
 
-inline void ZCamille::CreateSpells() {
+inline void ZCamille::SetupSpells() {
     // hi im using estimated values :^)
     Q = GPluginSDK->CreateSpell2(kSlotQ, kTargetCast, false, false, kCollidesWithNothing);
     Q->SetOverrideRange(175);

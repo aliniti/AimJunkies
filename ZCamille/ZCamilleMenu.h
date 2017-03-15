@@ -7,8 +7,6 @@ class ZCamilleMenu {
         ~ZCamilleMenu();
         ZCamilleMenu(IMenu * menu);
 
-        const char * Identifier;
-
         IMenu * Menu;
         IMenuOption * ComboKey;
         IMenuOption * HarassKey;
@@ -59,5 +57,6 @@ class ZCamilleMenu {
         IMenuOption * AvoidEventHorizon;
         IMenuOption * AvoidR;
         IMenuOption * UseRAvoider;
-        IMenuOption * AvoidSpell; };
+        IMenuOption * AvoidSpell;
+        std::map<std::string, IMenuOption *> SpellsToAvoid; };
 

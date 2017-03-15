@@ -139,7 +139,7 @@ inline bool ZCamille::CanW(IUnit * unit) {
     if (OnWall() || IsDashing() || unit == nullptr) {
         return false; }
 
-    if (GGame->TickCount() - LastE < 500) {
+    if (GGame->TickCount() - LastE < 1000) {
         // to prevent instant w after e
         return false; }
 
@@ -248,7 +248,10 @@ inline void ZCamille::UseE(Vec3 pos, bool combo = true) {
                     continue; } }
 
             if (GNavMesh->IsPointWall(Ex->To3D(posFor2D))) {
-                candidatePosList.push_back(posFor2D); } } }
+                candidatePosList.push_back(posFor2D); }
+
+            std::sort(candidatePosList.begin(), candidatePosList.end(), [&](Vec2 a, Vec2 b) {
+                return Ex->Dist2D(a, pos) < Ex->Dist2D(b, pos); }); } }
 
     if (ChargingW() == false) {
         for (auto vec : candidatePosList) {
@@ -316,10 +319,8 @@ inline double ZCamille::QDmg(IUnit * unit, bool bonus) {
     double dmg = 0;
 
     if (Q->IsReady() && unit != nullptr) {
-        double aa[] = { 0.2, 0.25, 0.30, 0.35, 0.40 };
-        double bb[] = { 0.4, 0.5, 0.6, 0.7, 0.8 };
-        dmg += GDamage->CalcPhysicalDamage(Player, unit, aa[Player->GetSpellLevel(kSlotQ) - 1] * (Player->PhysicalDamage() + Player->PhysicalDamageMod()));
-        auto dmgreg = GDamage->CalcPhysicalDamage(Player, unit, bb[Player->GetSpellLevel(kSlotQ) - 1] * (Player->PhysicalDamage() + Player->PhysicalDamageMod()));
+        dmg += GDamage->CalcPhysicalDamage(Player, unit, std::vector<double> {0.2, 0.25, 0.30, 0.35, 0.40 } [Player->GetSpellLevel(kSlotQ) - 1] * (Player->PhysicalDamage() + Player->PhysicalDamageMod()));
+        auto dmgreg = GDamage->CalcPhysicalDamage(Player, unit, std::vector<double> {0.4, 0.5, 0.6, 0.7, 0.8 } [Player->GetSpellLevel(kSlotQ) - 1] * (Player->PhysicalDamage() + Player->PhysicalDamageMod()));
         auto pct = 52 + (3 * min(16, Player->GetLevel()));
         auto dmgtrue = dmgreg * (pct / 100);
 
@@ -332,10 +333,8 @@ inline double ZCamille::WDmg(IUnit * unit, bool bonus) {
     double dmg = 0;
 
     if (W->IsReady() && unit != nullptr) {
-        int aa[] = { 65, 95, 125, 155, 185 };
-        dmg += GDamage->CalcPhysicalDamage(Player, unit, aa[Player->GetSpellLevel(kSlotW) - 1] + (0.6 * Player->PhysicalDamageMod()));
-        double bb[] = { 6, 6.5, 7, 7.5, 8 };
-        auto pct = bb[Player->GetSpellLevel(kSlotW) - 1];
+        dmg += GDamage->CalcPhysicalDamage(Player, unit, std::vector<double> { 65, 95, 125, 155, 185 } [Player->GetSpellLevel(kSlotW) - 1] + (0.6 * Player->PhysicalDamageMod()));
+        auto pct = std::vector<double> { 6, 6.5, 7, 7.5, 8 } [Player->GetSpellLevel(kSlotW) - 1];
 
         if (Player->PhysicalDamageMod() >= 100) {
             pct += min(300, Player->PhysicalDamageMod() * 3 / 100); }
@@ -349,8 +348,7 @@ inline double ZCamille::EDmg(IUnit * unit) {
     double dmg = 0;
 
     if (E->IsReady() && unit != nullptr) {
-        int aa[] = { 70, 115, 160, 205, 250 };
-        dmg += GDamage->CalcPhysicalDamage(Player, unit, aa[Player->GetSpellLevel(kSlotE) - 1] + (0.75 * Player->PhysicalDamageMod())); }
+        dmg += GDamage->CalcPhysicalDamage(Player, unit, std::vector<double> { 70, 115, 160, 205, 250 } [Player->GetSpellLevel(kSlotE) - 1] + (0.75 * Player->PhysicalDamageMod())); }
 
     return dmg; }
 
@@ -359,31 +357,26 @@ inline double ZCamille::RDmg(double dmg, IUnit * unit) {
         return 0; }
 
     if (R->IsReady() || unit->HasBuff("camillertether")) {
-        int aa[] = { 4, 6, 8, 8 };
-        int bb[] = { 5, 10, 15, 15 };;
-        auto xtra = bb[Player->GetSpellLevel(kSlotR) - 1] + aa[Player->GetSpellLevel(kSlotR) - 1] * (unit->GetHealth() / 100);
+        auto xtra = std::vector<double> { 5, 10, 15, 15 } [Player->GetSpellLevel(kSlotR) - 1] +
+                    std::vector<double> { 4, 6, 8, 8 } [Player->GetSpellLevel(kSlotR) - 1] * (unit->GetHealth() / 100);
         return dmg + xtra; }
 
     return dmg; }
 
 inline double ZCamille::SuperRotation(IUnit * unit) {
-    int a[] = { 5, 6, 7 };
-    return QDmg(unit, true) * a[min(18, Player->GetLevel()) / 6] + WDmg(unit, true) + EDmg(unit) + RDmg(GDamage->GetAutoAttackDamage(Player, unit, true) *
-            (a[min(18, Player->GetLevel()) / 6] * 0.75), unit); }
+    return QDmg(unit, true) * std::vector<int> {5, 6, 7 } [min(18, Player->GetLevel()) / 6] + WDmg(unit, true) + EDmg(unit) + RDmg(GDamage->GetAutoAttackDamage(Player, unit, true) *
+            (std::vector<int> {5, 6, 7 } [min(18, Player->GetLevel()) / 6] * 0.75), unit); }
 
 inline double ZCamille::HardRotation(IUnit * unit) {
-    int a[] = { 3, 4, 5 };
-    return QDmg(unit, true) * a[min(18, Player->GetLevel()) / 6] + WDmg(unit, true) + EDmg(unit) + RDmg(GDamage->GetAutoAttackDamage(Player, unit, true) *
-            (a[min(18, Player->GetLevel()) / 6] * 0.75), unit); }
+    return QDmg(unit, true) * std::vector<int> {3, 4, 5 } [min(18, Player->GetLevel()) / 6] + WDmg(unit, true) + EDmg(unit) + RDmg(GDamage->GetAutoAttackDamage(Player, unit, true) *
+            (std::vector<int> {3, 4, 5 } [min(18, Player->GetLevel()) / 6] * 0.75), unit); }
 
 inline double ZCamille::StandardRotation(IUnit * unit) {
-    int a[] = { 2, 3, 4 };
-    return QDmg(unit, true) * a[min(18, Player->GetLevel()) / 6] + WDmg(unit, true) + EDmg(unit) + RDmg(GDamage->GetAutoAttackDamage(Player, unit, true) *
-            (a[min(18, Player->GetLevel()) / 6] * 0.75), unit); }
+    return QDmg(unit, true) * std::vector<int> {2, 3, 4 } [min(18, Player->GetLevel()) / 6] + WDmg(unit, true) + EDmg(unit) + RDmg(GDamage->GetAutoAttackDamage(Player, unit, true) *
+            (std::vector<int> {2, 3, 4 } [min(18, Player->GetLevel()) / 6] * 0.75), unit); }
 
 inline double ZCamille::EasyRotation(IUnit * unit) {
-    int a[] = { 1, 2, 3 };
-    return QDmg(unit, true) * a[min(18, Player->GetLevel()) / 6] + WDmg(unit, true) + EDmg(unit) + RDmg(GDamage->GetAutoAttackDamage(Player, unit, true) *
-            (a[min(18, Player->GetLevel()) / 6] * 0.75), unit); }
+    return QDmg(unit, true) * std::vector<int> {1, 2, 3 } [min(18, Player->GetLevel()) / 6] + WDmg(unit, true) + EDmg(unit) + RDmg(GDamage->GetAutoAttackDamage(Player, unit, true) *
+            (std::vector<int> {1, 2, 3 } [min(18, Player->GetLevel()) / 6] * 0.75), unit); }
 
 

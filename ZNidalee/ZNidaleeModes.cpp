@@ -308,6 +308,7 @@ void ZNidaleeModes::OnRender() {
         GRender->DrawTextW(Vec2(pos.x + 52, pos.y + 10), ee, std::to_string(ZNidalee::Menu->HumanQMap.at("Javelinco").second).c_str()); } }
 
 void ZNidaleeModes::OnGapCloser(const GapCloserSpell & args) {
+    return;
     auto player = ZNidalee::Player;
     auto ex = ZNidalee::Ex;
 

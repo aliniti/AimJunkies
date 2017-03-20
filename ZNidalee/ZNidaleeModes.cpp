@@ -273,7 +273,7 @@ void ZNidaleeModes::OnSpellCast(CastedSpell & args) {
         for(auto a : allies) {
             if(a->GetNetworkId() == args.Caster_->GetNetworkId() &&
                     menu->AllyHealMap.at(a->ChampionName() + std::string("on"))->Enabled()) {
-                if((ZNidalee::CanUse(ZNidalee::SpellE, true, "on") || true) && (args.Target_->UnitFlags() == FL_TURRET || args.Target_->UnitFlags() == FL_HERO)) {
+                if(ZNidalee::CanUse(ZNidalee::SpellE, true, "on") && (args.Target_->UnitFlags() == FL_TURRET || args.Target_->UnitFlags() == FL_HERO)) {
                     if(a->HealthPercent() <= 90) {
                         if(!player->GetSpellBook()->IsChanneling() && !player->IsRecalling()) {
                             if(GOrbwalking->GetOrbwalkingMode() != kModeNone || a->HealthPercent() <= 35 || !ZNidalee::CatForm()) {

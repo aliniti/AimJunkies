@@ -33,8 +33,9 @@ class ZNidalee {
         static ISpell2 * SBushwhack;
         static ISpell2 * SPounce;
         static ISpell2 * SSwipe;
-        static eCollisionFlags QCollisionFlags;
 
+        static DelayAction * Delay;
+        static eCollisionFlags QCollisionFlags;
         static std::map<std::string, int> Stamps;
 
         static ZNidaleeModes * Modes;
@@ -96,7 +97,7 @@ inline bool ZNidalee::IsHunted(IUnit * unit) {
     return unit->HasBuff("nidaleepassivehunted"); }
 
 inline bool ZNidalee::CompareDamage(IUnit * a, IUnit * b) {
-    return a->PhysicalDamage() + a->PhysicalDamageMod() > b->PhysicalDamage() + b->PhysicalDamage(); }
+    return a->PhysicalDamage() + a->PhysicalDamageMod() > b->PhysicalDamage() + b->PhysicalDamageMod(); }
 
 inline bool ZNidalee::CompareLowHealth(IUnit * a, IUnit * b) {
     return a->HealthPercent() < b->HealthPercent(); }

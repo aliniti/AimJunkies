@@ -11,6 +11,8 @@ ZNidaleeExtensions * ZNidalee::Ex;
 
 eCollisionFlags ZNidalee::QCollisionFlags;
 std::map<std::string, int> ZNidalee::Stamps;
+DelayAction * ZNidalee::Delay;
+
 
 ISpell * ZNidalee::SpellQ;
 ISpell * ZNidalee::SpellW;
@@ -24,9 +26,9 @@ ISpell2 * ZNidalee::SSwipe;
 
 PLUGIN_EVENT(void) OnGameUpdate() {
     ZNidalee::Modes->OnUpdate(); }
-
 PLUGIN_EVENT(void) OnCastSpell(CastedSpell & args) {
-    ZNidalee::Modes->OnSpellCast(args); }
+    ZNidalee::Modes->OnSpellCast(args);
+    ZNidalee::Delay->AddCastedSpell(250, args, [&](CastedSpell & a) { ZNidalee::Modes->OnSpellCastDelayed(a); }); }
 
 PLUGIN_EVENT(void) OnGapCloser(GapCloserSpell const & args) {
     ZNidalee::Modes->OnGapCloser(args); }
@@ -36,6 +38,8 @@ PLUGIN_EVENT(void) OnRender() {
 
 PLUGIN_API void OnLoad(IPluginSDK * sdk) {
     PluginSDKSetup(sdk);
+
+    ZNidalee::Delay = new DelayAction;
     ZNidalee::Player = GEntityList->Player();
 
     if(strcmp(ZNidalee::Player->ChampionName(), "Nidalee") == 0) {

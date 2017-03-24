@@ -10,7 +10,8 @@ ZNidaleeModes * ZNidalee::Modes;
 ZNidaleeExtensions * ZNidalee::Ex;
 
 eCollisionFlags ZNidalee::QCollisionFlags;
-std::map<std::string, int> ZNidalee::Stamps;
+std::map<std::string, int> ZNidalee::TimeStamps;
+std::map<float, std::pair<int, int>> ZNidalee::TheHunted;
 DelayAction * ZNidalee::Delay;
 
 
@@ -26,6 +27,7 @@ ISpell2 * ZNidalee::SSwipe;
 
 PLUGIN_EVENT(void) OnGameUpdate() {
     ZNidalee::Modes->OnUpdate(); }
+
 PLUGIN_EVENT(void) OnCastSpell(CastedSpell & args) {
     ZNidalee::Modes->OnSpellCast(args);
     ZNidalee::Delay->AddCastedSpell(250, args, [&](CastedSpell & a) { ZNidalee::Modes->OnSpellCastDelayed(a); }); }
@@ -35,6 +37,9 @@ PLUGIN_EVENT(void) OnGapCloser(GapCloserSpell const & args) {
 
 PLUGIN_EVENT(void) OnRender() {
     ZNidalee::Modes->OnRender(); }
+
+PLUGIN_EVENT(void) OnBuffAdd(IUnit * source, void * buffdata) {
+    ZNidalee::Modes->OnBuffAdd(source, buffdata); }
 
 PLUGIN_API void OnLoad(IPluginSDK * sdk) {
     PluginSDKSetup(sdk);
@@ -46,6 +51,7 @@ PLUGIN_API void OnLoad(IPluginSDK * sdk) {
         ZNidalee::OnBoot();
         ZNidalee::Menu = new ZNidaleeMenu(GPluginSDK->AddMenu("ZNidalee"));
         GEventManager->AddEventHandler(kEventOnSpellCast, OnCastSpell);
+        GEventManager->AddEventHandler(kEventOnBuffAdd, OnBuffAdd);
         GEventManager->AddEventHandler(kEventOnGameUpdate, OnGameUpdate);
         GEventManager->AddEventHandler(kEventOnGapCloser, OnGapCloser);
         GEventManager->AddEventHandler(kEventOnRender, OnRender);
@@ -54,6 +60,7 @@ PLUGIN_API void OnLoad(IPluginSDK * sdk) {
 PLUGIN_API void OnUnload() {
     if(strcmp(ZNidalee::Player->ChampionName(), "Nidalee") == 0) {
         GEventManager->RemoveEventHandler(kEventOnGameUpdate, OnGameUpdate);
+        GEventManager->RemoveEventHandler(kEventOnBuffAdd, OnBuffAdd);
         GEventManager->RemoveEventHandler(kEventOnGapCloser, OnGapCloser);
         GEventManager->RemoveEventHandler(kEventOnSpellCast, OnCastSpell);
         GEventManager->RemoveEventHandler(kEventOnRender, OnRender);

@@ -9,14 +9,6 @@
 
 #define M_PI 3.14159265358979323846
 
-enum NidMode {
-    Combo,
-    Harass,
-    WaveClear,
-    JungleClear,
-    Gapcloser,
-    Immobile };
-
 class ZNidalee {
     public:
         ~ZNidalee();
@@ -36,7 +28,8 @@ class ZNidalee {
 
         static DelayAction * Delay;
         static eCollisionFlags QCollisionFlags;
-        static std::map<std::string, int> Stamps;
+        static std::map<std::string, int> TimeStamps;
+        static std::map<float, std::pair<int, int>> TheHunted;
 
         static ZNidaleeModes * Modes;
         static ZNidaleeMenu * Menu;
@@ -63,13 +56,13 @@ class ZNidalee {
         static void Flee(); };
 
 inline void ZNidalee::OnBoot() {
-    Stamps.insert(std::pair<std::string, int>("Takedown", 5));
-    Stamps.insert(std::pair<std::string, int>("Swipe", 5));
-    Stamps.insert(std::pair<std::string, int>("Pounce", 5));
-    Stamps.insert(std::pair<std::string, int>("Javelin", 5));
-    Stamps.insert(std::pair<std::string, int>("Bushwhack", 5));
-    Stamps.insert(std::pair<std::string, int>("Primalsurge", 5));
-    Stamps.insert(std::pair<std::string, int>("Aspect", 5));
+    TimeStamps.insert(std::pair<std::string, int>("Takedown", 5));
+    TimeStamps.insert(std::pair<std::string, int>("Swipe", 5));
+    TimeStamps.insert(std::pair<std::string, int>("Pounce", 5));
+    TimeStamps.insert(std::pair<std::string, int>("Javelin", 5));
+    TimeStamps.insert(std::pair<std::string, int>("Bushwhack", 5));
+    TimeStamps.insert(std::pair<std::string, int>("Primalsurge", 5));
+    TimeStamps.insert(std::pair<std::string, int>("Aspect", 5));
 
     SpellQ = GPluginSDK->CreateSpell(kSlotQ, 200);
     SpellW = GPluginSDK->CreateSpell(kSlotW, 375);
@@ -112,6 +105,7 @@ inline bool ZNidalee::CompareDistanceToCursor(IUnit * a, IUnit * b) {
     return Ex->Dist2D(a->ServerPosition(), GGame->CursorPosition()) < Ex->Dist2D(b->ServerPosition(), GGame->CursorPosition()); }
 
 inline bool ZNidalee::CanUse(ISpell * spell, bool human, std::string mode, int time = 1) {
+
     if(Player->GetSpellLevel(spell->GetSpellSlot()) < 1) {
         return false; }
 

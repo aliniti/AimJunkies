@@ -8,5 +8,7 @@ class ZNidaleeModes {
         void OnSpellCast(CastedSpell & args);
         void OnSpellCastDelayed(CastedSpell & args);
         void OnRender();
-        void OnGapCloser(const GapCloserSpell & args); };
+        void OnGapCloser(const GapCloserSpell & args);
+        void OnBuffAdd(IUnit * unit, void * buffdata);
+        void Flee(); };
 

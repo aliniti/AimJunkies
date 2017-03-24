@@ -6,7 +6,15 @@
 void ZNidaleeModes::OnUpdate() {
     auto ex = ZNidalee::Ex;
     auto menu = ZNidalee::Menu;
-    auto & stamps = ZNidalee::Stamps;
+    auto & stamps = ZNidalee::TimeStamps;
+
+
+    // remove hunted targets;
+    for(auto & i : ZNidalee::TheHunted) {
+        auto timestamp = i.first;
+
+        if(GGame->Time() - timestamp > 4) {
+            ZNidalee::TheHunted.erase(timestamp); } }
 
     // delay handler
     ZNidalee::Delay->OnGameUpdate();
@@ -160,7 +168,7 @@ void ZNidaleeModes::OnUpdate() {
 void ZNidaleeModes::OnSpellCast(CastedSpell & args) {
     auto menu = ZNidalee::Menu;
     auto player = ZNidalee::Player;
-    auto & timestamps = ZNidalee::Stamps;
+    auto & timestamps = ZNidalee::TimeStamps;
 
     // auto heal ally attacking a hero or turret
     if(args.Caster_->GetTeam() == player->GetTeam()) {
@@ -185,7 +193,8 @@ void ZNidaleeModes::OnSpellCast(CastedSpell & args) {
 void ZNidaleeModes::OnSpellCastDelayed(CastedSpell & args) {
     auto menu = ZNidalee::Menu;
     auto player = ZNidalee::Player;
-    auto & timestamps = ZNidalee::Stamps;
+    auto & timestamps = ZNidalee::TimeStamps;
+    auto & hunted = ZNidalee::TheHunted;
 
     if(args.Caster_->GetNetworkId() == player->GetNetworkId()) {
 
@@ -224,9 +233,20 @@ void ZNidaleeModes::OnSpellCastDelayed(CastedSpell & args) {
 
             if(val != timestamps.end()) {
                 if(unit != nullptr && !unit->IsDead() && unit->IsValidObject() && ZNidalee::IsHunted(unit)) {
-                    // if hunted pounce reduce timer
-                    // todo : check if same target because it is only reduced after one pounce on same target
-                    val->second = GGame->Time() +   cd / 2; }
+                    // checks if was a hunted pounce (targeted)
+                    for(auto & i : hunted) {
+                        auto networkId = i.second.first;
+                        auto & pounces = i.second.second;
+
+                        if(networkId == unit->GetNetworkId()) {
+                            if(pounces < 1) {
+                                // reduce cooldown by half
+                                val->second = GGame->Time() + cd / 2;
+                                pounces++; }
+                            else {
+                                // already reduced!
+                                val->second = GGame->Time() + cd;
+                                pounces++; } } } }
                 else {
                     // regular pounce
                     val->second = GGame->Time() + cd; } } }
@@ -334,5 +354,19 @@ void ZNidaleeModes::OnGapCloser(const GapCloserSpell & args) {
                 else {
                     ZNidalee::CastSpear(args.Sender, "gap");
                     ZNidalee::SwitchForm(args.Sender, "gap"); } } } } }
+
+void ZNidaleeModes::OnBuffAdd(IUnit * unit, void * buffdata) {
+    auto player = ZNidalee::Player;
+    auto & huntedList = ZNidalee::TheHunted;
+
+    if(strcmp(GBuffData->GetBuffName(buffdata), "NidaleePassiveHunted") == 0) {
+        if(unit->GetTeam() != player->GetTeam()) {
+            huntedList.insert(std::pair<float, std::pair<int, int>>(GGame->Time(), std::pair<int, int>(unit->GetNetworkId(), 0))); } } }
+
+void ZNidaleeModes::Flee() {
+
+}
+
+
 
 

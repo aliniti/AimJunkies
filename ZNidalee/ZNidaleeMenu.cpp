@@ -90,7 +90,7 @@ ZNidaleeMenu::ZNidaleeMenu(IMenu * menu) {
     auto mechanicsMenu = this->Menu->AddMenu("::Mechanics");
     this->CurrentPlayStyle = mechanicsMenu->AddSelection("Playstyle: ", 1, std::vector<std::string>({ "Single Target", "Multi-Target" }));
     this->PredictionSelection = mechanicsMenu->AddSelection("Prediction: ", 0, std::vector<std::string>({ "Default" }));
-    this->CheckSpearHitChanceMin = mechanicsMenu->AddSelection("- Min HitChance", 3, std::vector<std::string>({ "Low", "Medium", "High", "Very High" }));
+    this->CheckSpearHitChanceMin = mechanicsMenu->AddSelection("- Min HitChance", 2, std::vector<std::string>({ "Low", "Medium", "High", "Very High" }));
     this->JungleOrderPriority = mechanicsMenu->AddSelection("Jungle Target Priority", 1, std::vector<std::string>({ "Low HP", "MaxHealth", "Distance To Cursor" }));
 
     auto renderMenu = this->Menu->AddMenu("::Render");

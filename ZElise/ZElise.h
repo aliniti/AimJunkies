@@ -306,7 +306,8 @@ inline void ZElise::SwitchForm(IUnit * unit, std::string mode) {
             if(!CanTransform(unit, false, mode)) {
                 return; }
 
-            if(Ex->Dist2D(unit) >= Player->AttackRange()) {
+            if(Ex->Dist2D(unit) >= Player->AttackRange()
+                || CanTransform(unit, true, mode) && !CheckCocoonCollision(unit, mode)) {
                 SpellR->CastOnPlayer(); }  }
         else {
             if(!CanUse(SpellQ, false, mode) && !CanUse(SpellW, false, mode)) {

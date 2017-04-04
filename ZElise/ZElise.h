@@ -126,6 +126,7 @@ inline bool ZElise::CheckCocoonCollision(IUnit * unit, std::string mode) {
     if(unit == nullptr) {
         return false; }
 
+    if(!CanUse(SpellE, true, mode)) {
         return false; }
 
     if(unit->IsHero()) {

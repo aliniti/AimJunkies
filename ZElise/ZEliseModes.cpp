@@ -15,10 +15,14 @@ void ZEliseModes::OnUpdate() {
 
         ZElise::CocoonE(unit, mode);
 
+        if(ZElise::SpiderForm()) {
+            // E priority if already spider
+            ZElise::RappelE(unit, mode); }
+
         if(ZElise::BurstCheck(unit, mode)) {
-            ZElise::UseProtobelt(unit, mode);
             ZElise::NeurotoxinQ(unit, mode);
-            ZElise::VolatileW(unit, mode); }
+            ZElise::VolatileW(unit, mode);
+            ZElise::UseProtobelt(unit, mode); }
 
         ZElise::SwitchForm(unit, mode);
         ZElise::FrenzyW(unit, mode);

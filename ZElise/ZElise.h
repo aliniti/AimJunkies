@@ -131,11 +131,7 @@ inline bool ZElise::CheckCocoonCollision(IUnit * unit) {
 
         if(E->RunPrediction(unit, false, ECollisionFlags, pred)) {
             return true; } }
-    else {
-        auto pred = new AdvPredictionOutput();
-
-        if(E->RunPrediction(unit, false, ECollisionFlags, pred)) {
-            return true; } }
+    else {}
 
     return false; }
 
@@ -274,7 +270,7 @@ inline void ZElise::RappelE(IUnit * unit, std::string mode) {
         if(unit == nullptr || !unit->IsValidTarget()) {
             return; }
 
-        if(BurstCheck(unit, mode)) {
+        if(BurstCheck(unit, mode) && !CheckCocoonCollision(unit)) {
             if(Ex->Dist2D(unit) <= SpellQ->GetSpellRange() + 100 && CanUse(SpellQ, false, mode)) {
                 return; } }
 
@@ -297,11 +293,13 @@ inline void ZElise::SwitchForm(IUnit * unit, std::string mode) {
 
             if(!CanUse(SpellQ, true, mode)) {
                 if(CanUse(SpellZ, false, mode) && Ex->Dist2D(unit) <= SpellZ->GetSpellRange()) {
-                    SpellR->CastOnPlayer(); }
+                    SpellR->CastOnPlayer(); } }
 
-                if(CanUse(SpellE, false, mode) && Ex->Dist2D(unit) <= SpellE->GetSpellRange()) {
-                    if(!CanUse(SpellZ, false, mode) || Ex->Dist2D(unit) > SpellZ->GetSpellRange() + Player->AttackRange() + 35) {
-                        SpellR->CastOnPlayer(); } } } } }
+            if(CanUse(SpellE, false, mode) && Ex->Dist2D(unit) <= SpellE->GetSpellRange()) {
+                if(!CanUse(SpellZ, false, mode)
+                    || Ex->Dist2D(unit) > SpellZ->GetSpellRange() + Player->AttackRange() + 35
+                    || CheckCocoonCollision(unit)) {
+                    SpellR->CastOnPlayer(); } }  } }
 
     if(SpiderForm() && CanUse(SpellR, false, mode)) {
         if(unit == nullptr || !unit->IsValidTarget()) {
@@ -421,7 +419,7 @@ inline bool ZElise::CanUse(ISpell * spell, bool human, std::string mode, int tim
         auto key = name.append(mode);
 
         if(Menu->HumanQMap.at(key).first->Enabled() &&
-                Menu->HumanQMap.at(key).second <= time) {
+            Menu->HumanQMap.at(key).second <= time) {
             return true; } }
 
     if(spell->GetSpellSlot() == kSlotW && human) {
@@ -429,7 +427,7 @@ inline bool ZElise::CanUse(ISpell * spell, bool human, std::string mode, int tim
         auto key = name.append(mode);
 
         if(Menu->HumanWMap.at(key).first->Enabled() &&
-                Menu->HumanWMap.at(key).second <= time) {
+            Menu->HumanWMap.at(key).second <= time) {
             return true; } }
 
     if(spell->GetSpellSlot() == kSlotE && human) {
@@ -440,7 +438,7 @@ inline bool ZElise::CanUse(ISpell * spell, bool human, std::string mode, int tim
             return false; }
 
         if(Menu->HumanEMap.at(key).first->Enabled() &&
-                Menu->HumanEMap.at(key).second <= time) {
+            Menu->HumanEMap.at(key).second <= time) {
             return true; } }
 
     if(spell->GetSpellSlot() == kSlotQ && !human) {
@@ -448,7 +446,7 @@ inline bool ZElise::CanUse(ISpell * spell, bool human, std::string mode, int tim
         auto key = name.append(mode);
 
         if(Menu->SpiderQMap.at(key).first->Enabled() &&
-                Menu->SpiderQMap.at(key).second <= time) {
+            Menu->SpiderQMap.at(key).second <= time) {
             return true; } }
 
     if(spell->GetSpellSlot() == kSlotW && !human) {
@@ -456,7 +454,7 @@ inline bool ZElise::CanUse(ISpell * spell, bool human, std::string mode, int tim
         auto key = name.append(mode);
 
         if(Menu->SpiderWMap.at(key).first->Enabled() &&
-                Menu->SpiderWMap.at(key).second <= time) {
+            Menu->SpiderWMap.at(key).second <= time) {
             return true; } }
 
     if(spell->GetSpellSlot() == kSlotE && !human) {
@@ -464,7 +462,7 @@ inline bool ZElise::CanUse(ISpell * spell, bool human, std::string mode, int tim
         auto key = name.append(mode);
 
         if(Menu->SpiderEMap.at(key).first->Enabled() &&
-                Menu->SpiderEMap.at(key).second <= time) {
+            Menu->SpiderEMap.at(key).second <= time) {
             return true; } }
 
     if(spell->GetSpellSlot() == kSlotR) {
@@ -473,11 +471,11 @@ inline bool ZElise::CanUse(ISpell * spell, bool human, std::string mode, int tim
 
         if(human) {
             if(Menu->HumanRMap.at(key).first->Enabled() &&
-                    Menu->HumanRMap.at(key).second <= time) {
+                Menu->HumanRMap.at(key).second <= time) {
                 return true; } }
         else {
             if(Menu->SpiderRMap.at(key).first->Enabled() &&
-                    Menu->SpiderRMap.at(key).second <= time) {
+                Menu->SpiderRMap.at(key).second <= time) {
                 return true; } } }
 
     return  false; }

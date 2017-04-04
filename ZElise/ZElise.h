@@ -116,17 +116,14 @@ inline bool ZElise::CheckCocoonCollision(IUnit * unit, std::string mode) {
     if(unit == nullptr) {
         return false; }
 
-    if(!CanUse(SpellE, true, mode)) {
+    if(Menu->HumanEMap.at(std::string("cocoon").append(mode)).second > 0) {
         return false; }
 
     if(unit->IsHero()) {
         auto pred = new AdvPredictionOutput();
 
         if(E->RunPrediction(unit, false, ECollisionFlags, pred)) {
-            return pred->HitChance == kHitChanceImmobile; } }
-    else {
-
-    }
+            return pred->HitChance == kHitChanceCollision; } }
 
     return false; }
 
@@ -191,6 +188,7 @@ inline void ZElise::UseProtobelt(IUnit * unit, std::string mode) {
 inline void ZElise::NeurotoxinQ(IUnit * unit, std::string mode) {
     if(strcmp(mode.c_str(), "ha") != 0 || Player->ManaPercent() >= Menu->NeurotoxinHarassMinMana->GetInteger()) {
         if(strcmp(mode.c_str(), "jg") != 0 || Player->ManaPercent() >= Menu->NeurotoxinJungleMinMana->GetInteger()) {
+
             if(CanUse(SpellQ, true, mode) && !SpiderForm()) {
                 if(unit == nullptr || !unit->IsValidTarget()) {
                     return; }
@@ -201,11 +199,12 @@ inline void ZElise::NeurotoxinQ(IUnit * unit, std::string mode) {
 inline void ZElise::VolatileW(IUnit * unit, std::string mode) {
     if(strcmp(mode.c_str(), "ha") != 0 || Player->ManaPercent() >= Menu->VolotileSpiderHarassMinMana->GetInteger()) {
         if(strcmp(mode.c_str(), "jg") != 0 || Player->ManaPercent() >= Menu->VolotileSpiderJungleMinMana->GetInteger()) {
+
             if(CanUse(SpellW, true, mode) && !SpiderForm()) {
                 if(unit == nullptr || !unit->IsValidTarget()) {
                     return; }
 
-                if(Ex->Dist2D(unit) <= SpellW->GetSpellRange()) {
+                if(Ex->Dist2D(unit) <= SpellW->GetSpellRange() && !CheckCocoonCollision(unit, mode)) {
                     SpellW->CastOnPosition(unit->ServerPosition()); } } } } }
 
 inline void ZElise::CocoonE(IUnit * unit, std::string mode) {

@@ -29,6 +29,7 @@ class ZElise {
         static void OnBoot();
         static void OnShutdown();
         static void HandleAttacks();
+        static void HandleSpellTimers();
 
         static bool CompareDamage(IUnit * a, IUnit * b);
         static bool CompareLowHealth(IUnit * a, IUnit * b);
@@ -78,17 +79,6 @@ inline void ZElise::OnBoot() {
     Protobelt = GPluginSDK->CreateItemForId(3152, 300); }
 
 inline void ZElise::OnShutdown() {}
-
-inline void ZElise::HandleAttacks() {
-    if(SpiderForm()) {
-        GOrbwalking->SetAttacksAllowed(true); }
-    else {
-        auto unit = GTargetSelector->FindTarget(QuickestKill, SpellDamage, E->Range());
-
-        if(GOrbwalking->GetOrbwalkingMode() == kModeCombo) {
-            GOrbwalking->SetAttacksAllowed(!(CanBurst(unit, "co"))); }
-        else {
-            GOrbwalking->SetAttacksAllowed(true); } } }
 
 inline bool ZElise::CompareDamage(IUnit * a, IUnit * b) {
     return a->PhysicalDamage() + a->PhysicalDamageMod() > b->PhysicalDamage() + b->PhysicalDamageMod(); }
@@ -180,7 +170,7 @@ inline bool ZElise::CocoonStunned(IUnit * unit) {
 
 inline void ZElise::UseProtobelt(IUnit * unit, std::string mode) {
 
-    if(unit == nullptr) {
+    if(unit == nullptr || strcmp(mode.c_str(), "co") != 0) {
         return; }
 
     if(BurstCheck(unit, mode) && Menu->UseProtobelt->Enabled()) {
@@ -199,51 +189,53 @@ inline void ZElise::UseProtobelt(IUnit * unit, std::string mode) {
                         Protobelt->CastOnPosition(unit->ServerPosition()); } } } } } }
 
 inline void ZElise::NeurotoxinQ(IUnit * unit, std::string mode) {
-    if(CanUse(SpellQ, true, mode) && !SpiderForm()) {
-        if(unit == nullptr || !unit->IsValidTarget()) {
-            return; }
+    if(strcmp(mode.c_str(), "ha") != 0 || Player->ManaPercent() >= Menu->NeurotoxinHarassMinMana->GetInteger()) {
+        if(strcmp(mode.c_str(), "jg") != 0 || Player->ManaPercent() >= Menu->NeurotoxinJungleMinMana->GetInteger()) {
+            if(CanUse(SpellQ, true, mode) && !SpiderForm()) {
+                if(unit == nullptr || !unit->IsValidTarget()) {
+                    return; }
 
-        if(Ex->Dist2D(unit) <= SpellQ->GetSpellRange()) {
-            SpellQ->CastOnUnit(unit); } } }
+                if(Ex->Dist2D(unit) <= SpellQ->GetSpellRange()) {
+                    SpellQ->CastOnUnit(unit); } } } } }
 
 inline void ZElise::VolatileW(IUnit * unit, std::string mode) {
-    if(CanUse(SpellW, true, mode) && !SpiderForm()) {
-        if(unit == nullptr || !unit->IsValidTarget()) {
-            return; }
+    if(strcmp(mode.c_str(), "ha") != 0 || Player->ManaPercent() >= Menu->VolotileSpiderHarassMinMana->GetInteger()) {
+        if(strcmp(mode.c_str(), "jg") != 0 || Player->ManaPercent() >= Menu->VolotileSpiderJungleMinMana->GetInteger()) {
+            if(CanUse(SpellW, true, mode) && !SpiderForm()) {
+                if(unit == nullptr || !unit->IsValidTarget()) {
+                    return; }
 
-        if(Ex->Dist2D(unit) <= SpellW->GetSpellRange()) {
-            SpellW->CastOnPosition(unit->ServerPosition()); } } }
+                if(Ex->Dist2D(unit) <= SpellW->GetSpellRange()) {
+                    SpellW->CastOnPosition(unit->ServerPosition()); } } } } }
 
 inline void ZElise::CocoonE(IUnit * unit, std::string mode) {
     auto combo = strcmp(mode.c_str(), "co") == 0;
     auto harass = strcmp(mode.c_str(), "ha") == 0;
 
-    if(CanUse(SpellE, true, mode) && !SpiderForm()) {
-        if(unit == nullptr || !unit->IsValidTarget()) {
-            return; }
+    if(!harass || Player->ManaPercent() >= Menu->VolotileSpiderHarassMinMana->GetInteger()) {
+        if(!combo || Player->ManaPercent() >= Menu->VolotileSpiderJungleMinMana->GetInteger()) {
 
-        if(Ex->Dist2D(unit) <= E->Range()) {
+            if(CanUse(SpellE, true, mode) && !SpiderForm()) {
+                if(unit == nullptr || !unit->IsValidTarget()) {
+                    return; }
 
-            if(unit->IsHero()) {
+                if(Ex->Dist2D(unit) <= E->Range()) {
+                    if(unit->IsHero()) {
+                        auto pred = new AdvPredictionOutput();
 
-                auto pred = new AdvPredictionOutput();
+                        if(E->RunPrediction(unit, false, ECollisionFlags, pred)) {
+                            if(combo && pred->HitChance >= Menu->CocoonComboHitChance->GetInteger() + 3) {
+                                E->CastOnPosition(pred->CastPosition); }
 
-                if(E->RunPrediction(unit, false, ECollisionFlags, pred)) {
-                    if(combo && pred->HitChance >= Menu->CocoonComboHitChance->GetInteger() + 3) {
-                        E->CastOnPosition(pred->CastPosition); }
+                            if(harass && pred->HitChance >= Menu->CocoonHarassHitChance->GetInteger() + 3) {
+                                E->CastOnPosition(pred->CastPosition); } } }
+                    else {
 
-                    if(harass && pred->HitChance >= Menu->CocoonHarassHitChance->GetInteger() + 3) {
-                        E->CastOnPosition(pred->CastPosition); } } }
+                        if(Menu->DontCocoonJungleNearEnemies->Enabled()) {
+                            if(Ex->CountInRange(Player, 1000, GEntityList->GetAllHeros(false, true)) > 0) {
+                                return; } }
 
-            else {
-
-                if(Menu->DontCocoonJungleNearEnemies->Enabled()) {
-                    if(Ex->CountInRange(Player, 1000, GEntityList->GetAllHeros(false, true)) > 0) {
-                        return; } }
-
-                E->CastOnTarget(unit, kHitChanceMedium); }
-
-        } } }
+                        E->CastOnTarget(unit, kHitChanceMedium); } } } } } }
 
 inline void ZElise::BiteQ(IUnit * unit, std::string mode) {
 
@@ -301,7 +293,11 @@ inline void ZElise::SwitchForm(IUnit * unit, std::string mode) {
                 if(!CanUse(SpellZ, false, mode)
                     || Ex->Dist2D(unit) > SpellZ->GetSpellRange() + Player->AttackRange() + 35
                     || CheckCocoonCollision(unit, mode)) {
-                    SpellR->CastOnPlayer(); } }  } }
+                    SpellR->CastOnPlayer(); } } }
+        else {
+            if(!CanUse(SpellQ, true, mode) && !CanUse(SpellW, true, mode) && !CanUse(SpellE, true, mode)) {
+                if(CanTransform(unit, true, mode)) {
+                    SpellR->CastOnPlayer(); } } } }
 
     if(SpiderForm() && CanUse(SpellR, false, mode)) {
         if(unit == nullptr || !unit->IsValidTarget()) {
@@ -316,9 +312,7 @@ inline void ZElise::SwitchForm(IUnit * unit, std::string mode) {
         else {
             if(!CanUse(SpellQ, false, mode) && !CanUse(SpellW, false, mode)) {
                 if(!Player->HasBuff("elisespiderw")) {
-                    SpellR->CastOnPlayer(); } } }
-
-    }
+                    SpellR->CastOnPlayer(); } } } }
 
 }
 inline bool ZElise::CanTransform(IUnit * unit, bool human, std::string mode) {
@@ -482,3 +476,69 @@ inline bool ZElise::CanUse(ISpell * spell, bool human, std::string mode, int tim
                 return true; } } }
 
     return  false; }
+
+inline void ZElise::HandleAttacks() {
+    if(SpiderForm()) {
+        GOrbwalking->SetAttacksAllowed(true); }
+    else {
+        auto unit = GTargetSelector->FindTarget(QuickestKill, SpellDamage, E->Range());
+
+        if(GOrbwalking->GetOrbwalkingMode() == kModeCombo) {
+            GOrbwalking->SetAttacksAllowed(!(CanBurst(unit, "co"))); }
+        else {
+            GOrbwalking->SetAttacksAllowed(true); } } }
+
+
+inline void ZElise::HandleSpellTimers() {
+    auto & menu = Menu;
+    auto & stamps = TimeStamps;
+
+    // update spell states/timers
+    for(auto & HumanQ : menu->HumanQMap) {
+        auto map = menu->HumanQMap.find(HumanQ.first);
+
+        if(map != menu->HumanQMap.end()) {
+            map->second.second = (stamps.at("HumanQ") - GGame->Time()) > 0 ? (stamps.at("HumanQ") - GGame->Time()) : 0; } }
+
+    for(auto & HumanW : menu->HumanWMap) {
+        auto map = menu->HumanWMap.find(HumanW.first);
+
+        if(map != menu->HumanWMap.end()) {
+            map->second.second = (stamps.at("HumanW") - GGame->Time()) > 0 ? (stamps.at("HumanW") - GGame->Time()) : 0; } }
+
+    for(auto & HumanE : menu->HumanEMap) {
+        auto map = menu->HumanEMap.find(HumanE.first);
+
+        if(map != menu->HumanEMap.end()) {
+            map->second.second = (stamps.at("HumanE") - GGame->Time()) > 0 ? (stamps.at("HumanE") - GGame->Time()) : 0; } }
+
+    for(auto & HumanR : menu->HumanRMap) {
+        auto map = menu->HumanRMap.find(HumanR.first);
+
+        if(map != menu->HumanRMap.end()) {
+            map->second.second = (stamps.at("HumanR") - GGame->Time()) > 0 ? (stamps.at("HumanR") - GGame->Time()) : 0; } }
+
+    for(auto & spiderQ : menu->SpiderQMap) {
+        auto map = menu->SpiderQMap.find(spiderQ.first);
+
+        if(map != menu->SpiderQMap.end()) {
+            map->second.second = (stamps.at("SpiderQ") - GGame->Time()) > 0 ? (stamps.at("SpiderQ") - GGame->Time()) : 0; } }
+
+    for(auto & spiderW : menu->SpiderWMap) {
+        auto map = menu->SpiderWMap.find(spiderW.first);
+
+        if(map != menu->SpiderWMap.end()) {
+            map->second.second = (stamps.at("SpiderW") - GGame->Time()) > 0 ? (stamps.at("SpiderW") - GGame->Time()) : 0; } }
+
+    for(auto & spiderE : menu->SpiderEMap) {
+        auto map = menu->SpiderEMap.find(spiderE.first);
+
+        if(map != menu->SpiderEMap.end()) {
+            map->second.second = (stamps.at("SpiderE") - GGame->Time()) > 0 ? (stamps.at("SpiderE") - GGame->Time()) : 0; } }
+
+    for(auto & spiderR : menu->SpiderRMap) {
+        auto map = menu->SpiderRMap.find(spiderR.first);
+
+        if(map != menu->SpiderRMap.end()) {
+            map->second.second = (stamps.at("SpiderR") - GGame->Time()) > 0 ? (stamps.at("SpiderR") - GGame->Time()) : 0; } } }
+

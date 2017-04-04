@@ -17,7 +17,7 @@ ZEliseMenu::ZEliseMenu(IMenu * menu) {
     this->NeurotoxinHarassMinMana = menuHQ->AddInteger("- Harass Min Mana %", 0, 100, 66);
     HumanQMap.insert(std::pair<std::string, std::pair<IMenuOption *, float>>("neurotoxinjg", std::make_pair(menuHQ->CheckBox("Use In Jungle", true), 0)));
     this->NeurotoxinJungleMinMana = menuHQ->AddInteger("- Jungle Min Mana %", 0, 100, 35);
-    HumanQMap.insert(std::pair<std::string, std::pair<IMenuOption *, float>>("neurotoxinwc", std::make_pair(menuHQ->CheckBox("Use In WaveClear", true), 0)));
+    HumanQMap.insert(std::pair<std::string, std::pair<IMenuOption *, float>>("neurotoxinwc", std::make_pair(menuHQ->CheckBox("Use In WaveClear", false), 0)));
 
     auto menuHW = HumanMenu->AddMenu("::[W] Volotile Spider");
     HumanWMap.insert(std::pair<std::string, std::pair<IMenuOption *, float>>("volatilespiderco", std::make_pair(menuHW->CheckBox("Use In Combo", true), 0)));
@@ -25,7 +25,7 @@ ZEliseMenu::ZEliseMenu(IMenu * menu) {
     this->VolotileSpiderHarassMinMana = menuHW->AddInteger("- Harass Min Mana %", 0, 100, 66);
     HumanWMap.insert(std::pair<std::string, std::pair<IMenuOption *, float>>("volatilespiderjg", std::make_pair(menuHW->CheckBox("Use In Jungle", true), 0)));
     this->VolotileSpiderJungleMinMana = menuHW->AddInteger("- Jungle Min Mana %", 0, 100, 35);
-    HumanWMap.insert(std::pair<std::string, std::pair<IMenuOption *, float>>("volatilespiderwc", std::make_pair(menuHW->CheckBox("Use In WaveClear", true), 0)));
+    HumanWMap.insert(std::pair<std::string, std::pair<IMenuOption *, float>>("volatilespiderwc", std::make_pair(menuHW->CheckBox("Use In WaveClear", false), 0)));
 
     auto menuHE = HumanMenu->AddMenu("::[E] Cocoon");
     HumanEMap.insert(std::pair<std::string, std::pair<IMenuOption *, float>>("cocoonco", std::make_pair(menuHE->CheckBox("Use In Combo", true), 0)));

@@ -133,8 +133,10 @@ inline bool ZElise::CheckCocoonCollision(IUnit * unit, std::string mode) {
         auto pred = new AdvPredictionOutput();
 
         if(E->RunPrediction(unit, false, ECollisionFlags, pred)) {
-            return true; } }
-    else {}
+            return pred->HitChance == kHitChanceImmobile; } }
+    else {
+
+    }
 
     return false; }
 

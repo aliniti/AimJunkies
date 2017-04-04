@@ -57,7 +57,7 @@ PLUGIN_API void OnLoad(IPluginSDK * sdk) {
     ZCamille::SetupSpells();
     ZCamilleAvoider::GenerateAvoidList();
 
-    if (strcmp(ZCamille::Player->ChampionName(), "Camille") == 0) {
+    if(strcmp(ZCamille::Player->ChampionName(), "Camille") == 0) {
         ZCamille::Menu = new ZCamilleMenu(GPluginSDK->AddMenu("ZCamille"));
         GEventManager->AddEventHandler(kEventOnSpellCast, OnSpellCast);
         GEventManager->AddEventHandler(kEventOnGameUpdate, OnGameUpdate);
@@ -68,7 +68,7 @@ PLUGIN_API void OnLoad(IPluginSDK * sdk) {
         GGame->PrintChat("<font color=\"#794DFF\"><b>ZCamille</b></font><b><font color=\"#FFFFFF\"> Loaded!</font></b>"); } }
 
 PLUGIN_API void OnUnload() {
-    if (strcmp(ZCamille::Player->ChampionName(), "Camille") == 0) {
+    if(strcmp(ZCamille::Player->ChampionName(), "Camille") == 0) {
         // fail safe ->
         GOrbwalking->SetAttacksAllowed(true);
         GOrbwalking->SetMovementAllowed(true);

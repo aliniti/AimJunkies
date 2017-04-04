@@ -56,11 +56,11 @@ bool ZCamilleExtensions::IsKeyDown(IMenuOption * menuOption) {
 std::vector<IUnit *> ZCamilleExtensions::GetInRange(IUnit * unit, float range, std::vector<IUnit *> group) {
     std::vector<IUnit *> list;
 
-    if (group.empty()) {
+    if(group.empty()) {
         return list; }
 
-    for (auto o : group) {
-        if (o != nullptr && o->IsValidTarget() && Dist2D(o, unit) <= range) {
+    for(auto o : group) {
+        if(o != nullptr && o->IsValidTarget() && Dist2D(o, unit) <= range) {
             list.push_back(o); } }
 
     return list; }
@@ -79,11 +79,11 @@ ProjectionInfo * ZCamilleExtensions::ProjectOn(Vec2 point, Vec2 start, Vec2 end)
     auto pointLine = Vec2(ax + rL * (bx - ax), ay + rL * (by - ay));
     float rS;
 
-    if (rL < 0) {
+    if(rL < 0) {
         rS = 0; }
 
     else
-        if (rL > 1) {
+        if(rL > 1) {
             rS = 1; }
 
         else {
@@ -104,7 +104,7 @@ bool ZCamilleExtensions::CanHarass() {
 bool ZCamilleExtensions::CanJungleClear() {
     bool nearEnemy = CountInRange(GEntityList->Player(), 1000, GEntityList->GetAllHeros(false, true)) > 0;
 
-    if (!IsKeyDown(ZCamille::Menu->JungleClearKey)) {
+    if(!IsKeyDown(ZCamille::Menu->JungleClearKey)) {
         return false; }
 
     return IsKeyDown(ZCamille::Menu->JungleClearKey) && ZCamille::Player->GetMana() > nearEnemy
@@ -113,7 +113,7 @@ bool ZCamilleExtensions::CanJungleClear() {
 bool ZCamilleExtensions::CanWaveClear() {
     bool nearEnemy = CountInRange(GEntityList->Player(), 1000, GEntityList->GetAllHeros(false, true)) > 0;
 
-    if (!IsKeyDown(ZCamille::Menu->WaveClearKey)) {
+    if(!IsKeyDown(ZCamille::Menu->WaveClearKey)) {
         return false; }
 
     return IsKeyDown(ZCamille::Menu->WaveClearKey) && ZCamille::Player->GetMana() > nearEnemy

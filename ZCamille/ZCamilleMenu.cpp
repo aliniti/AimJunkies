@@ -65,8 +65,8 @@ ZCamilleMenu::ZCamilleMenu(IMenu * menu) {
     this->UseRAvoider = menuav->CheckBox("R Avoider", true);
     this->SpellsToAvoid = std::map<std::string, IMenuOption *>();
 
-    for (auto hero : GEntityList->GetAllHeros(false, true)) {
-        for (auto i : ZCamille::AvoidList) {
-            if (strcmp(hero->ChampionName(), i.second->ChampName.c_str()) == 0) {
+    for(auto hero : GEntityList->GetAllHeros(false, true)) {
+        for(auto i : ZCamille::AvoidList) {
+            if(strcmp(hero->ChampionName(), i.second->ChampName.c_str()) == 0) {
                 auto uniqueHero = std::string("- ").append(i.second->ChampName).append(" R");
                 this->SpellsToAvoid.insert(std::pair<std::string, IMenuOption *>(i.first, menuav->CheckBox(uniqueHero.c_str(), true))); } } } }

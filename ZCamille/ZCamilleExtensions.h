@@ -65,7 +65,7 @@ struct ActionIUnit {
         Unit = unit; }
 
     void Call() {
-        if (Unit != nullptr) {
+        if(Unit != nullptr) {
             CallbackObject(Unit); } }
 
     std::function<void(IUnit *)> CallbackObject;
@@ -88,21 +88,21 @@ struct ActionPosition {
 class DelayAction {
     public:
         void OnGameUpdate() {
-            Actions.erase(std::remove_if(Actions.begin(), Actions.end(), [](Action & Args) {
-                if (GGame->TickCount() >= Args.Time) {
-                    Args.Call();
+            Actions.erase(std::remove_if(Actions.begin(), Actions.end(), [](Action & args) {
+                if(GGame->TickCount() >= args.Time) {
+                    args.Call();
                     return true; }
 
                 return false; }), Actions.end());
-            ActionsIunit.erase(std::remove_if(ActionsIunit.begin(), ActionsIunit.end(), [](ActionIUnit & Args) {
-                if (GGame->TickCount() >= Args.Time) {
-                    Args.Call();
+            ActionsIunit.erase(std::remove_if(ActionsIunit.begin(), ActionsIunit.end(), [](ActionIUnit & args) {
+                if(GGame->TickCount() >= args.Time) {
+                    args.Call();
                     return true; }
 
                 return false; }), ActionsIunit.end());
-            ActionsPosition.erase(std::remove_if(ActionsPosition.begin(), ActionsPosition.end(), [](ActionPosition & Args) {
-                if (GGame->TickCount() >= Args.Time) {
-                    Args.Call();
+            ActionsPosition.erase(std::remove_if(ActionsPosition.begin(), ActionsPosition.end(), [](ActionPosition & args) {
+                if(GGame->TickCount() >= args.Time) {
+                    args.Call();
                     return true; }
 
                 return false; }), ActionsPosition.end()); }

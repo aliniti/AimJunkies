@@ -18,6 +18,9 @@ Vec3 ZEliseExtensions::To3D(Vec2 p) {
 Vec2 ZEliseExtensions::Perp(Vec2 v) {
     return Vec2(-v.y, v.x); }
 
+Vec3 ZEliseExtensions::Perp(Vec3 v) {
+    return Vec3(-v.y, 0, v.x); }
+
 float ZEliseExtensions::Dist(IUnit * to) {
     return (ZElise::Player->ServerPosition() - to->ServerPosition()).Length() -
            (ZElise::Player->BoundingRadius() + to->BoundingRadius()); }

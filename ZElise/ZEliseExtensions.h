@@ -22,6 +22,7 @@ class ZEliseExtensions {
         Vec2 To2D(Vec3 p);
         Vec3 To3D(Vec2 p);
         Vec2 Perp(Vec2 v);
+        Vec3 Perp(Vec3 v);
 
         float Dist(IUnit * to);
         float Dist2D(IUnit * to);

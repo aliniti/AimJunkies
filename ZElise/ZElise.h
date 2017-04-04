@@ -38,7 +38,7 @@ class ZElise {
         static bool GetPriorityJungleTarget(IUnit * a, IUnit * b);
 
         static bool SpiderForm();
-        static bool CheckCocoonCollision(IUnit * unit);
+        static bool CheckCocoonCollision(IUnit * unit, std::string mode);
         static bool BurstCheck(IUnit * unit, std::string mode);
         static bool CanBurst(IUnit * unit, std::string mode);
 
@@ -121,9 +121,11 @@ inline bool ZElise::GetPriorityJungleTarget(IUnit * a, IUnit * b) {
 inline bool ZElise::SpiderForm() {
     return strcmp(Player->GetBaseSkinName(), "Elise") != 0; }
 
-inline bool ZElise::CheckCocoonCollision(IUnit * unit) {
+inline bool ZElise::CheckCocoonCollision(IUnit * unit, std::string mode) {
 
     if(unit == nullptr) {
+        return false; }
+
         return false; }
 
     if(unit->IsHero()) {
@@ -156,7 +158,7 @@ inline bool ZElise::BurstCheck(IUnit * unit, std::string mode) {
     return false; }
 
 inline bool ZElise::CanBurst(IUnit * unit, std::string mode) {
-    if(!Menu->BlockAutoAttacks->Enabled() || SpiderForm() || unit == nullptr) {
+    if(unit == nullptr || (!Menu->BlockAutoAttacks->Enabled() || SpiderForm())) {
         return  false; }
 
     if(Ex->Dist2D(unit) > SpellQ->GetSpellRange()) {
@@ -179,22 +181,19 @@ inline void ZElise::UseProtobelt(IUnit * unit, std::string mode) {
         return; }
 
     if(BurstCheck(unit, mode) && Menu->UseProtobelt->Enabled()) {
-        Protobelt->CastOnPosition(unit->ServerPosition()); }
+        if(Ex->Dist2D(unit) <= SpellZ->GetSpellRange() && !CheckCocoonCollision(unit, mode)) {
+            Protobelt->CastOnPosition(unit->ServerPosition()); } }
 
     if(Protobelt->IsOwned() && Protobelt->IsReady() && Menu->UseProtobelt->Enabled()) {
         if(unit != nullptr && unit->IsValidTarget()) {
-            if(!unit->IsFacing(Player) && Player->IsFacing(unit)) {
-                if(Ex->Dist2D(unit) > 200) {
-                    auto dirPos = Ex->To2D(Player->ServerPosition()) + Ex->Perp(Ex->To2D(Player->Direction())) * 300;
+            auto dirPos = Player->ServerPosition() + Player->Direction() * 285;
 
-                    if(Ex->CountInRange(dirPos, 355, GEntityList->GetAllHeros(false, true)) > 0) {
-                        Protobelt->CastOnPosition(unit->ServerPosition()); } } }
-
-            if(!Player->IsFacing(unit)) {
-                auto dirPos = Ex->To2D(Player->ServerPosition()) + Ex->Perp(Ex->To2D(Player->Direction())) * 300;
-
-                if(Ex->CountInRange(dirPos, 355, GEntityList->GetAllHeros(false, true)) < 1) {
-                    Protobelt->CastOnPosition(unit->ServerPosition()); } } } } }
+            if(Ex->Dist2D(unit) > 100 || BurstCheck(unit, mode)) {
+                if(Ex->CountInRange(Ex->To2D(dirPos), 300, GEntityList->GetAllHeros(false, true)) > 0) {
+                    if(BurstCheck(unit, mode) && Ex->Dist2D(unit) <= 285 && !CheckCocoonCollision(unit, mode)) {
+                        Protobelt->CastOnPosition(unit->ServerPosition()); }
+                    else {
+                        Protobelt->CastOnPosition(unit->ServerPosition()); } } } } } }
 
 inline void ZElise::NeurotoxinQ(IUnit * unit, std::string mode) {
     if(CanUse(SpellQ, true, mode) && !SpiderForm()) {
@@ -270,7 +269,7 @@ inline void ZElise::RappelE(IUnit * unit, std::string mode) {
         if(unit == nullptr || !unit->IsValidTarget()) {
             return; }
 
-        if(BurstCheck(unit, mode) && !CheckCocoonCollision(unit)) {
+        if(BurstCheck(unit, mode) && !CheckCocoonCollision(unit, mode)) {
             if(Ex->Dist2D(unit) <= SpellQ->GetSpellRange() + 100 && CanUse(SpellQ, false, mode)) {
                 return; } }
 
@@ -298,7 +297,7 @@ inline void ZElise::SwitchForm(IUnit * unit, std::string mode) {
             if(CanUse(SpellE, false, mode) && Ex->Dist2D(unit) <= SpellE->GetSpellRange()) {
                 if(!CanUse(SpellZ, false, mode)
                     || Ex->Dist2D(unit) > SpellZ->GetSpellRange() + Player->AttackRange() + 35
-                    || CheckCocoonCollision(unit)) {
+                    || CheckCocoonCollision(unit, mode)) {
                     SpellR->CastOnPlayer(); } }  } }
 
     if(SpiderForm() && CanUse(SpellR, false, mode)) {
@@ -434,8 +433,9 @@ inline bool ZElise::CanUse(ISpell * spell, bool human, std::string mode, int tim
         auto name = std::string("cocoon");
         auto key = name.append(mode);
 
-        if(CheckCocoonCollision(unit)) {
-            return false; }
+        if(unit != nullptr) {
+            if(CheckCocoonCollision(unit, mode)) {
+                return false; } }
 
         if(Menu->HumanEMap.at(key).first->Enabled() &&
             Menu->HumanEMap.at(key).second <= time) {

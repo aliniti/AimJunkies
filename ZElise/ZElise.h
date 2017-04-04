@@ -212,8 +212,8 @@ inline void ZElise::CocoonE(IUnit * unit, std::string mode) {
     auto combo = strcmp(mode.c_str(), "co") == 0;
     auto harass = strcmp(mode.c_str(), "ha") == 0;
 
-    if(!harass || Player->ManaPercent() >= Menu->VolotileSpiderHarassMinMana->GetInteger()) {
-        if(!combo || Player->ManaPercent() >= Menu->VolotileSpiderJungleMinMana->GetInteger()) {
+    if(!harass || Player->ManaPercent() >= Menu->CocoonHarassMinMana->GetInteger()) {
+        if(!strcmp(mode.c_str(), "jg") != 0 || Player->ManaPercent() >= Menu->CocoonJungleMinMana->GetInteger()) {
 
             if(CanUse(SpellE, true, mode) && !SpiderForm()) {
                 if(unit == nullptr || !unit->IsValidTarget()) {

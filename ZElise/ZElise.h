@@ -73,7 +73,7 @@ inline void ZElise::OnBoot() {
 
     ECollisionFlags = static_cast<eCollisionFlags>(kCollidesWithMinions | kCollidesWithHeroes | kCollidesWithYasuoWall);
     E = GPluginSDK->CreateSpell2(kSlotE, kLineCast, true, false, ECollisionFlags);
-    E->SetSkillshot(0.5, 72, 1450, 1100);
+    E->SetSkillshot(0.25, 55, 1600, 1100);
 
     Protobelt = GPluginSDK->CreateItemForId(3152, 300); }
 

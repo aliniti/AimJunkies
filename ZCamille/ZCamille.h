@@ -4,9 +4,6 @@
 #include "ZCamilleAvoider.h"
 #include "ZCamilleExtensions.h"
 
-#include "PluginData.h"
-#include "PluginSDK.h"
-
 #include <math.h>
 #include <map>
 #include <string>
@@ -30,9 +27,6 @@ class ZCamille {
         static IInventoryItem * Titanic;
         static ISpell2 * Q, *W, *E, *R;
 
-        static bool KeyState;
-
-        static DelayAction Delay;
         static std::map<std::string, ZCamilleAvoider *> AvoidList;
         static std::map<float, ZCamilleAvoider *> DangerPoints;
 
@@ -43,7 +37,7 @@ class ZCamille {
         static bool OnWall();
         static bool IsDashing();
         static bool KnockedBack(IUnit * unit);
-        static bool LethalTarget(IUnit * unit);
+        static bool KeyState;
 
         // tick counts
         static int LastQ;
@@ -61,17 +55,14 @@ class ZCamille {
         static void UseR(IUnit * unit, bool force);
 
         // damage
+        static bool LethalTarget(IUnit * unit);
         static double CDmg(IUnit * unit);
         static double QDmg(IUnit * unit, bool includeq2 = true);
         static double WDmg(IUnit * unit, bool bonus = false);
         static double EDmg(IUnit * unit);
         static double RDmg(double dmg, IUnit * unit);
-
-        // combo damage dificulties
-        static double SuperRotation(IUnit * unit);
-        static double HardRotation(IUnit * unit);
-        static double StandardRotation(IUnit * unit);
-        static double EasyRotation(IUnit * unit); };
+        static auto DrawDamageOnChampionHPBar(IUnit * Hero, double Damage, const char * Text, Vec4 BarColor) -> void;
+        static auto DrawDamageOnChampionHPBar(IUnit * Hero, double Damage, Vec4 BarColor) -> void; };
 
 inline void ZCamille::SetupItems() {
     Tiamat = GPluginSDK->CreateItemForId(3077, 400);
@@ -110,6 +101,34 @@ inline bool ZCamille::KnockedBack(IUnit * unit) {
 
 inline bool ZCamille::LethalTarget(IUnit * unit) {
     return CDmg(unit) / 1.65 >= unit->GetHealth(); }
+
+inline auto ZCamille::DrawDamageOnChampionHPBar(IUnit * Hero, double Damage, const char * Text, Vec4 BarColor) -> void {
+    Vec2 HPBarPos;
+
+    if(Hero->GetHPBarPosition(HPBarPos)) {
+        Vec2 HPBarSize = Vec2(103 * (Damage / Hero->GetMaxHealth()), 8);
+        HPBarPos = Vec2(HPBarPos.x + 10, HPBarPos.y += 20);
+
+        Vec2 LinePos1 = Vec2(HPBarPos.x + HPBarSize.x, HPBarPos.y);
+        Vec2 LinePos2 = Vec2(HPBarPos.x + HPBarSize.x - 5, HPBarPos.y - 7);
+
+        GRender->DrawFilledBox(HPBarPos, HPBarSize, BarColor);
+        GRender->DrawLine(LinePos1, LinePos2, Vec4(255, 255, 255, 255));
+        GRender->DrawLine(LinePos1, LinePos1 + Vec2(0, 8), Vec4(255, 255, 255, 255));
+        GRender->DrawTextW(LinePos2 - Vec2(13, 13), Vec4(255, 255, 255, 255), Text); } }
+
+inline auto ZCamille::DrawDamageOnChampionHPBar(IUnit * Hero, double Damage, Vec4 BarColor) -> void {
+    Vec2 HPBarPos;
+
+    if(Hero->GetHPBarPosition(HPBarPos)) {
+        Vec2 HPBarSize = Vec2(103 * (Damage / Hero->GetMaxHealth()), 8);
+        HPBarPos = Vec2(HPBarPos.x + 10, HPBarPos.y += 20);
+
+        Vec2 LinePos1 = Vec2(HPBarPos.x + HPBarSize.x, HPBarPos.y);
+        Vec2 LinePos2 = Vec2(HPBarPos.x + HPBarSize.x - 5, HPBarPos.y - 7);
+
+        GRender->DrawFilledBox(HPBarPos, HPBarSize, BarColor); } }
+
 
 inline void ZCamille::UseQ(IUnit * unit) {
     if(Q->IsReady()) {
@@ -211,7 +230,7 @@ inline void ZCamille::UseE(Vec3 pos, bool combo = true) {
     while(posChecked < maxPosChecked) {
         radiusIndex++;
         auto curRadius = radiusIndex * (0x2 * posRadius);
-        auto curCurcleChecks = static_cast<int>(ceil((2 * M_PI * curRadius) / (2 * static_cast<double>(posRadius))));
+        auto curCurcleChecks = static_cast<int>(ceil((0x2 * M_PI * curRadius) / (2 * static_cast<double>(posRadius))));
 
         for(auto i = 1; i < curCurcleChecks; i++) {
             posChecked++;
@@ -251,27 +270,22 @@ inline void ZCamille::UseE(Vec3 pos, bool combo = true) {
                 candidatePosList.push_back(posFor2D); }
 
             std::sort(candidatePosList.begin(), candidatePosList.end(), [&](Vec2 a, Vec2 b) {
-                return Ex->Dist2D(a, pos) < Ex->Dist2D(b, pos); }); } }
+                switch(Menu->PreferedHookPoint->GetInteger()) {
+                    case 0:
+                        return Ex->Dist2D(a, pos) < Ex->Dist2D(b, pos);
+
+                    case 1:
+                        return Ex->Dist2D(a, Player->ServerPosition()) < Ex->Dist2D(b, Player->ServerPosition()); } }); } }
 
     if(ChargingW() == false) {
         for(auto vec : candidatePosList) {
             if(Ex->IsValid(vec) != false) {
                 if(Ex->Dist2D(Ex->To3D(vec), Player->ServerPosition()) <= E->Range() && Ex->Dist2D(Ex->To3D(vec), pos) <= E->Range()) {
                     if(Ex->IsValid(vec)) {
-                        //if (W->IsReady() && Menu->ExpirimentalCombo->Enabled() && combo) {
-                        //    int dashSpeedEst = 1450;
-                        //    int hookSpeedEst = 1250;
-                        //    float e1Time = 1000 * (Ex->Dist2D(vec, Player->ServerPosition()) - Player->BoundingRadius() / hookSpeedEst);
-                        //    float meToWall = e1Time + (1000 * (Ex->Dist2D(vec, Player->ServerPosition()) - Player->BoundingRadius() / dashSpeedEst));
-                        //    float wallToHero = (1000 * ((Ex->Dist2D(vec, pos) - Player->BoundingRadius() / dashSpeedEst)));
-                        //    auto travelTime = 250 + meToWall + wallToHero;
+                        if(W->IsReady() && Menu->ExpirimentalCombo->Enabled() && combo) {
+                            // todo
+                        }
 
-                        //    if (travelTime >= 1250 && travelTime <= 1750) {
-                        //        W->CastOnPosition(pos); }
-
-                        //    if (travelTime > 1750) {
-                        //        auto delay = 100 + (travelTime - 1750);
-                        //        Delay.Add(static_cast<int>(std::round(delay)), [&]() { W->CastOnPosition(pos); }); } }
                         if(E->CastOnPosition(Ex->To3D(vec))) {
                             LastE = GGame->TickCount(); } } } } } } }
 
@@ -294,35 +308,40 @@ inline void ZCamille::UseR(IUnit * unit, bool force = false) {
             R->CastOnUnit(unit); } } }
 
 inline double ZCamille::CDmg(IUnit * unit) {
-    if(unit == nullptr) {
-        return 0; }
+    if(unit != nullptr) {
+        auto qq = std::vector<int> {1, 1, 2, 2, 3 };
+        auto qqcount = std::vector<int> {2, 3, 4, 4 } [min(Player->GetLevel(), 18) / 6];
 
-    switch(Menu->RWhen->GetInteger()) {
-        case 0:
-            return EasyRotation(unit);
+        qqcount += abs(Player->GetCooldownReductionPercent()) * 100 / 10;
 
-        case 1:
-            return StandardRotation(unit);
+        switch(Menu->RWhen->GetInteger()) {
+            case 0:
+                qqcount = qqcount - round(qqcount - 0.6);
 
-        case 2:
-            return HardRotation(unit);
+            case 1:
+                qqcount = qqcount - round(qqcount * 0.4);
 
-        case 3:
-            return SuperRotation(unit);
+            case 2:
+                qqcount = qqcount - round(qqcount * 0.3);
 
-        default: ; }
+            default: qqcount = qqcount; }
+
+        auto az = qqcount * qq[static_cast<int>(abs(Player->GetCooldownReductionPercent()) * 100 / 10)];
+        auto ac = Player->GetMana() / Q->ManaCost();
+        auto aa = GDamage->GetAutoAttackDamage(Player, unit, true);
+
+        return min(az, ac) * QDmg(unit, false) + WDmg(unit, false) + (RDmg(aa * qqcount, unit)) + EDmg(unit); }
 
     return 0; }
-
 
 inline double ZCamille::QDmg(IUnit * unit, bool bonus) {
     double dmg = 0;
 
     if(Q->IsReady() && unit != nullptr) {
-        dmg += GDamage->CalcPhysicalDamage(Player, unit, std::vector<double> {0.2, 0.25, 0.30, 0.35, 0.40 } [Player->GetSpellLevel(kSlotQ) - 1] * (Player->PhysicalDamage() + Player->PhysicalDamageMod()));
-        auto dmgreg = GDamage->CalcPhysicalDamage(Player, unit, std::vector<double> {0.4, 0.5, 0.6, 0.7, 0.8 } [Player->GetSpellLevel(kSlotQ) - 1] * (Player->PhysicalDamage() + Player->PhysicalDamageMod()));
+        dmg += GDamage->CalcPhysicalDamage(Player, unit, GDamage->GetAutoAttackDamage(Player, unit, true) + std::vector<double> {0.2, 0.25, 0.30, 0.35, 0.40 } [Player->GetSpellLevel(kSlotQ) - 1] * (Player->PhysicalDamage() + Player->PhysicalDamageMod()));
+        auto dmgreg = GDamage->CalcPhysicalDamage(Player, unit, GDamage->GetAutoAttackDamage(Player, unit, true) + std::vector<double> {0.4, 0.5, 0.6, 0.7, 0.8 } [Player->GetSpellLevel(kSlotQ) - 1] * (Player->PhysicalDamage() + Player->PhysicalDamageMod()));
         auto pct = 52 + (3 * min(16, Player->GetLevel()));
-        auto dmgtrue = dmgreg * (pct / 100);
+        auto dmgtrue = dmgreg * pct / 100;
 
         if(bonus) {
             dmg += dmgtrue; } }
@@ -348,7 +367,7 @@ inline double ZCamille::EDmg(IUnit * unit) {
     double dmg = 0;
 
     if(E->IsReady() && unit != nullptr) {
-        dmg += GDamage->CalcPhysicalDamage(Player, unit, std::vector<double> { 70, 115, 160, 205, 250 } [Player->GetSpellLevel(kSlotE) - 1] + (0.75 * Player->PhysicalDamageMod())); }
+        dmg += GDamage->CalcPhysicalDamage(Player, unit, GDamage->GetAutoAttackDamage(Player, unit, true) + std::vector<double> { 70, 115, 160, 205, 250 } [Player->GetSpellLevel(kSlotE) - 1] + (0.75 * Player->PhysicalDamageMod())); }
 
     return dmg; }
 
@@ -362,21 +381,5 @@ inline double ZCamille::RDmg(double dmg, IUnit * unit) {
         return dmg + xtra; }
 
     return dmg; }
-
-inline double ZCamille::SuperRotation(IUnit * unit) {
-    return QDmg(unit, true) * std::vector<int> {5, 6, 7 } [min(18, Player->GetLevel()) / 6] + WDmg(unit, true) + EDmg(unit) + RDmg(GDamage->GetAutoAttackDamage(Player, unit, true) *
-            (std::vector<int> {5, 6, 7 } [min(18, Player->GetLevel()) / 6] * 0.75), unit); }
-
-inline double ZCamille::HardRotation(IUnit * unit) {
-    return QDmg(unit, true) * std::vector<int> {3, 4, 5 } [min(18, Player->GetLevel()) / 6] + WDmg(unit, true) + EDmg(unit) + RDmg(GDamage->GetAutoAttackDamage(Player, unit, true) *
-            (std::vector<int> {3, 4, 5 } [min(18, Player->GetLevel()) / 6] * 0.75), unit); }
-
-inline double ZCamille::StandardRotation(IUnit * unit) {
-    return QDmg(unit, true) * std::vector<int> {2, 3, 4 } [min(18, Player->GetLevel()) / 6] + WDmg(unit, true) + EDmg(unit) + RDmg(GDamage->GetAutoAttackDamage(Player, unit, true) *
-            (std::vector<int> {2, 3, 4 } [min(18, Player->GetLevel()) / 6] * 0.75), unit); }
-
-inline double ZCamille::EasyRotation(IUnit * unit) {
-    return QDmg(unit, true) * std::vector<int> {1, 2, 3 } [min(18, Player->GetLevel()) / 6] + WDmg(unit, true) + EDmg(unit) + RDmg(GDamage->GetAutoAttackDamage(Player, unit, true) *
-            (std::vector<int> {1, 2, 3 } [min(18, Player->GetLevel()) / 6] * 0.75), unit); }
 
 

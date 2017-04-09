@@ -199,6 +199,14 @@ void ZCamilleModes::OnRender() {
     if(ZCamille::Player->IsDead()) {
         return; }
 
+    if(ZCamille::Menu->DrawComboDamage->Enabled()) {
+        Vec4 bb;
+        ZCamille::Menu->DrawComboDamageColor->GetColor(&bb);
+
+        for(auto i : GEntityList->GetAllHeros(false, true)) {
+            if(i->IsOnScreen() && i->IsVisible() && i->IsValidTarget()) {
+                ZCamille::DrawDamageOnChampionHPBar(i, ZCamille::CDmg(i), bb); } } }
+
     if(ZCamille::Menu->DrawR->Enabled()) {
         Vec4 rr;
         ZCamille::Menu->DrawRColor->GetColor(&rr);
@@ -351,11 +359,9 @@ bool ZCamilleModes::OnIssueOrder(IUnit * source, DWORD orderIdx, Vec3 position, 
                             if(pred->HitChance >= kHitChanceHigh) {
                                 GGame->IssueOrderEx(player, kMoveTo, pred->CastPosition, false);
                                 return false; } } }
-
                     else {
                         GGame->IssueOrderEx(player, kMoveTo, etarget->ServerPosition(), false);
                         return false; } }
-
                 else {
                     return false; } } } }
 

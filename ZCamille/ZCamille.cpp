@@ -6,7 +6,6 @@
 #include <string>
 
 PluginSetup("ZCamille");
-DelayAction ZCamille::Delay;
 
 int ZCamille::LastQ;
 int ZCamille::LastW;

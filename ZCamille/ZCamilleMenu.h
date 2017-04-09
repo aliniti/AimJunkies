@@ -45,6 +45,7 @@ class ZCamilleMenu {
         IMenuOption * DontEUnderTurretToggle;
         IMenuOption * MinimumERange;
         IMenuOption * EnhancedEPrecision;
+        IMenuOption * PreferedHookPoint;
         IMenuOption * UltOnlySelected;
         IMenuOption * ForceROrbwalk;
         IMenuOption * ExpirimentalCombo;
@@ -54,9 +55,10 @@ class ZCamilleMenu {
         IMenuOption * DrawEColor;
         IMenuOption * DrawR;
         IMenuOption * DrawRColor;
+        IMenuOption * DrawComboDamage;
+        IMenuOption * DrawComboDamageColor;
         IMenuOption * AvoidEventHorizon;
         IMenuOption * AvoidR;
         IMenuOption * UseRAvoider;
         IMenuOption * AvoidSpell;
         std::map<std::string, IMenuOption *> SpellsToAvoid; };
-

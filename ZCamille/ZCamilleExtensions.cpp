@@ -15,6 +15,9 @@ Vec2 ZCamilleExtensions::To2D(Vec3 p) {
 Vec3 ZCamilleExtensions::To3D(Vec2 p) {
     return Vec3(p.x, 0, p.y); }
 
+Vec2 ZCamilleExtensions::Perp(Vec2 v) {
+    return Vec2(-v.y, v.x); }
+
 float ZCamilleExtensions::Dist(IUnit * to) {
     return (ZCamille::Player->ServerPosition() - to->ServerPosition()).Length() -
            (ZCamille::Player->BoundingRadius() + to->BoundingRadius()); }
@@ -37,6 +40,30 @@ float ZCamilleExtensions::Dist2D(Vec2 from, Vec2 to) {
 
 float ZCamilleExtensions::Dist2D(Vec2 from, Vec3 to) {
     return (from - To2D(to)).Length(); }
+
+Vec3 ZCamilleExtensions::RotateAroundPoint(Vec3 rotated, Vec3 around, float angle) {
+    auto sin = std::sin(angle);
+    auto cos = std::cos(angle);
+
+    auto x = cos * (rotated.x - around.x) - sin * (rotated.z - around.z) + around.z;
+    auto y = sin * (rotated.x - around.x) + cos * (rotated.z - around.z) + around.z;
+
+    return Vec3(static_cast<float>(x), 0, static_cast<float>(y)); }
+
+std::vector<Vec2> ZCamilleExtensions::CircleCircleIntersection(Vec2 center1, Vec2 center2, float radius1, float radius2) {
+    auto D = Dist2D(center1, center2);
+
+    //The Circles dont intersect:
+    if(D > radius1 + radius2 || (D <= std::abs(radius1 - radius2))) {
+        return std::vector<Vec2>(); }
+
+    auto A = (radius1 * radius1 - radius2 * radius2 + D * D) / (2 * D);
+    auto H = static_cast<float>(std::sqrt(radius1 * radius1 - A * A));
+    auto Direction = (center2 - center1).VectorNormalize();
+    auto PA = center1 + A * Direction;
+    auto S1 = PA + H * Perp(Direction);
+    auto S2 = PA - H * Perp(Direction);
+    return std::vector<Vec2>({ S1, S2 }); }
 
 bool ZCamilleExtensions::UnderEnemyTurret(Vec3 pos) {
     return GUtility->IsPositionUnderTurret(pos, false, true); }

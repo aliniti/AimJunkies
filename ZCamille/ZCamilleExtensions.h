@@ -21,6 +21,7 @@ class ZCamilleExtensions {
 
         Vec2 To2D(Vec3 p);
         Vec3 To3D(Vec2 p);
+        Vec2 Perp(Vec2 v);
 
         float Dist(IUnit * to);
         float Dist2D(IUnit * to);
@@ -29,6 +30,8 @@ class ZCamilleExtensions {
         float Dist2D(Vec3 from, Vec3 to);
         float Dist2D(Vec2 from, Vec2 to);
         float Dist2D(Vec2 from, Vec3 to);
+        Vec3 RotateAroundPoint(Vec3 rotated, Vec3 around, float angle);
+        std::vector<Vec2> CircleCircleIntersection(Vec2 center1, Vec2 center2, float radius1, float radius2);
 
         bool UnderEnemyTurret(Vec3 pos);
         bool UnderEnemyTurret(Vec2 pos);

@@ -11,6 +11,7 @@ ZCamilleMenu::ZCamilleMenu(IMenu * menu) {
     this->JungleClearKey = menuhk->AddKey("JungleClear [active]", 'V');
     this->FleeKey = menuhk->AddKey("Flee [active]", 'A');
     auto menucb = this->Menu->AddMenu("::Combo");
+
     this->ComboMana = menucb->AddInteger("Minimum Mana % ", 0, 100, 0);
     this->ComboQ = menucb->CheckBox("Use Q", true);
     this->ComboW = menucb->CheckBox("Use W", true);
@@ -18,10 +19,12 @@ ZCamilleMenu::ZCamilleMenu(IMenu * menu) {
     this->ComboEPred = menucb->AddSelection("- Prediction:", 0, std::vector<std::string>({ "Disabled", "Enabled" }));
     this->MinimumERange = menucb->AddInteger("- Minimum Range", 0, 1100, 165);
     this->EnhancedEPrecision = menucb->CheckBox("- Enhanced Precision", false);
+    this->PreferedHookPoint = menucb->AddSelection("- Prefered E Spot:", 0, std::vector<std::string> { "Closest To Hero", "Closest To Me" });
     this->ComboR = menucb->CheckBox("Use R", true);
     this->RWhen = menucb->AddSelection("- When:", 2, std::vector<std::string>({ "Easy", "Normal", "Hard", "Challenging" }));
     this->ForceROrbwalk = menucb->CheckBox("- Orbwalk Focus Target", true);
     this->UltOnlySelected = menucb->CheckBox("- Selected Target Only", false);
+    //this->ExpirimentalCombo = menucb->CheckBox("Use Expiremental Combo", false);
     auto menuhr = this->Menu->AddMenu("::Harass");
     this->HarassMana = menuhr->AddInteger("Minimum Mana %", 0, 100, 75);
     this->HarassQ = menuhr->CheckBox("Use Q", true);
@@ -45,7 +48,6 @@ ZCamilleMenu::ZCamilleMenu(IMenu * menu) {
     //auto menuev = this->Menu->AddMenu("::Events");
     //this->UseAntiGapcloser = menuev->CheckBox("Anti-Gapcloser", false);
     //this->UseInterrupter = menuev->CheckBox("Use Interrupter", true);
-    //this->ExpirimentalCombo = menumc->CheckBox("Use Expiremental Combo [W->E)", false);
     auto menumg = this->Menu->AddMenu("::Magnet");
     this->MagnetW = menumg->CheckBox("Magner W [Beta]", true);
     this->MagnetWCombo = menumg->CheckBox("- Combo", true);
@@ -58,6 +60,10 @@ ZCamilleMenu::ZCamilleMenu(IMenu * menu) {
     this->DrawEColor = menurd->AddColor("- Color E", 121, 77, 255, 200);
     this->DrawR = menurd->CheckBox("Enabled R Drawings", true);
     this->DrawRColor = menurd->AddColor("- Color R", 255, 255, 255, 200);
+    this->DrawComboDamage = menurd->CheckBox("Enabled R Drawings", true);
+    this->DrawComboDamageColor = menurd->AddColor("- Color R", 121, 77, 255, 200);
+
+
     auto menuav = this->Menu->AddMenu("::Avoider");
     this->DontEUnderTurret = menuav->CheckBox("Avoid E Into Turret", true);
     this->DontEUnderTurretToggle = menuav->AddKey("- Toggle Key:", 'J');

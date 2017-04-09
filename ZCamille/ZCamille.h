@@ -275,16 +275,18 @@ inline void ZCamille::UseE(Vec3 pos, bool combo = true) {
                         return Ex->Dist2D(a, pos) < Ex->Dist2D(b, pos);
 
                     case 1:
-                        return Ex->Dist2D(a, Player->ServerPosition()) < Ex->Dist2D(b, Player->ServerPosition()); } }); } }
+                        return Ex->Dist2D(a, Player->ServerPosition()) < Ex->Dist2D(b, Player->ServerPosition());
+
+                    default: return Ex->Dist2D(a, pos) < Ex->Dist2D(b, pos); ; } }); } }
 
     if(ChargingW() == false) {
         for(auto vec : candidatePosList) {
             if(Ex->IsValid(vec) != false) {
                 if(Ex->Dist2D(Ex->To3D(vec), Player->ServerPosition()) <= E->Range() && Ex->Dist2D(Ex->To3D(vec), pos) <= E->Range()) {
                     if(Ex->IsValid(vec)) {
-                        if(W->IsReady() && Menu->ExpirimentalCombo->Enabled() && combo) {
-                            // todo
-                        }
+                        //if(W->IsReady() && Menu->ExpirimentalCombo->Enabled() && combo) {
+                        //    // todo
+                        //}
 
                         if(E->CastOnPosition(Ex->To3D(vec))) {
                             LastE = GGame->TickCount(); } } } } } } }

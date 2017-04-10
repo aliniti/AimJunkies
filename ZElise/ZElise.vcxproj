@@ -157,6 +157,7 @@
     <ClInclude Include="PluginSDK.h" />
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="ZElise.h" />
+    <ClInclude Include="ZEliseAvoider.h" />
     <ClInclude Include="ZEliseExtensions.h" />
     <ClInclude Include="ZEliseMenu.h" />
     <ClInclude Include="ZEliseModes.h" />
@@ -164,6 +165,7 @@
   <ItemGroup>
     <ClCompile Include="PluginSDK.cpp" />
     <ClCompile Include="ZElise.cpp" />
+    <ClCompile Include="ZEliseAvoider.cpp" />
     <ClCompile Include="ZEliseExtensions.cpp" />
     <ClCompile Include="ZEliseMenu.cpp" />
     <ClCompile Include="ZEliseModes.cpp" />

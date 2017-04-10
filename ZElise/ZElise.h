@@ -5,6 +5,8 @@
 #include "ZEliseExtensions.h"
 #include <map>
 #include <string>
+#include "ZEliseAvoider.h"
+#include <map>
 
 class ZElise {
     public:
@@ -25,12 +27,17 @@ class ZElise {
         static ISpell2 * E;
         static eCollisionFlags ECollisionFlags;
         static std::map<std::string, int> TimeStamps;
+        static std::map<std::string, ZEliseAvoider *> AvoidList;
 
         static void OnBoot();
         static void OnShutdown();
         static void HandleAttacks();
         static void HandleSpellTimers();
 
+        static double AADmg(IUnit * unit);
+        static double QDmg(IUnit * unit, bool human);
+        static double WDmg(IUnit * unit);
+        static double CDmg(IUnit * unit);
         static bool CompareDamage(IUnit * a, IUnit * b);
         static bool CompareLowHealth(IUnit * a, IUnit * b);
         static bool CompareHighHealth(IUnit * a, IUnit * b);
@@ -39,6 +46,8 @@ class ZElise {
         static bool GetPriorityJungleTarget(IUnit * a, IUnit * b);
 
         static bool SpiderForm();
+        static auto DrawDamageOnChampionHPBar(IUnit * Hero, double Damage, const char * Text, Vec4 BarColor) -> void;
+        static auto DrawDamageOnChampionHPBar(IUnit * Hero, double Damage, Vec4 BarColor) -> void;
         static bool CheckCocoonCollision(IUnit * unit, std::string mode);
         static bool BurstCheck(IUnit * unit, std::string mode);
         static bool CanBurst(IUnit * unit, std::string mode);
@@ -71,6 +80,7 @@ inline void ZElise::OnBoot() {
     SpellE = GPluginSDK->CreateSpell(kSlotE, 750);
     SpellR = GPluginSDK->CreateSpell(kSlotR);
     SpellZ = GPluginSDK->CreateSpell(kSlotQ, 475);
+
 
     ECollisionFlags = static_cast<eCollisionFlags>(kCollidesWithMinions | kCollidesWithHeroes | kCollidesWithYasuoWall);
     E = GPluginSDK->CreateSpell2(kSlotE, kLineCast, true, false, ECollisionFlags);
@@ -110,6 +120,35 @@ inline bool ZElise::GetPriorityJungleTarget(IUnit * a, IUnit * b) {
 
 inline bool ZElise::SpiderForm() {
     return strcmp(Player->GetBaseSkinName(), "Elise") != 0; }
+
+// credits: @rembrandt
+inline auto ZElise::DrawDamageOnChampionHPBar(IUnit * Hero, double Damage, const char * Text, Vec4 BarColor) -> void {
+    Vec2 HPBarPos;
+
+    if(Hero->GetHPBarPosition(HPBarPos)) {
+        Vec2 HPBarSize = Vec2(103 * (Damage / Hero->GetMaxHealth()), 8);
+        HPBarPos = Vec2(HPBarPos.x + 10, HPBarPos.y += 20);
+
+        Vec2 LinePos1 = Vec2(HPBarPos.x + HPBarSize.x, HPBarPos.y);
+        Vec2 LinePos2 = Vec2(HPBarPos.x + HPBarSize.x - 5, HPBarPos.y - 7);
+
+        GRender->DrawFilledBox(HPBarPos, HPBarSize, BarColor);
+        GRender->DrawLine(LinePos1, LinePos2, Vec4(255, 255, 255, 255));
+        GRender->DrawLine(LinePos1, LinePos1 + Vec2(0, 8), Vec4(255, 255, 255, 255));
+        GRender->DrawTextW(LinePos2 - Vec2(13, 13), Vec4(255, 255, 255, 255), Text); } }
+
+// credits: @rembrandt
+inline auto ZElise::DrawDamageOnChampionHPBar(IUnit * Hero, double Damage, Vec4 BarColor) -> void {
+    Vec2 HPBarPos;
+
+    if(Hero->GetHPBarPosition(HPBarPos)) {
+        Vec2 HPBarSize = Vec2(103 * (Damage / Hero->GetMaxHealth()), 8);
+        HPBarPos = Vec2(HPBarPos.x + 10, HPBarPos.y += 20);
+
+        Vec2 LinePos1 = Vec2(HPBarPos.x + HPBarSize.x, HPBarPos.y);
+        Vec2 LinePos2 = Vec2(HPBarPos.x + HPBarSize.x - 5, HPBarPos.y - 7);
+
+        GRender->DrawFilledBox(HPBarPos, HPBarSize, BarColor); } }
 
 inline bool ZElise::CheckCocoonCollision(IUnit * unit, std::string mode) {
 
@@ -295,8 +334,7 @@ inline void ZElise::SwitchForm(IUnit * unit, std::string mode) {
                     SpellR->CastOnPlayer(); } } }
         else {
             if(!CanUse(SpellQ, true, mode) && !CanUse(SpellW, true, mode) && !CanUse(SpellE, true, mode)) {
-                if(CanTransform(unit, true, mode)) {
-                    SpellR->CastOnPlayer(); } } } }
+                SpellR->CastOnPlayer(); } } }
 
     if(SpiderForm() && CanUse(SpellR, false, mode)) {
         if(unit == nullptr || !unit->IsValidTarget()) {
@@ -310,6 +348,11 @@ inline void ZElise::SwitchForm(IUnit * unit, std::string mode) {
                 || CanTransform(unit, true, mode) && !CheckCocoonCollision(unit, mode)) {
                 SpellR->CastOnPlayer(); }  }
         else {
+            if(CanUse(SpellQ, true, mode) && CanUse(SpellW, true, mode) && CanUse(SpellE, true, mode)) {
+                if(!Player->HasBuff("elisespiderw")) {
+                    if(Ex->Dist2D(unit) > SpellZ->GetSpellRange() + 55) {
+                        SpellR->CastOnPlayer(); } } }
+
             if(!CanUse(SpellQ, false, mode) && !CanUse(SpellW, false, mode)) {
                 if(!Player->HasBuff("elisespiderw")) {
                     SpellR->CastOnPlayer(); } } } }
@@ -430,9 +473,8 @@ inline bool ZElise::CanUse(ISpell * spell, bool human, std::string mode, int tim
         auto name = std::string("cocoon");
         auto key = name.append(mode);
 
-        if(unit != nullptr) {
-            if(CheckCocoonCollision(unit, mode)) {
-                return false; } }
+        if(CheckCocoonCollision(unit, mode)) {
+            return false; }
 
         if(Menu->HumanEMap.at(key).first->Enabled() &&
             Menu->HumanEMap.at(key).second <= time) {
@@ -541,4 +583,67 @@ inline void ZElise::HandleSpellTimers() {
 
         if(map != menu->SpiderRMap.end()) {
             map->second.second = (stamps.at("SpiderR") - GGame->Time()) > 0 ? (stamps.at("SpiderR") - GGame->Time()) : 0; } } }
+
+inline double ZElise::AADmg(IUnit * unit) {
+    double dmg = 0;
+
+    if(unit == nullptr || !unit->IsValidTarget()) {
+        return  dmg; }
+
+    if(SpiderForm() || !SpiderForm() && CanUse(SpellR, true, "co")) {
+        dmg += GDamage-> CalcMagicDamage(
+                   Player, unit, GDamage->GetAutoAttackDamage(Player, unit, true)
+                   + std::vector<int> { 10, 20, 30, 40 } [Player->GetSpellLevel(kSlotR) - 1] + 0.3 * Player->TotalMagicDamage()); }
+
+    return  dmg; }
+
+inline double ZElise::QDmg(IUnit * unit, bool human) {
+    double dmg = 0;
+
+    if(unit == nullptr
+        || !unit->IsValidTarget()
+        || !CanUse(SpellQ, human, "co")) {
+        return dmg; }
+
+    if(human) {
+        dmg += GDamage->CalcMagicDamage(
+                   Player, unit, std::vector<int> {40, 75, 110, 145, 180 } [Player->GetSpellLevel(kSlotQ) - 1]
+                   + (0.08 + 0.03 / 100 * Player->TotalMagicDamage()) * unit->GetHealth()); }
+    else {
+
+        auto predictedDmg = QDmg(unit, true);
+
+        dmg += GDamage->CalcMagicDamage(
+                   Player, unit, std::vector<int> {60, 100, 140, 180, 220 } [Player->GetSpellLevel(kSlotQ) - 1]
+                   + (0.08 + 0.03 / 100 * Player->TotalMagicDamage()) * (unit->GetMaxHealth() - predictedDmg)); }
+
+    return dmg; }
+
+inline double ZElise::WDmg(IUnit * unit) {
+    double dmg = 0;
+
+    if(unit == nullptr
+        || !unit->IsValidTarget()) {
+        return  dmg; }
+
+    if(CanUse(SpellW, false, "co")) {
+        dmg += GDamage->CalcMagicDamage(
+                   Player, unit, std::vector<int> {75, 125, 175, 225, 275 } [Player->GetSpellLevel(kSlotW) - 1]
+                   + (0.8 * Player->TotalMagicDamage())); }
+
+    return dmg; }
+
+inline double ZElise::CDmg(IUnit * unit) {
+    double dmg = 0;
+    int aa = 2;
+
+    if(unit == nullptr
+        || !unit->IsValidTarget()) {
+        return  dmg; }
+
+    if(CanUse(SpellW, false, "co") || Player->HasBuff("elisespiderw")) {
+        aa = aa + std::vector<int> { 2, 3, 4, 5 } [min(Player->GetLevel(), 18) / 6]; }
+
+    return (AADmg(unit) * aa) + QDmg(unit, true) + QDmg(unit, false) + WDmg(unit); }
+
 

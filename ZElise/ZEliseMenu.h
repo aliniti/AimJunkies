@@ -53,6 +53,9 @@ class ZEliseMenu {
         IMenuOption * DrawE;
         IMenuOption * DrawEColor;
         IMenuOption * JungleOrderPriority;
-        IMenuOption * DontCocoonJungleNearEnemies; };
+        IMenuOption * DontCocoonJungleNearEnemies;
+        IMenuOption * DrawComboDamage;
+        IMenuOption * DrawComboDamageColor;
+        std::map<std::string, IMenuOption *> SpellsToAvoid; };
 
 

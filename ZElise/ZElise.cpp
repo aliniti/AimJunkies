@@ -16,6 +16,7 @@ ISpell * ZElise::SpellZ;
 
 ISpell2 * ZElise::E;
 IInventoryItem * ZElise::Protobelt;
+std::map<std::string, ZEliseAvoider *> ZElise::AvoidList;
 eCollisionFlags ZElise::ECollisionFlags;
 std::map<std::string, int> ZElise::TimeStamps;
 
@@ -37,6 +38,7 @@ PLUGIN_API void OnLoad(IPluginSDK * sdk) {
 
     ZElise::Delay = new DelayAction;
     ZElise::Player = GEntityList->Player();
+    ZEliseAvoider::GenerateAvoidList();
 
     if(strcmp(ZElise::Player->ChampionName(), "Elise") == 0) {
         ZElise::OnBoot();

@@ -1,4 +1,5 @@
 #include "ZEliseMenu.h"
+#include "ZElise.h"
 
 ZEliseMenu::ZEliseMenu(IMenu * menu) {
     this->Menu = menu;
@@ -84,5 +85,18 @@ ZEliseMenu::ZEliseMenu(IMenu * menu) {
     this->DrawQColor = renderMenu->AddColor("- Color Q", 121, 77, 255, 200);
     this->DrawE = renderMenu->CheckBox("Enabled E Drawings", true);
     this->DrawEColor = renderMenu->AddColor("- Color E", 121, 77, 255, 200);
+    this->DrawComboDamage = renderMenu->CheckBox("Draw Combo Damage", true);
+    this->DrawComboDamageColor = renderMenu->AddColor("- Color Combo Damage", 121, 77, 255, 200);
+
+    auto avoidMenu = this->Menu->AddMenu("::Avoider");
+    SpiderEMap.insert(std::pair<std::string, std::pair<IMenuOption *, float>>("rapellav", std::make_pair(avoidMenu->CheckBox("E Avoider", true), 0)));
+    SpiderEMap.insert(std::pair<std::string, std::pair<IMenuOption *, float>>("rapellaz", std::make_pair(avoidMenu->CheckBox("- Auto Switch Form", true), 0)));
+    this->SpellsToAvoid = std::map<std::string, IMenuOption *>();
+
+    for(auto hero : GEntityList->GetAllHeros(false, true)) {
+        for(auto i : ZElise::AvoidList) {
+            if(strcmp(hero->ChampionName(), i.second->ChampName.c_str()) == 0) {
+                auto uniqueHero = std::string("- ").append(i.second->ChampName).append(" R");
+                this->SpellsToAvoid.insert(std::pair<std::string, IMenuOption *>(i.first, avoidMenu->CheckBox(uniqueHero.c_str(), true))); } } }
 
     this->PracticeToolsDebug = this->Menu->CheckBox("Debug/Practice Tools", false); }

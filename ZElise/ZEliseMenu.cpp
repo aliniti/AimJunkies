@@ -8,7 +8,7 @@ ZEliseMenu::ZEliseMenu(IMenu * menu) {
     this->ComboButton = mainMenu->AddKey("Combo [active]", 32);
     this->FarmButton = mainMenu->AddKey("Wave/Jungleclear [active]", 'V');
     this->HarassButton = mainMenu->AddKey("Harass [active]", 'G');
-    this->FleeButton = mainMenu->AddKey("Flee [active]", 'A');
+    //this->FleeButton = mainMenu->AddKey("Flee [active]", 'A');
 
     auto HumanMenu = this->Menu->AddMenu("::Human");
 

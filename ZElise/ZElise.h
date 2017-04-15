@@ -79,8 +79,7 @@ inline void ZElise::OnBoot() {
     SpellW = GPluginSDK->CreateSpell(kSlotW, 950);
     SpellE = GPluginSDK->CreateSpell(kSlotE, 750);
     SpellR = GPluginSDK->CreateSpell(kSlotR);
-    SpellZ = GPluginSDK->CreateSpell(kSlotQ, 475);
-
+    SpellZ = GPluginSDK->CreateSpell(kSlotQ, 425);
 
     ECollisionFlags = static_cast<eCollisionFlags>(kCollidesWithMinions | kCollidesWithHeroes | kCollidesWithYasuoWall);
     E = GPluginSDK->CreateSpell2(kSlotE, kLineCast, true, false, ECollisionFlags);
@@ -178,8 +177,7 @@ inline bool ZElise::BurstCheck(IUnit * unit, std::string mode) {
         return true; }
 
     if(!CanUse(SpellE, true, mode, 1, unit)) {
-        if(time < Player->GetSpellTotalCooldown(kSlotE) / 2) {
-            return  true; } }
+        return  true; }
 
     if(CocoonStunned(unit)) {
         return true; }

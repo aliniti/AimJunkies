@@ -90,7 +90,7 @@ inline void ZZed::OnBoot() {
     R = GPluginSDK->CreateSpell(kSlotR, 625);
 
     Q = GPluginSDK->CreateSpell2(kSlotQ, kLineCast, true, false, kCollidesWithYasuoWall);
-    Q->SetSkillshot(0.25, 70, 1750, 900); }
+    Q->SetSkillshot(0.25, 50, 1700, 900); }
 
 inline void ZZed::OnShutdown() { }
 

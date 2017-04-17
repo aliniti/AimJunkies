@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Core">
+      <UniqueIdentifier>{03cb6b91-4067-4ddc-98b5-c9c067fa898e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="PluginSDK.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ZZed.cpp" />
+    <ClCompile Include="ZZedExtensions.cpp" />
+    <ClCompile Include="ZZedMenu.cpp" />
+    <ClCompile Include="ZZedModes.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="LPPConstants.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="PluginData.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="PluginSDK.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector3.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ZZed.h" />
+    <ClInclude Include="ZZedExtensions.h" />
+    <ClInclude Include="ZZedMenu.h" />
+    <ClInclude Include="ZZedModes.h" />
+  </ItemGroup>
+</Project>

@@ -528,12 +528,12 @@ inline void ZZed::GetMaxWPositions(IUnit * unit, Vec3 & wpos) {
 
                 possiblePositions.push_back(position); } } }
 
-    // sort by closest to enemy
+    // sort by furthest to enemy
     std::sort(possiblePositions.begin(), possiblePositions.end(), [&](Vec3 v1, Vec3 v2) {
-        return Ex->Dist2D(unit->ServerPosition(), v1) < Ex->Dist2D(unit->ServerPosition(), v2); });
-    // then by closest to me
+        return Ex->Dist2D(unit->ServerPosition(), v1) > Ex->Dist2D(unit->ServerPosition(), v2); });
+    // then by furthest to me
     std::sort(possiblePositions.begin(), possiblePositions.end(), [&](Vec3 v1, Vec3 v2) {
-        return Ex->Dist2D(Player->ServerPosition(), v1) < Ex->Dist2D(Player->ServerPosition(), v2); });
+        return Ex->Dist2D(Player->ServerPosition(), v1) > Ex->Dist2D(Player->ServerPosition(), v2); });
 
     if(possiblePositions.size() > 0) {
         for(auto vec : possiblePositions) {

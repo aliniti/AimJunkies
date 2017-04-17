@@ -32,7 +32,7 @@ class ZZed {
 
         static bool SoloQ(Vec3 sourcepos, IUnit * unit);
         static void GetMaxWPositions(IUnit * unit, Vec3 & wpos);
-        static void GetBestWPosition(IUnit * unit, Vec3 & wpos);
+        static void GetBestWPosition(IUnit * unit, Vec3 & wpos, bool draw = false);
 
         static void OnBoot();
         static void OnShutdown();
@@ -376,6 +376,7 @@ inline double ZZed::EDmg(IUnit * unit, double & energy) {
     // initial e damage
     double dmg = 0;
 
+
     if(unit != nullptr && unit->IsValidTarget() && Ex->IsReady(E, 2) && Player->GetMana() >= E->GetManaCost()) {
         energy += E->GetManaCost();
         dmg += GDamage->CalcPhysicalDamage(Player, unit, std::vector<int> {65, 90, 115, 140, 165 } [Player->GetSpellLevel(kSlotE) - 1] + (0.8 * Player->BonusDamage()));
@@ -439,7 +440,11 @@ inline double ZZed::CDmg(IUnit * unit, double & energy) {
     dmg += qq + ee + aa + rr;
     return dmg; }
 
-inline void ZZed::GetBestWPosition(IUnit * unit, Vec3 & wpos) {
+inline void ZZed::GetBestWPosition(IUnit * unit, Vec3 & wpos, bool draw) {
+
+    if(!Beans("ZedR", 1500) && !draw) {
+        wpos = unit->ServerPosition();
+        return; }
 
     // get w position using r shadow position
     if(Shadows.size() > 0) {
@@ -463,7 +468,6 @@ inline void ZZed::GetBestWPosition(IUnit * unit, Vec3 & wpos) {
 
     // simulate a shadow position using player position
     else {
-
         // line
         if(Menu->ShadowPlacement->GetInteger() == 0) {
             wpos = Player->ServerPosition().Extend(unit->ServerPosition(), W->GetSpellRange() + 200); }
@@ -475,7 +479,9 @@ inline void ZZed::GetBestWPosition(IUnit * unit, Vec3 & wpos) {
 
         // check multiple positions find best one with less units in way
         if(Menu->ShadowPlacement->GetInteger() == 2) {
-            GetMaxWPositions(unit, wpos); } } }
+            GetMaxWPositions(unit, wpos); } }
+
+}
 
 
 inline void ZZed::GetMaxWPositions(IUnit * unit, Vec3 & wpos) {

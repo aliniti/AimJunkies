@@ -115,7 +115,7 @@ void ZZedModes::OnRender() {
 
     if(menu->DrawPredictedShadow->Enabled() && unit != nullptr) {
         Vec3 wpos;
-        ZZed::GetBestWPosition(unit, wpos);
+        ZZed::GetBestWPosition(unit, wpos, true);
         GRender->DrawCircle(wpos, ZZed::Player->BoundingRadius(), Vec4(255, 0, 0, 255), 4, false, true); }
 
     if(menu->DrawComboDamage->Enabled()) {

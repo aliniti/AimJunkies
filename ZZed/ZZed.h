@@ -73,6 +73,8 @@ inline void ZZed::OnBoot() {
     Ticks["ZedR"] = 0;
     Ticks["ZedR2"] = 0;
 
+    Ignite = GPluginSDK->CreateSpell(kSlotUnknown);
+
     if(strcmp(Player->GetSpellName(kSummonerSlot1), "SummonerDot") == 0) {
         Ignite = GPluginSDK->CreateSpell(kSummonerSlot1, 550); }
 
@@ -290,8 +292,9 @@ inline void ZZed::UseR(IUnit * unit, bool beans) {
                     if(Youmuus->IsReady()) {
                         Youmuus->CastOnPlayer(); }
 
-                    if(Ex->Dist2D(unit) <= Ignite->GetSpellRange() && Ignite->IsReady()) {
-                        Ignite->CastOnUnit(unit); }
+                    if(Ignite->GetSpellSlot() != kSlotUnknown) {
+                        if(Ex->Dist2D(unit) <= Ignite->GetSpellRange() && Ignite->IsReady()) {
+                            Ignite->CastOnUnit(unit); } }
 
                     R->CastOnUnit(unit); } }
 
@@ -375,7 +378,6 @@ inline double ZZed::EDmg(IUnit * unit, double & energy) {
 
     // initial e damage
     double dmg = 0;
-
 
     if(unit != nullptr && unit->IsValidTarget() && Ex->IsReady(E, 2) && Player->GetMana() >= E->GetManaCost()) {
         energy += E->GetManaCost();

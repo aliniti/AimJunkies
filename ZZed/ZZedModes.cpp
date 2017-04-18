@@ -8,14 +8,15 @@ void ZZedModes::OnUpdate() {
     if(GGame->IsChatOpen() || !GUtility->IsLeagueWindowFocused()) {
         return; }
 
+    auto morebeans = false;
+
     if(ZZed::Menu->AutoR->Enabled()) {
-        auto beans = false;
 
         for(auto o : GEntityList->GetAllHeros(false, true)) {
-            ZZed::UseR(o, beans); } }
+            ZZed::UseR(o, morebeans); } }
 
     // auto e on enemies
-    if(ZZed::E->IsReady() && ZZed::Menu->AutoEUnitInRage->Enabled()
+    if(ZZed::E->IsReady() && ZZed::Menu->AutoEUnitInRage->Enabled() && !morebeans
         && ZZed::Player->GetMana() > ZZed::Menu->AutoEUnitInRagePct->GetInteger()) {
 
         if(ZZed::Ex->CountInRange(ZZed::Player, ZZed::E->GetSpellRange() + ZZed::Player->BoundingRadius(), GEntityList->GetAllHeros(false, true)) > 0) {

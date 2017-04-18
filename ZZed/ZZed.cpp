@@ -14,6 +14,7 @@ ISpell * ZZed::E;
 ISpell * ZZed::R;
 ISpell * ZZed::Ignite;
 ISpell2 * ZZed::Q;
+ISpell2 * ZZed::Z;
 
 IInventoryItem * ZZed::Hydra;
 IInventoryItem * ZZed::Tiamat;
@@ -66,6 +67,7 @@ PLUGIN_API void OnUnload() {
         GEventManager->RemoveEventHandler(kEventOnCreateObject, OnCreateObject);
         GEventManager->RemoveEventHandler(kEventOnSpellCast, OnCastSpell);
         GEventManager->RemoveEventHandler(kEventOnRender, OnRender);
+        ZZed::Menu->Menu->SaveSettings();
         ZZed::Menu->Menu->Remove(); } }
 
 

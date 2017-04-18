@@ -458,6 +458,10 @@ inline void ZZed::GetBestWPosition(IUnit * unit, Vec3 & wpos, bool harass, bool 
 
         if(Menu->ShadowPlacement->GetInteger() == 2 || seih) {
             GetMaxWPositions(unit, wpos);
+
+            if(onupdate) {
+                Ticks["DrawLimiter"] = GGame->TickCount(); }
+
             return; }
 
         // get w position using r shadow position

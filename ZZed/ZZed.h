@@ -32,7 +32,7 @@ class ZZed {
 
         static bool SoloQ(Vec3 sourcepos, IUnit * unit);
         static void GetMaxWPositions(IUnit * unit, Vec3 & wpos);
-        static void GetBestWPosition(IUnit * unit, Vec3 & wpos, bool draw = false);
+        static void GetBestWPosition(IUnit * unit, Vec3 & wpos, bool harass = false, bool onupdate = false);
 
         static void OnBoot();
         static void OnShutdown();
@@ -42,7 +42,6 @@ class ZZed {
         static bool GetPriorityJungleTarget(IUnit * a, IUnit * b);
         static void CanUlt(IUnit * unit, bool & morebeans);
         static bool Beans(std::string name, float time);
-
 
         static bool CanSwap(ISpell * spell);
         static bool HasDeathMark(IUnit * unit);
@@ -72,6 +71,7 @@ inline void ZZed::OnBoot() {
     Ticks["ZedE"] = 0;
     Ticks["ZedR"] = 0;
     Ticks["ZedR2"] = 0;
+    Ticks["DrawLimiter"] = 0;
 
     Ignite = GPluginSDK->CreateSpell(kSlotUnknown);
 
@@ -148,7 +148,7 @@ inline bool ZZed::HasDeathMark(IUnit * unit) {
     return false; }
 
 inline bool ZZed::WShadowExists() {
-    if(Beans("ZedW")) {
+    if(Beans("ZedW", 500 + GGame->Latency())) {
         return true; }
 
     for(auto z : Shadows) {
@@ -160,7 +160,7 @@ inline bool ZZed::WShadowExists() {
     return  false; }
 
 inline bool ZZed::RShadowExists() {
-    if(Beans("ZedR")) {
+    if(Beans("ZedR", 500 + GGame->Latency())) {
         return true; }
 
     for(auto z : Shadows) {
@@ -241,7 +241,10 @@ inline void ZZed::UseW(IUnit * unit, bool harass) {
     CanUlt(unit, somebeans);
 
     // update the cast position via our method
-    GetBestWPosition(unit, castposition);
+    GetBestWPosition(unit, castposition, harass);
+
+    if(Menu->DebugPathfinding->Enabled()) {
+        GRender->DrawCircle(castposition, 50, Vec4(255, 255, 255, 255), 10, false, true); }
 
     if(!WShadowExists()) {
         if(Ex->Dist2D(unit) <= W->GetSpellRange() * 2) {
@@ -349,7 +352,7 @@ inline double ZZed::QDmg(IUnit * source, IUnit * unit, double & energy) {
 
         // if networkId is me predict extra damage because shadows aren't created yet
         if(source->GetNetworkId() == Player->GetNetworkId()) {
-            GetBestWPosition(unit, wposition);
+            GetBestWPosition(unit, wposition, false, true);
 
             if(W->IsReady() && !WShadowExists()) {
                 energy += W->GetManaCost(); }
@@ -360,7 +363,7 @@ inline double ZZed::QDmg(IUnit * source, IUnit * unit, double & energy) {
             if(R->IsReady() && SoloQ(Player->ServerPosition(), unit)) {
                 shurikens += 1; } }
 
-        dmg += GDamage->CalcPhysicalDamage(Player, unit, std::vector<int> {70, 105, 140, 175, 210 } [Player->GetSpellLevel(kSlotQ) - 1] + (0.9 * Player->BonusDamage()));
+        dmg += GDamage->CalcPhysicalDamage(Player, unit, std::vector<int> {70, 105, 140, 175, 210 } [max(0, Player->GetSpellLevel(kSlotQ) - 1)] + (0.9 * Player->BonusDamage()));
 
         // reduce damage if the main unit is not the first thing hit
         if(!SoloQ(source->ServerPosition(), unit)) {
@@ -381,17 +384,18 @@ inline double ZZed::EDmg(IUnit * unit, double & energy) {
 
     if(unit != nullptr && unit->IsValidTarget() && Ex->IsReady(E, 2) && Player->GetMana() >= E->GetManaCost()) {
         energy += E->GetManaCost();
-        dmg += GDamage->CalcPhysicalDamage(Player, unit, std::vector<int> {65, 90, 115, 140, 165 } [Player->GetSpellLevel(kSlotE) - 1] + (0.8 * Player->BonusDamage()));
+
+        dmg += GDamage->CalcPhysicalDamage(Player, unit, std::vector<int> {65, 90, 115, 140, 165 } [max(0, Player->GetSpellLevel(kSlotE) - 1)] + (0.8 * Player->BonusDamage()));
 
         return dmg * Ex->AmplifyDamage(Player, unit); }
 
-    return  dmg; }
+    return dmg; }
 
 inline double ZZed::RDmg(IUnit * unit, float predictedDmg = 0) {
     double dmg = 0;
 
     if(unit != nullptr && unit->IsValidTarget() && R->IsReady() && !CanSwap(R)) {
-        dmg += GDamage->CalcPhysicalDamage(Player, unit, predictedDmg * std::vector<double> {0.25, 0.35, 0.45, 0.45 } [Player->GetSpellLevel(kSlotR) - 1] + 1 * Player->TotalPhysicalDamage());
+        dmg += GDamage->CalcPhysicalDamage(Player, unit, predictedDmg * std::vector<double> {0.25, 0.35, 0.45, 0.45 } [max(0, Player->GetSpellLevel(kSlotR) - 1)] + 1 * Player->TotalPhysicalDamage());
 
         return dmg; }
 
@@ -407,10 +411,10 @@ inline double ZZed::AADmg(IUnit * unit, float predictedDmg = 0) {
         if(Menu->UltMode->GetInteger() == 1) {
             aa += std::vector<int> { 2, 2, 3, 3 } [min(18, Player->GetLevel()) / 6]; }
 
+        dmg += GDamage->GetAutoAttackDamage(Player, unit, false) * aa;
+
         if(!unit->HasBuff("zedpassivecd") && unit->HealthPercent() <= 50) {
             dmg += GDamage->CalcMagicDamage(Player, unit, std::vector<double> {0.06, 0.08, 0.1, 0.1 } [min(18, Player->GetLevel()) / 6] * (unit->GetMaxHealth() - predictedDmg)); }
-
-        dmg += GDamage->GetAutoAttackDamage(Player, unit, false) * aa;
 
         return dmg; }
 
@@ -442,48 +446,50 @@ inline double ZZed::CDmg(IUnit * unit, double & energy) {
     dmg += qq + ee + aa + rr;
     return dmg; }
 
-inline void ZZed::GetBestWPosition(IUnit * unit, Vec3 & wpos, bool draw) {
+inline void ZZed::GetBestWPosition(IUnit * unit, Vec3 & wpos, bool harass, bool onupdate) {
 
-    if(!Beans("ZedR", 1500) && !draw) {
-        wpos = unit->ServerPosition();
-        return; }
+    // should enable in harass
+    auto seih = harass && (Menu->UseHarassWPF->GetInteger() == 1 || Ex->Dist2D(unit) > Q->Range() + 450);
 
-    // get w position using r shadow position
-    if(Shadows.size() > 0) {
+    if(Beans("ZedR", 1500) || onupdate || seih) {
 
-        for(auto o : Shadows) {
-            auto shadow = o.second;
+        if(onupdate && GGame->TickCount() - Ticks["DrawLimiter"] < 1000) {
+            return; }
+
+        if(Menu->ShadowPlacement->GetInteger() == 2 || seih) {
+            GetMaxWPositions(unit, wpos);
+            return; }
+
+        // get w position using r shadow position
+        if(Shadows.size() > 0) {
+            for(auto o : Shadows) {
+                auto shadow = o.second;
+
+                // line
+                if(Menu->ShadowPlacement->GetInteger() == 0) {
+                    if(shadow->HasBuff("zedrshadowbuff")) {
+                        wpos = shadow->ServerPosition().Extend(unit->ServerPosition(), W->GetSpellRange() + 200); } }
+
+                // triangle
+                if(Menu->ShadowPlacement->GetInteger() == 1) {
+                    if(shadow->HasBuff("zedrshadowbuff")) {
+                        auto v = Ex->CircleCircleIntersection(Ex->To2D(shadow->ServerPosition()), Ex->To2D(Player->ServerPosition()), 550, 450);
+                        wpos = v.size() > 0 ? Ex->To3D(v.front()) : shadow->ServerPosition().Extend(unit->ServerPosition(), W->GetSpellRange() + 200); } } } }
+
+        // simulate a shadow position using player position
+        else {
 
             // line
             if(Menu->ShadowPlacement->GetInteger() == 0) {
-                if(shadow->HasBuff("zedrshadowbuff")) {
-                    wpos = shadow->ServerPosition().Extend(unit->ServerPosition(), W->GetSpellRange() + 200); } }
+                wpos = Player->ServerPosition().Extend(unit->ServerPosition(), W->GetSpellRange() + 200); }
 
             // triangle
             if(Menu->ShadowPlacement->GetInteger() == 1) {
-                if(shadow->HasBuff("zedrshadowbuff")) {
-                    auto v = Ex->CircleCircleIntersection(Ex->To2D(shadow->ServerPosition()), Ex->To2D(Player->ServerPosition()), 550, 450);
-                    wpos = v.size() > 0 ? Ex->To3D(v.front()) : shadow->ServerPosition().Extend(unit->ServerPosition(), W->GetSpellRange() + 200); } } }
+                auto v = Ex->CircleCircleIntersection(Ex->To2D(unit->ServerPosition()), Ex->To2D(Player->ServerPosition()), 400, 550);
+                wpos = v.size() > 0 ? Ex->To3D(v.front()) : Player->ServerPosition().Extend(unit->ServerPosition(), W->GetSpellRange() + 200); } }
 
-        if(Menu->ShadowPlacement->GetInteger() == 2) {
-            GetMaxWPositions(unit, wpos); } }
-
-    // simulate a shadow position using player position
-    else {
-        // line
-        if(Menu->ShadowPlacement->GetInteger() == 0) {
-            wpos = Player->ServerPosition().Extend(unit->ServerPosition(), W->GetSpellRange() + 200); }
-
-        // triangle
-        if(Menu->ShadowPlacement->GetInteger() == 1) {
-            auto v = Ex->CircleCircleIntersection(Ex->To2D(unit->ServerPosition()), Ex->To2D(Player->ServerPosition()), 400, 550);
-            wpos = v.size() > 0 ? Ex->To3D(v.front()) : Player->ServerPosition().Extend(unit->ServerPosition(), W->GetSpellRange() + 200); }
-
-        // check multiple positions find best one with less units in way
-        if(Menu->ShadowPlacement->GetInteger() == 2) {
-            GetMaxWPositions(unit, wpos); } }
-
-}
+        if(onupdate) {
+            Ticks["DrawLimiter"] = GGame->TickCount(); } } }
 
 
 inline void ZZed::GetMaxWPositions(IUnit * unit, Vec3 & wpos) {
@@ -502,6 +508,7 @@ inline void ZZed::GetMaxWPositions(IUnit * unit, Vec3 & wpos) {
         auto curCurcleChecks = static_cast<int>(ceil((0x2 * M_PI * curRadius) / (0x2 * static_cast<double>(posRadius))));
 
         for(auto i = 0x1; i < curCurcleChecks; i++) {
+
             posChecked++;
             auto cRadians = (0x2 * M_PI / (curCurcleChecks - 0x1)) * i;
             auto xaxis = static_cast<float>(floor(unit->ServerPosition().x + curRadius * cos(cRadians)));

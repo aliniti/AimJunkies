@@ -23,6 +23,7 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
     auto menuiw = menucb->AddMenu("::[W] Living Shadow");
     this->UseComboW = menuiw->CheckBox("Use W in Combo", true);
     this->UseHarassW = menuiw->CheckBox("Use W in Harass", true);
+    this->UseHarassWPF = menuiw->AddSelection("- Shadow Placement:", 0, std::vector<std::string> { "Unit Position (W-Q->E)", "Pathfinding" });
     this->UseFleeW = menuiw->CheckBox("Use W in Flee", true);
 
     auto menuie = menucb->AddMenu("::[E] Shadow Slash");
@@ -37,6 +38,7 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
     this->AutoR = menuir->CheckBox("- Killsteal", true);
 
     this->UseAlwaysR = menuir->CheckBox("Enable Always R", false);
+    this->AlwaysRSelected = menuir->CheckBox("- Always R on Focus Target", true);
 
     for(auto i : GEntityList->GetAllHeros(false, true)) {
         if(!i->IsDead()) {

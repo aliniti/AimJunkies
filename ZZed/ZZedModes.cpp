@@ -37,11 +37,11 @@ void ZZedModes::OnUpdate() {
         ZZed::UseR(unit, beans);
 
         if(!beans || ZZed::Marked.size() > 0) {
-
             ZZed::UseW(unit, false);
             ZZed::UseE(unit, false);
-            ZZed::UseQ(unit, false); } }
+            ZZed::UseQ(unit, false); }
 
+    }
 
     if(ZZed::Ex->IsKeyDown(ZZed::Menu->HarassKey)) {
         auto unit = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, ZZed::W->GetSpellRange() * 2);
@@ -115,7 +115,7 @@ void ZZedModes::OnRender() {
 
     if(menu->DrawPredictedShadow->Enabled() && unit != nullptr) {
         Vec3 wpos;
-        ZZed::GetBestWPosition(unit, wpos, true);
+        ZZed::GetBestWPosition(unit, wpos, false, true);
         GRender->DrawCircle(wpos, ZZed::Player->BoundingRadius(), Vec4(255, 0, 0, 255), 4, false, true); }
 
     if(menu->DrawComboDamage->Enabled()) {

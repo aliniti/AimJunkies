@@ -41,6 +41,8 @@ class ZZedMenu {
         IMenuOption * AutoR;
         IMenuOption * ClearKey;
         IMenuOption * UseFleeW;
-        IMenuOption * UseItemsCombo; };
+        IMenuOption * UseItemsCombo;
+        IMenuOption * AlwaysRSelected;
+        IMenuOption * UseHarassWPF; };
 
 

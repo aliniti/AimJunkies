@@ -43,6 +43,18 @@ class ZZedMenu {
         IMenuOption * UseFleeW;
         IMenuOption * UseItemsCombo;
         IMenuOption * AlwaysRSelected;
-        IMenuOption * UseHarassWPF; };
+        IMenuOption * UseHarassWPF;
+        IMenuOption * DrawQ;
+        IMenuOption * DrawQColor;
+        IMenuOption * DrawW;
+        IMenuOption * DrawWColor;
+        IMenuOption * DrawE;
+        IMenuOption * DrawEColor;
+        IMenuOption * DrawR;
+        IMenuOption * DrawRColor;
+        IMenuOption * UseJungleQ;
+        IMenuOption * UseJungleW;
+        IMenuOption * UseJungleE;
+        IMenuOption * UseJungleWNearEnemy; };
 
 

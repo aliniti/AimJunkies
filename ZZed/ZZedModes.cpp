@@ -3,63 +3,61 @@
 #include "ZZed.h"
 #include <string>
 
+void ZZedModes::Combo() {
+
+    auto unit = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, ZZed::W->GetSpellRange() * 2);
+    auto beans = false;
+
+    ZZed::CanUlt(unit, beans);
+    ZZed::UseR(unit, beans);
+
+    if(!beans || ZZed::Marked.size() > 0) {
+        ZZed::UseW(unit, false);
+        ZZed::UseE(unit, false);
+        ZZed::UseQ(unit, false); } }
+
+void ZZedModes::Harass() {
+
+    auto unit = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, ZZed::W->GetSpellRange() * 2);
+
+    ZZed::UseW(unit, true);
+    ZZed::UseE(unit, true);
+    ZZed::UseQ(unit, true); }
+
+void ZZedModes::Flee() {
+
+    GOrbwalking->Orbwalk(nullptr, GGame->CursorPosition());
+
+    if(ZZed::W->IsReady() && ZZed::Menu->UseFleeW->Enabled()) {
+        ZZed::W->CastOnPosition(GGame->CursorPosition()); } }
+
+void ZZedModes::WaveClear() {
+
+}
+
+void ZZedModes::Jungling() {
+    auto menu = ZZed::Menu;
+    auto player = ZZed::Player;
+    auto exten = ZZed::Ex;
+
+    if(player->GetMana() > menu->MinimumClearEnergy->GetInteger()) {
+        auto mobs = GEntityList->GetAllMinions(false, true, true);
+        std::sort(mobs.begin(), mobs.end(), [&](IUnit * a, IUnit * b) { return ZZed::GetPriorityJungleTarget(a, b); });
+
+        for(auto unit : mobs) {
+            if(unit->IsJungleCreep() && ZZed::Ex->Dist(unit) <= 655) {
+                if(unit->IsValidObject() && !unit->IsDead() && unit->IsVisible()) {
+                    if(menu->UseJungleWNearEnemy->Enabled() || exten->CountInRange(player, 1000, GEntityList->GetAllHeros(false, true)) < 1) {
+                        if(menu->UseJungleW->Enabled()) {
+                            ZZed::UseWEx(unit, true); } }
+
+                    if(menu->UseJungleE->Enabled()) {
+                        ZZed::UseEEx(unit, true); }
+
+                    if(menu->UseJungleQ->Enabled()) {
+                        ZZed::UseQ(unit, false); } } } } } }
+
 void ZZedModes::OnUpdate() {
-
-    if(GGame->IsChatOpen() || !GUtility->IsLeagueWindowFocused()) {
-        return; }
-
-    auto morebeans = false;
-
-    if(ZZed::Menu->AutoR->Enabled()) {
-
-        for(auto o : GEntityList->GetAllHeros(false, true)) {
-            ZZed::UseR(o, morebeans); } }
-
-    // auto e on enemies
-    if(ZZed::E->IsReady() && ZZed::Menu->AutoEUnitInRage->Enabled() && !morebeans
-        && ZZed::Player->GetMana() > ZZed::Menu->AutoEUnitInRagePct->GetInteger()) {
-
-        if(ZZed::Ex->CountInRange(ZZed::Player, ZZed::E->GetSpellRange() + ZZed::Player->BoundingRadius(), GEntityList->GetAllHeros(false, true)) > 0) {
-            if(!ZZed::Ex->UnderEnemyTurret(ZZed::Player)) {
-                ZZed::E->CastOnPlayer(); } }
-
-        for(auto entry : ZZed::Shadows) {
-            auto shadow = entry.second;
-
-            if(ZZed::Ex->CountInRange(shadow, ZZed::E->GetSpellRange() + ZZed::Player->BoundingRadius(), GEntityList->GetAllHeros(false, true)) > 0) {
-                if(!ZZed::Ex->UnderEnemyTurret(ZZed::Player)) {
-                    ZZed::E->CastOnPlayer(); } } } }
-
-    if(ZZed::Ex->IsKeyDown(ZZed::Menu->ComboKey)) {
-        auto unit = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, ZZed::W->GetSpellRange() * 2);
-        auto beans = false;
-
-        ZZed::CanUlt(unit, beans);
-        ZZed::UseR(unit, beans);
-
-        if(!beans || ZZed::Marked.size() > 0) {
-            ZZed::UseW(unit, false);
-            ZZed::UseE(unit, false);
-            ZZed::UseQ(unit, false); }
-
-    }
-
-    if(ZZed::Ex->IsKeyDown(ZZed::Menu->HarassKey)) {
-        auto unit = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, ZZed::W->GetSpellRange() * 2);
-
-        ZZed::UseW(unit, true);
-        ZZed::UseE(unit, true);
-        ZZed::UseQ(unit, true); }
-
-    //if(ZZed::Ex->IsKeyDown(ZZed::Menu->ClearKey)) {
-
-    //}
-
-    if(ZZed::Ex->IsKeyDown(ZZed::Menu->FleeKey)) {
-        GOrbwalking->Orbwalk(nullptr, GGame->CursorPosition());
-
-        if(ZZed::W->IsReady() && ZZed::Menu->UseFleeW->Enabled()) {
-            ZZed::W->CastOnPosition(GGame->CursorPosition()); } }
 
     // itterrate marked targets
     for(auto i : ZZed::Marked) {
@@ -98,7 +96,25 @@ void ZZedModes::OnUpdate() {
         // remove shadows after 10 seconds
         if(GGame->Time() - key > 10) {
             ZZed::Shadows.erase(key);
-            break; } } }
+            break; } }
+
+    if(GGame->IsChatOpen() || !GUtility->IsLeagueWindowFocused()) {
+        return; }
+
+    ZZed::Modes->Auto();
+
+    if(ZZed::Ex->IsKeyDown(ZZed::Menu->ComboKey)) {
+        ZZed::Modes->Combo(); }
+
+    if(ZZed::Ex->IsKeyDown(ZZed::Menu->HarassKey)) {
+        ZZed::Modes->Harass(); }
+
+    if(ZZed::Ex->IsKeyDown(ZZed::Menu->ClearKey)) {
+        ZZed::Modes->WaveClear();
+        ZZed::Modes->Jungling(); }
+
+    if(ZZed::Ex->IsKeyDown(ZZed::Menu->FleeKey)) {
+        ZZed::Modes->Flee(); } }
 
 void ZZedModes::OnSpellCast(const CastedSpell & args) {
     auto & player = ZZed::Player;
@@ -113,6 +129,29 @@ void ZZedModes::OnSpellCast(const CastedSpell & args) {
 void ZZedModes::OnRender() {
     auto menu = ZZed::Menu;
     auto unit = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, ZZed::W->GetSpellRange() * 2);
+
+    if(ZZed::Player->IsDead()) {
+        return; }
+
+    if(ZZed::Menu->DrawQ->Enabled()) {
+        Vec4 qq;
+        ZZed::Menu->DrawQColor->GetColor(&qq);
+        GRender->DrawOutlinedCircle(GEntityList->Player()->GetPosition(), qq, ZZed::Q->Range()); }
+
+    if(ZZed::Menu->DrawE->Enabled()) {
+        Vec4 ee;
+        ZZed::Menu->DrawEColor->GetColor(&ee);
+        GRender->DrawOutlinedCircle(GEntityList->Player()->GetPosition(), ee, ZZed::E->GetSpellRange()); }
+
+    if(ZZed::Menu->DrawW->Enabled()) {
+        Vec4 ww;
+        ZZed::Menu->DrawWColor->GetColor(&ww);
+        GRender->DrawOutlinedCircle(GEntityList->Player()->GetPosition(), ww, ZZed::W->GetSpellRange()); }
+
+    if(ZZed::Menu->DrawR->Enabled()) {
+        Vec4 rr;
+        ZZed::Menu->DrawRColor->GetColor(&rr);
+        GRender->DrawOutlinedCircle(GEntityList->Player()->GetPosition(), rr, ZZed::R->GetSpellRange()); }
 
     if(menu->DrawPredictedShadow->Enabled() && unit != nullptr) {
         Vec3 wpos;
@@ -159,22 +198,30 @@ void ZZedModes::OnBuffAdd(IUnit * unit, void * buffdata) {
         if(strcmp(GBuffData->GetBuffName(buffdata), "zedrdeathmark") == 0) {
             ZZed::Marked[GGame->Time()] = unit; } } }
 
-void ZZedModes::OnDoCast(const CastedSpell & args) {}
+void ZZedModes::OnDoCast(const CastedSpell & args) {
 
-//void ZZedModes::WaveClear() {
-//
-//}
-//
-//void ZZedModes::Jungling() {
-//    auto ex = ZZed::Ex;
-//    auto player = ZZed::Player;
-//
-//    auto mobs = GEntityList->GetAllMinions(false, true, true);
-//    std::sort(mobs.begin(), mobs.end(), [&](IUnit * a, IUnit * b) { return ZZed::GetPriorityJungleTarget(a, b); });
-//
-//    for(auto unit : mobs) {
-//        if(unit->IsJungleCreep()) {
-//
-//        } }
-//
-//}
+}
+
+void ZZedModes::Auto() {
+    auto morebeans = false;
+
+    if(ZZed::Menu->AutoR->Enabled()) {
+        for(auto o : GEntityList->GetAllHeros(false, true)) {
+            ZZed::CanUlt(o, morebeans);
+            ZZed::UseR(o, morebeans, true); } }
+
+    // auto e on enemies
+    if(ZZed::E->IsReady() && ZZed::Menu->AutoEUnitInRage->Enabled() && !morebeans
+        && ZZed::Player->GetMana() > ZZed::Menu->AutoEUnitInRagePct->GetInteger()) {
+
+        if(ZZed::Ex->CountInRange(ZZed::Player, ZZed::E->GetSpellRange() + ZZed::Player->BoundingRadius(), GEntityList->GetAllHeros(false, true)) > 0) {
+            if(!ZZed::Ex->UnderEnemyTurret(ZZed::Player)) {
+                ZZed::E->CastOnPlayer(); } }
+
+        for(auto entry : ZZed::Shadows) {
+            auto shadow = entry.second;
+
+            if(ZZed::Ex->CountInRange(shadow, ZZed::E->GetSpellRange() + ZZed::Player->BoundingRadius(), GEntityList->GetAllHeros(false, true)) > 0) {
+                if(!ZZed::Ex->UnderEnemyTurret(ZZed::Player)) {
+                    ZZed::E->CastOnPlayer(); } } } } }
+

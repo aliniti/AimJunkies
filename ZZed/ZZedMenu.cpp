@@ -3,13 +3,13 @@
 ZZedMenu::ZZedMenu(IMenu * menu) {
     this->Menu = menu;
 
-    auto menuhk = this->Menu->AddMenu("::Hotkeys");
+    auto menuhk = this->Menu->AddMenu("::Keys");
     this->ComboKey = menuhk->AddKey("Combo [active]", 32);
     this->HarassKey = menuhk->AddKey("Harass [active]", 'G');
-    //this->ClearKey = menuhk->AddKey("Clear [active]", 'V');
+    this->ClearKey = menuhk->AddKey("Clear [active]", 'V');
     this->FleeKey = menuhk->AddKey("Flee ", 'A');
 
-    auto menucb = this->Menu->AddMenu("::Main Settings");
+    auto menucb = this->Menu->AddMenu("::Main");
 
     auto menuiq = menucb->AddMenu("::[Q] Razor Shuriken");
     this->UseComboQ = menuiq->CheckBox("Use Q in Combo", true);
@@ -18,17 +18,20 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
     this->UseHarassQ = menuiq->CheckBox("Use Q in Harass", true);
     this->ExtendedQHarass = menuiq->CheckBox("- Use Extended Q", true);
     //this->ExHarassQMaxDamage = menuiq->CheckBox("- Only Max Damage Q", false);
-
+    this->UseJungleQ = menuiq->CheckBox("Use Q in Jungle", true);
 
     auto menuiw = menucb->AddMenu("::[W] Living Shadow");
     this->UseComboW = menuiw->CheckBox("Use W in Combo", true);
     this->UseHarassW = menuiw->CheckBox("Use W in Harass", true);
     this->UseHarassWPF = menuiw->AddSelection("- Shadow Placement:", 0, std::vector<std::string> { "Unit Position (W-Q->E)", "Pathfinding" });
+    this->UseJungleW = menuiw->CheckBox("Use W in Jungle", true);
+    this->UseJungleWNearEnemy = menuiw->CheckBox("- Use Near Enemy", false);
     this->UseFleeW = menuiw->CheckBox("Use W in Flee", true);
 
     auto menuie = menucb->AddMenu("::[E] Shadow Slash");
     this->UseComboE = menuie->CheckBox("Use E in Combo", true);
     this->UseHarassE = menuie->CheckBox("Use E in Harass", true);
+    this->UseJungleE = menuie->CheckBox("Use E in Jungle", true);
 
     auto menuir = menucb->AddMenu("::[R] Death Mark");
     this->UseComboR = menuir->CheckBox("Use R in Combo", true);
@@ -44,9 +47,9 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
         if(!i->IsDead()) {
             this->AlwaysRTargets[i->ChampionName()] = menuir->CheckBox(std::string("- Always R on").append(" ").append(i->ChampionName()).c_str(), false); } }
 
-    auto menuem = this->Menu->AddMenu("::Energy Management");
+    auto menuem = this->Menu->AddMenu("::Energy");
     this->MinimumHarassEnergy = menuem->AddInteger("Minimum Harass Energy", 0, 200, 100);
-    //this->MinimumClearEnergy = menuem->AddInteger("Minimum Clear Energy", 0, 200, 50);
+    this->MinimumClearEnergy = menuem->AddInteger("Minimum Clear Energy", 0, 200, 50);
 
     auto menumc = this->Menu->AddMenu("::Mechanics");
     this->UseItemsCombo = menumc->CheckBox("Use Items", true);
@@ -55,6 +58,14 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
     this->JungleOrderPriority = menumc->AddSelection("Jungle Target Priority:", 1, std::vector<std::string> {"Low Health", "Max Health", "Closest to Cursor" });
 
     auto menurd = this->Menu->AddMenu("::Render");
+    this->DrawQ = menurd->CheckBox("Enabled Q Drawings", true);
+    this->DrawQColor = menurd->AddColor("- Color Q", 121, 77, 255, 200);
+    this->DrawW = menurd->CheckBox("Enabled W Drawings", true);
+    this->DrawWColor = menurd->AddColor("- Color W", 121, 77, 255, 200);
+    this->DrawE = menurd->CheckBox("Enabled E Drawings", false);
+    this->DrawEColor = menurd->AddColor("- Color E", 255, 255, 255, 200);
+    this->DrawR = menurd->CheckBox("Enabled R Drawings", true);
+    this->DrawRColor = menurd->AddColor("- Color R", 255, 255, 255, 200);
     this->DrawComboDamage = menurd->CheckBox("Draw Combo Damage", true);
     this->DrawComboDamageColor = menurd->AddColor("- Color Combo Damage", 121, 77, 255, 200);
 

@@ -43,13 +43,13 @@ PLUGIN_EVENT(void) OnRender() {
 PLUGIN_EVENT(void) OnDoCast(CastedSpell const & args) {
     ZZed::Modes->OnDoCast(args); }
 
-
 PLUGIN_API void OnLoad(IPluginSDK * sdk) {
     PluginSDKSetup(sdk);
 
     ZZed::Player = GEntityList->Player();
 
     if(strcmp(ZZed::Player->ChampionName(), "Zed") == 0) {
+
         ZZed::OnBoot();
         ZZed::Menu = new ZZedMenu(GPluginSDK->AddMenu("ZZed"));
         GEventManager->AddEventHandler(kEventOnSpellCast, OnCastSpell);

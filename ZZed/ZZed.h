@@ -28,8 +28,13 @@ class ZZed {
 
         static void UseQ(IUnit * unit, bool harass = false);
         static void UseW(IUnit * unit, bool harass);
+        static void UseWEx(IUnit * unit, bool jungle);
         static void UseE(IUnit * unit, bool harass);
-        static void UseR(IUnit * unit, bool beans);
+        static void UseEEx(IUnit * unit, bool jungle);
+        static void UseR(IUnit * unit, bool beans, bool killsteal = false);
+
+        static void JungleClear(IUnit * unit, bool waveclear, bool kill = false);
+        static void WaveClear(IUnit * unit, bool waveclear, bool kill = false);
 
         static bool SoloQ(Vec3 sourcepos, IUnit * unit);
         static void GetMaxWPositions(IUnit * unit, Vec3 & wpos);
@@ -37,6 +42,7 @@ class ZZed {
 
         static void OnBoot();
         static void OnShutdown();
+        static bool LethalTarget(IUnit * unit);
         static bool CompareLowHealth(IUnit * a, IUnit * b);
         static bool CompareMaxHealth(IUnit * a, IUnit * b);
         static bool CompareDistanceToCursor(IUnit * a, IUnit * b);
@@ -100,7 +106,13 @@ inline void ZZed::OnBoot() {
     Z = GPluginSDK->CreateSpell2(kSlotQ, kLineCast, true, false, static_cast<eCollisionFlags>(kCollidesWithYasuoWall | kCollidesWithHeroes | kCollidesWithMinions));
     Z->SetSkillshot(0.25, 100, 1700, 900); }
 
-inline void ZZed::OnShutdown() { }
+inline void ZZed::OnShutdown() {
+
+}
+
+inline bool ZZed::LethalTarget(IUnit * unit) {
+    double tacos;
+    return CDmg(unit, tacos) / 1.65 >= unit->GetHealth(); }
 
 inline bool ZZed::CompareLowHealth(IUnit * a, IUnit * b) {
     return a->HealthPercent() < b->HealthPercent(); }
@@ -130,7 +142,7 @@ inline bool ZZed::Beans(std::string name, float time = 0) {
 inline void ZZed::CanUlt(IUnit * unit, bool & coolbeans) {
     coolbeans = false;
 
-    if(unit != nullptr && R->IsReady() && Menu->UseComboR->Enabled()) {
+    if(unit != nullptr && R->IsReady() && Menu->UseComboR->Enabled() && unit->IsHero()) {
         auto focus = GTargetSelector->GetFocusedTarget();
         double energy = 0;
 
@@ -198,47 +210,58 @@ inline IUnit * ZZed::WShadow() {
 
 inline void ZZed::UseQ(IUnit * unit, bool harass) {
 
-    if(unit == nullptr || !unit->IsValidTarget()) {
+    if(unit == nullptr || !unit->IsValidTarget() || !Q->IsReady()) {
         return; }
 
     bool somebeans;
     CanUlt(unit, somebeans);
 
-    if(Q->IsReady()) {
-        if(Ex->Dist2D(unit) <= Q->Range() && harass && Menu->UseHarassQ->Enabled()
-            || Ex->Dist2D(unit) <= Q->Range() && !harass && Menu->UseComboQ->Enabled()) {
+
+    if(Ex->Dist2D(unit) <= Q->Range()) {
+        if(harass && Menu->UseHarassQ->Enabled() && Player->GetMana() > Menu->MinimumHarassEnergy->GetInteger()) {
             Q->CastOnTarget(unit); }
 
-        if(harass && Ex->Dist2D(unit) > Q->Range() && Menu->UseHarassQ->Enabled()) {
-            for(auto z : Shadows) {
-                auto shadow = z.second;
+        if(!harass && Menu->UseComboQ->Enabled()) {
+            Q->CastOnTarget(unit); }
 
-                if(Ex->Dist2D(shadow, unit) <= Q->Range() + unit->BoundingRadius()) {
-                    if(Ex->Dist2D(shadow, unit) <= E->GetSpellRange() + unit->BoundingRadius() || Menu->ExtendedQHarass->Enabled()) {
-                        Q->SetFrom(shadow->ServerPosition());
-                        Q->SetRangeCheckFrom(shadow->ServerPosition());
+        if(!harass && Menu->UseJungleQ->Enabled() && Ex->IsKeyDown(Menu->ClearKey) && !unit->IsHero()) {
+            Vec3 pos;
+            int numberHit;
+            Q->FindBestCastPosition(true, false, pos, numberHit);
+            Q->CastOnPosition(pos); } }
 
-                        if(Q->CastOnTarget(unit)) {
-                            Q->SetFrom(Player->ServerPosition());
-                            Q->SetRangeCheckFrom(Player->ServerPosition()); } } } } }
+    if(harass && Ex->Dist2D(unit) > Q->Range() && Menu->UseHarassQ->Enabled()) {
+        for(auto z : Shadows) {
+            auto shadow = z.second;
 
-        if(!harass && Ex->Dist2D(unit) > Q->Range() && Menu->UseComboQ->Enabled()) {
-            for(auto z : Shadows) {
-                auto shadow = z.second;
+            if(Ex->Dist2D(shadow, unit) <= Q->Range() + unit->BoundingRadius()) {
+                if(Ex->Dist2D(shadow, unit) <= E->GetSpellRange() + unit->BoundingRadius() || Menu->ExtendedQHarass->Enabled()) {
+                    Q->SetFrom(shadow->ServerPosition());
+                    Q->SetRangeCheckFrom(shadow->ServerPosition());
 
-                if(Ex->Dist2D(shadow, unit) <= Q->Range() + unit->BoundingRadius()) {
-                    if(Ex->Dist2D(shadow, unit) <= E->GetSpellRange() + unit->BoundingRadius() || Menu->ExtendedQCombo->Enabled()) {
-                        Q->SetFrom(shadow->ServerPosition());
-                        Q->SetRangeCheckFrom(shadow->ServerPosition());
+                    if(Q->CastOnTarget(unit)) {
+                        Q->SetFrom(Player->ServerPosition());
+                        Q->SetRangeCheckFrom(Player->ServerPosition()); } } } } }
 
-                        if(Q->CastOnTarget(unit)) {
-                            Q->SetFrom(Player->ServerPosition());
-                            Q->SetRangeCheckFrom(Player->ServerPosition()); } } } } } } }
+    if(!harass && Ex->Dist2D(unit) > Q->Range() && Menu->UseComboQ->Enabled()) {
+        for(auto z : Shadows) {
+            auto shadow = z.second;
+
+            if(Ex->Dist2D(shadow, unit) <= Q->Range() + unit->BoundingRadius()) {
+                if(Ex->Dist2D(shadow, unit) <= E->GetSpellRange() + unit->BoundingRadius() || Menu->ExtendedQCombo->Enabled()) {
+                    Q->SetFrom(shadow->ServerPosition());
+                    Q->SetRangeCheckFrom(shadow->ServerPosition());
+
+                    if(Q->CastOnTarget(unit)) {
+                        Q->SetFrom(Player->ServerPosition());
+                        Q->SetRangeCheckFrom(Player->ServerPosition()); } } } } }
+
+}
 
 inline void ZZed::UseW(IUnit * unit, bool harass) {
 
     if(unit == nullptr
-        || !unit->IsValidTarget()) {
+        || !unit->IsValidTarget() || !W->IsReady()) {
         return; }
 
     // default castposition
@@ -257,28 +280,44 @@ inline void ZZed::UseW(IUnit * unit, bool harass) {
         if(Ex->Dist2D(unit) <= W->GetSpellRange() * 2) {
 
             // combo check if extended position has enemy near e, or if extended q is enabled. Go full yolo if we have a marked target
-            if((!harass && Ex->Dist2D(unit) <= W->GetSpellRange() + E->GetSpellRange() || !harass && Menu->ExtendedQCombo->Enabled())) {
-                if(Q->IsReady() && Player->GetMana() >= Q->ManaCost() + W->GetManaCost()) {
-                    W->CastOnPosition(castposition); }
+            if(!harass) {
+                if(Ex->Dist2D(unit) <= W->GetSpellRange() + E->GetSpellRange() || Menu->ExtendedQCombo->Enabled()) {
+                    if(Q->IsReady() && Player->GetMana() >= Q->ManaCost() + W->GetManaCost()) {
+                        W->CastOnPosition(castposition); }
 
-                if(E->IsReady() && Player->GetMana() >= E->GetManaCost() + W->GetManaCost()) {
-                    W->CastOnPosition(castposition); } }
+                    if(E->IsReady() && Player->GetMana() >= E->GetManaCost() + W->GetManaCost()) {
+                        W->CastOnPosition(castposition); } } }
 
             // harass check if extended position has enemy near e, or if extended q is enabled. Go full yolo if we have a marked target
-            if((harass && Ex->Dist2D(unit) <= W->GetSpellRange() + E->GetSpellRange() || harass && Menu->ExtendedQHarass->Enabled())) {
-                if(Q->IsReady() && Player->GetMana() >= Q->ManaCost() + W->GetManaCost()) {
-                    W->CastOnPosition(castposition); }
+            if(harass & Player->GetMana() >= Menu->MinimumHarassEnergy->GetInteger()) {
+                if(Ex->Dist2D(unit) <= W->GetSpellRange() + E->GetSpellRange() ||  Menu->ExtendedQHarass->Enabled()) {
+                    if(Q->IsReady() && Player->GetMana() >= Q->ManaCost() + W->GetManaCost()) {
+                        W->CastOnPosition(castposition); }
 
-                if(E->IsReady() && Player->GetMana() >= E->GetManaCost() + W->GetManaCost()) {
-                    W->CastOnPosition(castposition); } } } } }
+                    if(E->IsReady() && Player->GetMana() >= E->GetManaCost() + W->GetManaCost()) {
+                        W->CastOnPosition(castposition); } } } } } }
+
+inline void ZZed::UseWEx(IUnit * unit, bool jungle) {
+    Vec3 castposition = unit->ServerPosition();
+
+    if(!WShadowExists()) {
+        if(Ex->Dist2D(unit) <= W->GetSpellRange() * 2) {
+            if(jungle & Player->GetMana() >= Menu->MinimumClearEnergy->GetInteger()) {
+                if(Ex->Dist2D(unit) <= W->GetSpellRange() + E->GetSpellRange() /*|| Menu->ExtendedQHarass->Enabled()*/) {
+                    if(Q->IsReady() && Menu->UseJungleQ->Enabled() && Player->GetMana() >= Q->ManaCost() + W->GetManaCost()) {
+                        W->CastOnPosition(castposition); }
+
+                    if(E->IsReady() && Menu->UseJungleE->Enabled() && Player->GetMana() >= E->GetManaCost() + W->GetManaCost()) {
+                        W->CastOnPosition(castposition); } } } } } }
 
 inline void ZZed::UseE(IUnit * unit, bool harass) {
-    if(unit == nullptr || !unit->IsValidTarget()) {
+    if(unit == nullptr || !unit->IsValidTarget() || !E->IsReady()) {
         return; }
 
-    if(E->IsReady() && Player->GetMana() >= E->GetManaCost()) {
+    if(Player->GetMana() >= E->GetManaCost()) {
         if(Ex->Dist2D(unit) <= E->GetSpellRange()) {
-            if(!harass && Menu->UseComboE->Enabled() || harass && Menu->UseHarassE->Enabled()) {
+            if(!harass && Menu->UseComboE->Enabled() ||
+                harass && Menu->UseHarassE->Enabled() && Player->GetMana() >= Menu->MinimumHarassEnergy->GetInteger()) {
                 E->CastOnPlayer(); } } }
 
     for(auto o : Shadows) {
@@ -288,13 +327,36 @@ inline void ZZed::UseE(IUnit * unit, bool harass) {
             if(!harass && Menu->UseComboE->Enabled() || harass && Menu->UseHarassE->Enabled()) {
                 E->CastOnPlayer(); } } } }
 
-inline void ZZed::UseR(IUnit * unit, bool beans) {
+inline void ZZed::UseEEx(IUnit * unit, bool jungle) {
+    if(unit == nullptr || !unit->IsValidTarget() || !E->IsReady()) {
+        return; }
+
+    if(Player->GetMana() >= E->GetManaCost()) {
+        if(Ex->Dist2D(unit) <= E->GetSpellRange()) {
+            if(jungle && Menu->UseJungleE->Enabled() && Player->GetMana() >= Menu->MinimumClearEnergy->GetInteger()) {
+                E->CastOnPlayer(); } } }
+
+    for(auto o : Shadows) {
+        auto shadow = o.second;
+
+        if(Ex->Dist2D(unit, shadow) <= E->GetSpellRange()) {
+            if(jungle && Menu->UseJungleE->Enabled() && Player->GetMana() >= Menu->MinimumClearEnergy->GetInteger()) {
+                E->CastOnPlayer(); } } } }
+
+inline void ZZed::UseR(IUnit * unit, bool beans, bool killsteal) {
     if(unit != nullptr && unit->IsValidTarget()) {
 
         double energy = 0;
 
         if(RShadowExists() || !Menu->UseComboR->Enabled()) {
             return; }
+
+        if(killsteal && CDmg(unit, energy) < unit->GetHealth()) {
+            return; }
+
+        if(beans && Youmuus->IsReady() && Ex->IsKeyDown(Menu->ComboKey)) {
+            if(Player->GetMana() >= energy && Ex->Dist2D(unit) <= 1000) {
+                Youmuus->CastOnPlayer(); } }
 
         if(R->IsReady() && beans) {
             if(Ex->Dist2D(unit) <= R->GetSpellRange()) {
@@ -325,6 +387,12 @@ inline void ZZed::UseR(IUnit * unit, bool beans) {
 
                     if(E->IsReady() && Ex->Dist2D(shadow, unit) <= E->GetSpellRange() + 25) {
                         W->CastOnPlayer(); } } } } } }
+
+inline void ZZed::JungleClear(IUnit * unit, bool waveclear, bool kill) {}
+
+inline void ZZed::WaveClear(IUnit * unit, bool waveclear, bool kill) {
+
+}
 
 inline bool ZZed::SoloQ(Vec3 sourcepos, IUnit * unit) {
 
@@ -512,15 +580,8 @@ inline void ZZed::GetMaxWPositions(IUnit * unit, Vec3 & wpos) {
 
             posChecked++;
             auto cRadians = (0x2 * M_PI / (curCurcleChecks - 0x1)) * i;
-            auto xaxis = static_cast<float>(floor(unit->ServerPosition().x + curRadius * cos(cRadians)));
-            auto yaxis = static_cast<float>(floor(unit->ServerPosition().z + curRadius * sin(cRadians)));
-            auto position = Vec3(xaxis, 0, yaxis);
-
-            // todo: maybe check fountain
-
-            // dont push if it is a wall;
-            if(GNavMesh->IsPointWall(position)) {
-                continue; }
+            auto position = Vec3(static_cast<float>(floor(unit->ServerPosition().x + curRadius * cos(cRadians))), 0,
+                                 static_cast<float>(floor(unit->ServerPosition().z + curRadius * sin(cRadians))));
 
             // if wposition range greater than my range dont push
             if(Ex->Dist2D(Player->ServerPosition(), position) > W->GetSpellRange()) {
@@ -528,6 +589,10 @@ inline void ZZed::GetMaxWPositions(IUnit * unit, Vec3 & wpos) {
 
             // if wposition range greater than enemy range dont push
             if(Ex->Dist2D(unit->ServerPosition(), position) > W->GetSpellRange()) {
+                continue; }
+
+            // dont push if it is a wall;
+            if(GNavMesh->IsPointWall(position)) {
                 continue; }
 
             // fps drop? :s
@@ -538,7 +603,7 @@ inline void ZZed::GetMaxWPositions(IUnit * unit, Vec3 & wpos) {
 
                 possiblePositions.push_back(position); } } }
 
-    // sort by furthest to enemy
+    // sort by closest to enemy
     std::sort(possiblePositions.begin(), possiblePositions.end(), [&](Vec3 v1, Vec3 v2) {
         return Ex->Dist2D(unit->ServerPosition(), v1) < Ex->Dist2D(unit->ServerPosition(), v2); });
     // then by furthest from me

@@ -401,10 +401,9 @@ inline void ZZed::UseR(IUnit * unit, bool beans, bool killsteal) {
             for(auto o : Shadows) {
                 auto shadow = o.second;
 
-                if(shadow->HasBuff("zedwshadowbuff") && Player->GetMana() >= energy) {
+                if(shadow->HasBuff("zedwshadowbuff")) {
                     if(Ex->Dist2D(shadow, unit) <= Player->AttackRange() + Player->BoundingRadius()) {
-                        if(Menu->SwapForKill->Enabled()) {
-
+                        if(Menu->SwapForKill->Enabled() && CDmg(unit, energy) >= unit->GetHealth() && Player->GetMana() >= energy) {
                             W->CastOnPlayer(); } } } } }
 
         if(!RShadowExists() && Menu->UseComboR->Enabled()) {

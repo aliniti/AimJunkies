@@ -203,15 +203,16 @@ void ZZedModes::OnDoCast(const CastedSpell & args) {
 }
 
 void ZZedModes::Auto() {
-    auto morebeans = false;
 
     if(ZZed::Menu->AutoR->Enabled()) {
-        for(auto o : GEntityList->GetAllHeros(false, true)) {
-            ZZed::CanUlt(o, morebeans);
-            ZZed::UseR(o, morebeans, true); } }
+        auto morebeans = false;
+        auto unit = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, ZZed::W->GetSpellRange() * 2);
+
+        ZZed::CanUlt(unit, morebeans);
+        ZZed::UseR(unit, morebeans, true); }
 
     // auto e on enemies
-    if(ZZed::E->IsReady() && ZZed::Menu->AutoEUnitInRage->Enabled() && !morebeans
+    if(ZZed::E->IsReady() && ZZed::Menu->AutoEUnitInRage->Enabled()
         && ZZed::Player->GetMana() > ZZed::Menu->AutoEUnitInRagePct->GetInteger()) {
 
         if(ZZed::Ex->CountInRange(ZZed::Player, ZZed::E->GetSpellRange() + ZZed::Player->BoundingRadius(), GEntityList->GetAllHeros(false, true)) > 0) {

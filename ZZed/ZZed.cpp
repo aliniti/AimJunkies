@@ -20,6 +20,8 @@ IInventoryItem * ZZed::Hydra;
 IInventoryItem * ZZed::Tiamat;
 IInventoryItem * ZZed::Titanic;
 IInventoryItem * ZZed::Youmuus;
+IInventoryItem * ZZed::Bilgewater;
+IInventoryItem * ZZed::Botrk;
 
 std::map<float, IUnit *> ZZed::Marked;
 std::map<float, IUnit *> ZZed::Shadows;

@@ -25,6 +25,8 @@ class ZZed {
         static IInventoryItem * Hydra;
         static IInventoryItem * Titanic;
         static IInventoryItem * Youmuus;
+        static IInventoryItem * Bilgewater;
+        static IInventoryItem * Botrk;
 
         static void UseQ(IUnit * unit, bool harass = false);
         static void UseW(IUnit * unit, bool harass);
@@ -93,6 +95,8 @@ inline void ZZed::OnBoot() {
     Hydra = GPluginSDK->CreateItemForId(3074, 400);
     Titanic = GPluginSDK->CreateItemForId(3748, 400);
     Youmuus = GPluginSDK->CreateItemForId(3142, 900);
+    Bilgewater = GPluginSDK->CreateItemForId(3144, 550);
+    Botrk = GPluginSDK->CreateItemForId(3153, 550);
 
     W = GPluginSDK->CreateSpell(kSlotW, 700);
     E = GPluginSDK->CreateSpell(kSlotE, 200);
@@ -149,11 +153,23 @@ inline void ZZed::CanUlt(IUnit * unit, bool & coolbeans) {
         if(HasDeathMark(unit)) {
             coolbeans = false; }
 
-        if(Menu->AlwaysRTargets[unit->ChampionName()]->Enabled() && Menu->UseAlwaysR->Enabled()
-            || CDmg(unit, energy) /*100001*/ >= unit->GetHealth()
-            || focus != nullptr && focus->GetNetworkId() == unit->GetNetworkId()
-            && Menu->UseAlwaysR->Enabled() && Menu->AlwaysRSelected->Enabled()) {
-            coolbeans = true; } } }
+        if(unit->IsHero() && CDmg(unit, energy) >= unit->GetHealth()) {
+            coolbeans = true; }
+
+        // double check if hero is on the menu to stop throwing exceptions on update
+        // for some instance like in proving grounds menu is generated on load.
+        // this is to prevent nullptr's and add any new targets to the menu on the fly (e.g Target Dummy)
+
+        if(Menu->AlwaysRTargets.find(unit->GetNetworkId()) == Menu->AlwaysRTargets.end()) {
+            Menu->AlwaysRTargets[unit->GetNetworkId()] = Menu->DeathMarkMenu->CheckBox(std::string("- Always R on").append(" ").append(unit->ChampionName()).c_str(), false);
+            return; }
+
+        if(Menu->AlwaysRTargets[unit->GetNetworkId()]->Enabled() && Menu->UseAlwaysR->Enabled()) {
+            coolbeans = true; }
+
+        if(Menu->UseAlwaysR->Enabled() && Menu->AlwaysRSelected->Enabled()) {
+            if(focus != nullptr && focus->GetNetworkId() == unit->GetNetworkId()) {
+                coolbeans = true; } } } }
 
 inline bool ZZed::CanSwap(ISpell * spell) {
     return strstr(Player->GetSpellName(spell->GetSpellSlot()), std::to_string(2).c_str()); }
@@ -355,14 +371,23 @@ inline void ZZed::UseR(IUnit * unit, bool beans, bool killsteal) {
             return; }
 
         if(beans && Youmuus->IsReady() && Ex->IsKeyDown(Menu->ComboKey)) {
-            if(Player->GetMana() >= energy && Ex->Dist2D(unit) <= 1000) {
+            if(Player->GetMana() >= energy && Ex->Dist2D(unit) <= 1200) {
                 Youmuus->CastOnPlayer(); } }
 
         if(R->IsReady() && beans) {
             if(Ex->Dist2D(unit) <= R->GetSpellRange()) {
                 if(Player->GetMana() >= energy) {
+
                     if(Youmuus->IsReady()) {
                         Youmuus->CastOnPlayer(); }
+
+                    if(Bilgewater->IsOwned() && Bilgewater->IsReady()) {
+                        if(Ex->Dist2D(unit) <= 550) {
+                            Bilgewater->CastOnTarget(unit); } }
+
+                    if(Botrk->IsOwned() && Botrk->IsReady()) {
+                        if(Ex->Dist2D(unit) <= 550) {
+                            Botrk->CastOnTarget(unit); } }
 
                     if(Ignite->GetSpellSlot() != kSlotUnknown) {
                         if(Ex->Dist2D(unit) <= Ignite->GetSpellRange() && Ignite->IsReady()) {
@@ -377,15 +402,38 @@ inline void ZZed::UseR(IUnit * unit, bool beans, bool killsteal) {
                     if(Ex->Dist2D(shadow, unit) <= R->GetSpellRange() + 25) {
                         W->CastOnPlayer(); } } } }
 
-        if(!R->IsReady() && beans) {
+        if(beans) {
             for(auto o : Shadows) {
                 auto shadow = o.second;
 
                 if(shadow->HasBuff("zedwshadowbuff") && CanSwap(W) && !HasDeathMark(unit)) {
                     if(Ex->Dist2D(shadow, unit) <= Player->AttackRange() + 25) {
+
+                        if(Botrk->IsOwned() && Botrk->IsReady()) {
+                            if(Ex->Dist2D(unit) <= 550) {
+                                Botrk->CastOnTarget(unit); } }
+
+                        if(Bilgewater->IsOwned() && Bilgewater->IsReady()) {
+                            if(Ex->Dist2D(unit) <= 550) {
+                                Bilgewater->CastOnTarget(unit); } }
+
+                        if(Ignite->GetSpellSlot() != kSlotUnknown) {
+                            if(Ex->Dist2D(unit) <= Ignite->GetSpellRange() && Ignite->IsReady()) {
+                                Ignite->CastOnUnit(unit); } }
+
                         W->CastOnPlayer(); }
 
                     if(E->IsReady() && Ex->Dist2D(shadow, unit) <= E->GetSpellRange() + 25) {
+
+
+                        if(Bilgewater->IsOwned() && Bilgewater->IsReady()) {
+                            if(Ex->Dist2D(unit) <= 550) {
+                                Bilgewater->CastOnTarget(unit); } }
+
+                        if(Ignite->GetSpellSlot() != kSlotUnknown) {
+                            if(Ex->Dist2D(unit) <= Ignite->GetSpellRange() && Ignite->IsReady()) {
+                                Ignite->CastOnUnit(unit); } }
+
                         W->CastOnPlayer(); } } } } } }
 
 inline void ZZed::JungleClear(IUnit * unit, bool waveclear, bool kill) {}

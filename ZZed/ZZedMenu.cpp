@@ -33,19 +33,19 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
     this->UseHarassE = menuie->CheckBox("Use E in Harass", true);
     this->UseJungleE = menuie->CheckBox("Use E in Jungle", true);
 
-    auto menuir = menucb->AddMenu("::[R] Death Mark");
-    this->UseComboR = menuir->CheckBox("Use R in Combo", true);
-    this->UltMode = menuir->AddSelection("- Mode:", 0, std::vector<std::string> {"Only Kill", "Duel" });
-    this->ShadowPlacement = menuir->AddSelection("- Shadow Placement:", 0, std::vector<std::string> {"Line", "Triangle", "Pathfinder" });
-    this->SwapRIfDead = menuir->CheckBox("- Swap Back if Dead", true);
-    this->AutoR = menuir->CheckBox("- Killsteal", true);
+    this->DeathMarkMenu = menucb->AddMenu("::[R] Death Mark");
+    this->UseComboR = this->DeathMarkMenu->CheckBox("Use R in Combo", true);
+    this->UltMode = this->DeathMarkMenu->AddSelection("- Mode:", 0, std::vector<std::string> {"Only Kill", "Duel" });
+    this->ShadowPlacement = this->DeathMarkMenu->AddSelection("- Shadow Placement:", 0, std::vector<std::string> {"Line", "Triangle", "Pathfinder" });
+    this->SwapRIfDead = this->DeathMarkMenu->CheckBox("- Swap Back if Dead", true);
+    this->AutoR = this->DeathMarkMenu->CheckBox("- Killsteal", true);
 
-    this->UseAlwaysR = menuir->CheckBox("Enable Always R", true);
-    this->AlwaysRSelected = menuir->CheckBox("- Always R on Focus Target", true);
+    this->UseAlwaysR = this->DeathMarkMenu->CheckBox("Enable Always R", true);
+    this->AlwaysRSelected = this->DeathMarkMenu->CheckBox("- Always R on Focus Target", true);
 
     for(auto i : GEntityList->GetAllHeros(false, true)) {
         if(!i->IsDead()) {
-            this->AlwaysRTargets[i->ChampionName()] = menuir->CheckBox(std::string("- Always R on").append(" ").append(i->ChampionName()).c_str(), false); } }
+            this->AlwaysRTargets[i->GetNetworkId()] = this->DeathMarkMenu->CheckBox(std::string("- Always R on").append(" ").append(i->ChampionName()).c_str(), false); } }
 
     auto menuem = this->Menu->AddMenu("::Energy");
     this->MinimumHarassEnergy = menuem->AddInteger("Minimum Harass Energy", 0, 200, 100);

@@ -5,10 +5,11 @@ class ZZedMenu {
     public:
         explicit ZZedMenu(IMenu * menu);
 
-        std::map<std::string, IMenuOption *> AlwaysRTargets;
+        std::map<int, IMenuOption *> AlwaysRTargets;
 
         // root;
         IMenu * Menu;
+        IMenu * DeathMarkMenu;
         IMenuOption * Debug;
 
         IMenuOption * UseComboQ;

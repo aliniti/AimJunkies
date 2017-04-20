@@ -1,4 +1,5 @@
 #include "ZZedMenu.h"
+#include "ZZed.h"
 
 ZZedMenu::ZZedMenu(IMenu * menu) {
     this->Menu = menu;
@@ -23,7 +24,7 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
     auto menuiw = menucb->AddMenu("::[W] Living Shadow");
     this->UseComboW = menuiw->CheckBox("Use W in Combo", true);
     this->UseHarassW = menuiw->CheckBox("Use W in Harass", true);
-    this->UseHarassWPF = menuiw->AddSelection("- Shadow Placement:", 0, std::vector<std::string> { "Unit Position (W-Q->E)", "Pathfinding" });
+    this->UseHarassWPF = menuiw->AddSelection("- Shadow Placement:", 2, std::vector<std::string> { "Unit Position (W-Q->E)", "Pathfinding", "Smart (Auto)", });
     this->UseJungleW = menuiw->CheckBox("Use W in Jungle", true);
     this->UseJungleWNearEnemy = menuiw->CheckBox("- Use Near Enemy", false);
     this->UseFleeW = menuiw->CheckBox("Use W in Flee", true);
@@ -53,6 +54,7 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
 
     auto menumc = this->Menu->AddMenu("::Mechanics");
     this->UseItemsCombo = menumc->CheckBox("Use Items", true);
+    this->UseIgnite = menumc->CheckBox("Use Ignite", true);
     this->AutoEUnitInRage = menumc->CheckBox("Auto E Enemies", true);
     this->AutoEUnitInRagePct = menumc->AddInteger("- If Energy >", 0, 200, 100);
     this->JungleOrderPriority = menumc->AddSelection("Jungle Target Priority:", 1, std::vector<std::string> {"Low Health", "Max Health", "Closest to Cursor" });
@@ -68,6 +70,17 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
     this->DrawRColor = menurd->AddColor("- Color R", 255, 255, 255, 200);
     this->DrawComboDamage = menurd->CheckBox("Draw Combo Damage", true);
     this->DrawComboDamageColor = menurd->AddColor("- Color Combo Damage", 121, 77, 255, 200);
+
+    auto menuav = this->Menu->AddMenu("::Avoider");
+    this->UseRAvoider = menuav->CheckBox("R Avoider", true);
+    this->SpellsToAvoid = std::map<std::string, IMenuOption *>();
+
+    for(auto hero : GEntityList->GetAllHeros(false, true)) {
+        for(auto i : ZZed::AvoidList) {
+            if(strcmp(hero->ChampionName(), i.second->ChampName.c_str()) == 0) {
+                auto uniqueHero = std::string("- ").append(i.second->ChampName).append(" R");
+                this->SpellsToAvoid.insert(std::pair<std::string, IMenuOption *>(i.first, menuav->CheckBox(uniqueHero.c_str(), true))); } } }
+
 
     auto menudb = this->Menu->AddMenu("::Debug");
     this->Debug = menudb->CheckBox("Debug Damage", false);

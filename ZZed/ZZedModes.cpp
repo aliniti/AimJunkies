@@ -124,7 +124,51 @@ void ZZedModes::OnSpellCast(const CastedSpell & args) {
         auto name = std::string(args.Name_);
 
         if(stamps.find(name) != stamps.end()) {
-            stamps[name] = GGame->TickCount(); } } }
+            stamps[name] = GGame->TickCount(); } }
+
+    // recycle op :^)
+    if(args.Caster_ != nullptr) {
+        auto ex = ZZed::Ex;
+
+        if(args.Caster_->IsHero() && args.Caster_->GetTeam() != ZZed::Player->GetTeam()) {
+            auto bestTarget = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, ZZed::R->GetSpellRange());
+            auto name = args.Name_;
+            auto size = strlen(name);
+            auto nameToLower = static_cast<char *>(malloc(size + 1));
+            nameToLower[size] = 0;
+
+            for(auto i = 0; i < size; i++) {
+                nameToLower[i] = tolower(name[i]); }
+
+            if(bestTarget == nullptr) {
+                return; }
+
+            if(ZZed::R->IsReady() && ZZed::Menu->UseRAvoider->Enabled()) {
+                auto rrange = ZZed::R->GetSpellRange();
+
+                for(auto entry : ZZed::AvoidList) {
+                    if(strcmp(entry.first.c_str(), nameToLower) == 0) {
+                        if(ZZed::Menu->SpellsToAvoid.at(nameToLower)->Enabled()) {
+                            if(entry.second->eType == Targeted) {
+                                if(args.Target_ != nullptr && args.Target_->GetNetworkId() == player->GetNetworkId()) {
+                                    if(!ZZed::RShadowExists()) {
+                                        ZZed::R->CastOnUnit(bestTarget); } }
+
+                                if(entry.second->eType == SelfCast) {
+                                    if(args.Target_ != nullptr && ex->Dist2D(args.Target_) <= entry.second->Radius) {
+                                        if(!ZZed::RShadowExists()) {
+                                            ZZed::R->CastOnUnit(bestTarget); } } }
+
+                                if(entry.second->eType == SkillshotCircle) {
+                                    auto cStart = ex->To2D(args.Position_);
+                                    auto cEnd = ex->To2D(args.EndPosition_);
+
+                                    if(ex->Dist2D(cStart, cEnd) > ZZed::R->GetSpellRange()) {
+                                        cEnd = cStart + (cEnd - cStart).VectorNormalize() * rrange; }
+
+                                    if(ex->Dist2D(cEnd, player->ServerPosition()) <= rrange) {
+                                        if(!ZZed::RShadowExists()) {
+                                            ZZed::R->CastOnUnit(bestTarget); } } } } } } } } } } }
 
 void ZZedModes::OnRender() {
     auto menu = ZZed::Menu;
@@ -199,20 +243,31 @@ void ZZedModes::OnBuffAdd(IUnit * unit, void * buffdata) {
             ZZed::Marked[GGame->Time()] = unit; } } }
 
 void ZZedModes::OnDoCast(const CastedSpell & args) {
+    if(args.Caster_->GetNetworkId() == ZZed::Player->GetNetworkId()) {
+        if(args.AutoAttack_) {
+            if(args.Target_ != nullptr && args.Target_->IsValidTarget() && !args.Target_->IsDead()) {
+                if(args.Target_->IsHero() && (!ZZed::Ex->UnderEnemyTurret(args.Target_) || ZZed::Ex->IsKeyDown(ZZed::Menu->ComboKey))) {
+                    if(ZZed::Tiamat->IsOwned() && ZZed::Tiamat->IsReady()) {
+                        ZZed::Tiamat->CastOnPlayer(); }
 
-}
+                    if(ZZed::Hydra->IsOwned() && ZZed::Hydra->IsReady()) {
+                        ZZed::Hydra->CastOnPlayer(); }
+
+                    if(ZZed::Titanic->IsOwned() && ZZed::Titanic->IsReady()) {
+                        ZZed::Titanic->CastOnPlayer(); } } } } } }
 
 void ZZedModes::Auto() {
 
-    if(ZZed::Menu->AutoR->Enabled()) {
-        auto morebeans = false;
-        auto unit = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, ZZed::W->GetSpellRange() * 2);
+    auto morebeans = false;
+    auto unit = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, ZZed::W->GetSpellRange() * 2);
 
-        ZZed::CanUlt(unit, morebeans);
+    ZZed::CanUlt(unit, morebeans);
+
+    if(ZZed::Menu->AutoR->Enabled()) {
         ZZed::UseR(unit, morebeans, true); }
 
     // auto e on enemies
-    if(ZZed::E->IsReady() && ZZed::Menu->AutoEUnitInRage->Enabled()
+    if(ZZed::E->IsReady() && ZZed::Menu->AutoEUnitInRage->Enabled() && !morebeans
         && ZZed::Player->GetMana() > ZZed::Menu->AutoEUnitInRagePct->GetInteger()) {
 
         if(ZZed::Ex->CountInRange(ZZed::Player, ZZed::E->GetSpellRange() + ZZed::Player->BoundingRadius(), GEntityList->GetAllHeros(false, true)) > 0) {

@@ -26,6 +26,7 @@ IInventoryItem * ZZed::Botrk;
 std::map<float, IUnit *> ZZed::Marked;
 std::map<float, IUnit *> ZZed::Shadows;
 std::map<std::string, float> ZZed::Ticks;
+std::map<std::string, ZZedAvoider *> ZZed::AvoidList;
 
 PLUGIN_EVENT(void) OnGameUpdate() {
     ZZed::Modes->OnUpdate(); }
@@ -49,12 +50,15 @@ PLUGIN_API void OnLoad(IPluginSDK * sdk) {
     PluginSDKSetup(sdk);
 
     ZZed::Player = GEntityList->Player();
+    ZZedAvoider::GenerateAvoidList();
 
     if(strcmp(ZZed::Player->ChampionName(), "Zed") == 0) {
 
         ZZed::OnBoot();
+
         ZZed::Menu = new ZZedMenu(GPluginSDK->AddMenu("ZZed"));
         GEventManager->AddEventHandler(kEventOnSpellCast, OnCastSpell);
+        GEventManager->AddEventHandler(kEventOnSpellCast, OnDoCast);
         GEventManager->AddEventHandler(kEventOnBuffAdd, OnBuffAdd);
         GEventManager->AddEventHandler(kEventOnCreateObject, OnCreateObject);
         GEventManager->AddEventHandler(kEventOnGameUpdate, OnGameUpdate);
@@ -65,6 +69,7 @@ PLUGIN_API void OnUnload() {
     if(strcmp(ZZed::Player->ChampionName(), "Zed") == 0) {
         ZZed::OnShutdown();
         GEventManager->RemoveEventHandler(kEventOnGameUpdate, OnGameUpdate);
+        GEventManager->RemoveEventHandler(kEventOnSpellCast, OnDoCast);
         GEventManager->RemoveEventHandler(kEventOnBuffAdd, OnBuffAdd);
         GEventManager->RemoveEventHandler(kEventOnCreateObject, OnCreateObject);
         GEventManager->RemoveEventHandler(kEventOnSpellCast, OnCastSpell);

@@ -151,6 +151,7 @@
   <ItemGroup>
     <ClCompile Include="PluginSDK.cpp" />
     <ClCompile Include="ZZed.cpp" />
+    <ClCompile Include="ZZedAvoider.cpp" />
     <ClCompile Include="ZZedExtensions.cpp" />
     <ClCompile Include="ZZedMenu.cpp" />
     <ClCompile Include="ZZedModes.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="PluginSDK.h" />
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="ZZed.h" />
+    <ClInclude Include="ZZedAvoider.h" />
     <ClInclude Include="ZZedExtensions.h" />
     <ClInclude Include="ZZedMenu.h" />
     <ClInclude Include="ZZedModes.h" />

@@ -13,6 +13,7 @@
     <ClCompile Include="ZZedExtensions.cpp" />
     <ClCompile Include="ZZedMenu.cpp" />
     <ClCompile Include="ZZedModes.cpp" />
+    <ClCompile Include="ZZedAvoider.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LPPConstants.h">
@@ -31,5 +32,6 @@
     <ClInclude Include="ZZedExtensions.h" />
     <ClInclude Include="ZZedMenu.h" />
     <ClInclude Include="ZZedModes.h" />
+    <ClInclude Include="ZZedAvoider.h" />
   </ItemGroup>
 </Project>

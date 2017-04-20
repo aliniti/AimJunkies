@@ -6,6 +6,7 @@ class ZZedMenu {
         explicit ZZedMenu(IMenu * menu);
 
         std::map<int, IMenuOption *> AlwaysRTargets;
+        std::map<std::basic_string<char>, IMenuOption *> SpellsToAvoid;
 
         // root;
         IMenu * Menu;
@@ -56,6 +57,8 @@ class ZZedMenu {
         IMenuOption * UseJungleQ;
         IMenuOption * UseJungleW;
         IMenuOption * UseJungleE;
-        IMenuOption * UseJungleWNearEnemy; };
+        IMenuOption * UseJungleWNearEnemy;
+        IMenuOption * UseRAvoider;
+        IMenuOption * UseIgnite; };
 
 

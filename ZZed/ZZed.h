@@ -4,6 +4,7 @@
 #include "ZZedExtensions.h"
 #include <map>
 #include <string>
+#include "ZZedAvoider.h"
 
 #define M_PI 3.14159265358979323846
 
@@ -27,6 +28,7 @@ class ZZed {
         static IInventoryItem * Youmuus;
         static IInventoryItem * Bilgewater;
         static IInventoryItem * Botrk;
+        static std::map<std::string, ZZedAvoider *> AvoidList;
 
         static void UseQ(IUnit * unit, bool harass = false);
         static void UseW(IUnit * unit, bool harass);
@@ -51,6 +53,7 @@ class ZZed {
         static bool GetPriorityJungleTarget(IUnit * a, IUnit * b);
         static void CanUlt(IUnit * unit, bool & morebeans);
         static bool Beans(std::string name, float time);
+        static bool CanShadowCPA(IUnit * unit, bool harass);
 
         static bool CanSwap(ISpell * spell);
         static bool HasDeathMark(IUnit * unit);
@@ -142,6 +145,19 @@ inline bool ZZed::GetPriorityJungleTarget(IUnit * a, IUnit * b) {
 
 inline bool ZZed::Beans(std::string name, float time = 0) {
     return  GGame->TickCount() - Ticks[name] < 500 + time - GGame->Latency(); }
+
+inline bool ZZed::CanShadowCPA(IUnit * unit, bool harass) {
+    if(harass) {
+        if(Menu->UseHarassWPF->GetInteger() == 1) {
+            return  true; }
+
+        if(Menu->UseHarassWPF->GetInteger() == 2) {
+            if(Ex->Dist2D(unit) > Q->Range() + 400 && !SoloQ(Player->ServerPosition(), unit)) {
+                return  true; } }
+
+    }
+
+    return  false; }
 
 inline void ZZed::CanUlt(IUnit * unit, bool & coolbeans) {
     coolbeans = false;
@@ -370,7 +386,7 @@ inline void ZZed::UseR(IUnit * unit, bool beans, bool killsteal) {
         if(killsteal && CDmg(unit, energy) < unit->GetHealth()) {
             return; }
 
-        if(beans && Youmuus->IsReady() && Ex->IsKeyDown(Menu->ComboKey)) {
+        if(beans && Menu->UseItemsCombo->Enabled() && Youmuus->IsReady() && Ex->IsKeyDown(Menu->ComboKey)) {
             if(Player->GetMana() >= energy && Ex->Dist2D(unit) <= 1200) {
                 Youmuus->CastOnPlayer(); } }
 
@@ -378,20 +394,19 @@ inline void ZZed::UseR(IUnit * unit, bool beans, bool killsteal) {
             if(Ex->Dist2D(unit) <= R->GetSpellRange()) {
                 if(Player->GetMana() >= energy) {
 
-                    if(Youmuus->IsReady()) {
-                        Youmuus->CastOnPlayer(); }
+                    if(Menu->UseIgnite->Enabled()) {
+                        if(Ignite->GetSpellSlot() != kSlotUnknown) {
+                            if(Ex->Dist2D(unit) <= Ignite->GetSpellRange() && Ignite->IsReady()) {
+                                Ignite->CastOnUnit(unit); } } }
 
-                    if(Bilgewater->IsOwned() && Bilgewater->IsReady()) {
-                        if(Ex->Dist2D(unit) <= 550) {
-                            Bilgewater->CastOnTarget(unit); } }
+                    if(Menu->UseItemsCombo->Enabled()) {
+                        if(Bilgewater->IsOwned() && Bilgewater->IsReady()) {
+                            if(Ex->Dist2D(unit) <= 550) {
+                                Bilgewater->CastOnTarget(unit); } }
 
-                    if(Botrk->IsOwned() && Botrk->IsReady()) {
-                        if(Ex->Dist2D(unit) <= 550) {
-                            Botrk->CastOnTarget(unit); } }
-
-                    if(Ignite->GetSpellSlot() != kSlotUnknown) {
-                        if(Ex->Dist2D(unit) <= Ignite->GetSpellRange() && Ignite->IsReady()) {
-                            Ignite->CastOnUnit(unit); } }
+                        if(Botrk->IsOwned() && Botrk->IsReady()) {
+                            if(Ex->Dist2D(unit) <= 550) {
+                                Botrk->CastOnTarget(unit); } } }
 
                     R->CastOnUnit(unit); } }
 
@@ -408,7 +423,6 @@ inline void ZZed::UseR(IUnit * unit, bool beans, bool killsteal) {
 
                 if(shadow->HasBuff("zedwshadowbuff") && CanSwap(W) && !HasDeathMark(unit)) {
                     if(Ex->Dist2D(shadow, unit) <= Player->AttackRange() + 25) {
-
                         if(Botrk->IsOwned() && Botrk->IsReady()) {
                             if(Ex->Dist2D(unit) <= 550) {
                                 Botrk->CastOnTarget(unit); } }
@@ -417,22 +431,26 @@ inline void ZZed::UseR(IUnit * unit, bool beans, bool killsteal) {
                             if(Ex->Dist2D(unit) <= 550) {
                                 Bilgewater->CastOnTarget(unit); } }
 
-                        if(Ignite->GetSpellSlot() != kSlotUnknown) {
-                            if(Ex->Dist2D(unit) <= Ignite->GetSpellRange() && Ignite->IsReady()) {
-                                Ignite->CastOnUnit(unit); } }
+                        if(Menu->UseIgnite->Enabled()) {
+                            if(Ignite->GetSpellSlot() != kSlotUnknown) {
+                                if(Ex->Dist2D(unit) <= Ignite->GetSpellRange() && Ignite->IsReady()) {
+                                    Ignite->CastOnUnit(unit); } } }
 
                         W->CastOnPlayer(); }
 
                     if(E->IsReady() && Ex->Dist2D(shadow, unit) <= E->GetSpellRange() + 25) {
-
+                        if(Botrk->IsOwned() && Botrk->IsReady()) {
+                            if(Ex->Dist2D(unit) <= 550) {
+                                Botrk->CastOnTarget(unit); } }
 
                         if(Bilgewater->IsOwned() && Bilgewater->IsReady()) {
                             if(Ex->Dist2D(unit) <= 550) {
                                 Bilgewater->CastOnTarget(unit); } }
 
-                        if(Ignite->GetSpellSlot() != kSlotUnknown) {
-                            if(Ex->Dist2D(unit) <= Ignite->GetSpellRange() && Ignite->IsReady()) {
-                                Ignite->CastOnUnit(unit); } }
+                        if(Menu->UseIgnite->Enabled()) {
+                            if(Ignite->GetSpellSlot() != kSlotUnknown) {
+                                if(Ex->Dist2D(unit) <= Ignite->GetSpellRange() && Ignite->IsReady()) {
+                                    Ignite->CastOnUnit(unit); } } }
 
                         W->CastOnPlayer(); } } } } } }
 
@@ -571,12 +589,11 @@ inline double ZZed::CDmg(IUnit * unit, double & energy) {
 
 inline void ZZed::GetBestWPosition(IUnit * unit, Vec3 & wpos, bool harass, bool onupdate) {
 
-    // should enable in harass
-    auto seih = harass && (Menu->UseHarassWPF->GetInteger() == 1 || Ex->Dist2D(unit) > Q->Range() + 450);
+    // if i should enable in harass
 
-    if(Beans("ZedR", 1500) || onupdate || seih) {
+    if(Beans("ZedR", 1500) || onupdate || CanShadowCPA(unit, harass)) {
 
-        if(Menu->ShadowPlacement->GetInteger() == 2 || seih) {
+        if(Menu->ShadowPlacement->GetInteger() == 2 || CanShadowCPA(unit, harass)) {
             GetMaxWPositions(unit, wpos);
             return; }
 
@@ -613,7 +630,7 @@ inline void ZZed::GetMaxWPositions(IUnit * unit, Vec3 & wpos) {
 
     auto posChecked = 0;
     auto maxPosChecked = 12;
-    auto posRadius = 75;
+    auto posRadius = 100;
     auto radiusIndex = 0;
 
     auto possiblePositions = std::vector<Vec3>();
@@ -647,7 +664,7 @@ inline void ZZed::GetMaxWPositions(IUnit * unit, Vec3 & wpos) {
             if(SoloQ(position, unit)) {
 
                 if(Menu->DebugPathfinding->Enabled()) {
-                    GRender->DrawCircle(position, 100, Vec4(255, 0, 255, 255), 2, false, true); }
+                    GRender->DrawCircle(position, posRadius, Vec4(255, 0, 255, 255), 2, false, true); }
 
                 possiblePositions.push_back(position); } } }
 

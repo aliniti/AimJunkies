@@ -37,9 +37,6 @@ class ZZed {
         static void UseEEx(IUnit * unit, bool jungle);
         static void UseR(IUnit * unit, bool beans, bool killsteal = false);
 
-        static void JungleClear(IUnit * unit, bool waveclear, bool kill = false);
-        static void WaveClear(IUnit * unit, bool waveclear, bool kill = false);
-
         static bool SoloQ(Vec3 sourcepos, IUnit * unit);
         static void GetMaxWPositions(IUnit * unit, Vec3 & wpos);
         static void GetBestWPosition(IUnit * unit, Vec3 & wpos, bool harass = false, bool onupdate = false);
@@ -162,7 +159,7 @@ inline bool ZZed::CanShadowCPA(IUnit * unit, bool harass) {
 inline void ZZed::CanUlt(IUnit * unit, bool & coolbeans) {
     coolbeans = false;
 
-    if(unit != nullptr && R->IsReady() && Menu->UseComboR->Enabled() && unit->IsHero()) {
+    if(unit != nullptr && R->IsReady() && unit->IsHero()) {
         auto focus = GTargetSelector->GetFocusedTarget();
         double energy = 0;
 
@@ -377,88 +374,66 @@ inline void ZZed::UseEEx(IUnit * unit, bool jungle) {
 
 inline void ZZed::UseR(IUnit * unit, bool beans, bool killsteal) {
     if(unit != nullptr && unit->IsValidTarget()) {
-
         double energy = 0;
 
-        if(RShadowExists() || !Menu->UseComboR->Enabled()) {
-            return; }
-
-        if(killsteal && CDmg(unit, energy) < unit->GetHealth()) {
-            return; }
+        if(!Ex->IsKeyDown(Menu->ComboKey)) {
+            if(killsteal && CDmg(unit, energy) < unit->GetHealth()) {
+                return; } }
 
         if(beans && Menu->UseItemsCombo->Enabled() && Youmuus->IsReady() && Ex->IsKeyDown(Menu->ComboKey)) {
             if(Player->GetMana() >= energy && Ex->Dist2D(unit) <= 1200) {
                 Youmuus->CastOnPlayer(); } }
 
-        if(R->IsReady() && beans) {
-            if(Ex->Dist2D(unit) <= R->GetSpellRange()) {
-                if(Player->GetMana() >= energy) {
+        if(beans && CanSwap(W) && !HasDeathMark(unit) && !killsteal) {
+            if(Botrk->IsOwned() && Botrk->IsReady()) {
+                if(Ex->Dist2D(unit) <= 550) {
+                    Botrk->CastOnTarget(unit); } }
 
-                    if(Menu->UseIgnite->Enabled()) {
-                        if(Ignite->GetSpellSlot() != kSlotUnknown) {
-                            if(Ex->Dist2D(unit) <= Ignite->GetSpellRange() && Ignite->IsReady()) {
-                                Ignite->CastOnUnit(unit); } } }
+            if(Bilgewater->IsOwned() && Bilgewater->IsReady()) {
+                if(Ex->Dist2D(unit) <= 550) {
+                    Bilgewater->CastOnTarget(unit); } }
 
-                    if(Menu->UseItemsCombo->Enabled()) {
-                        if(Bilgewater->IsOwned() && Bilgewater->IsReady()) {
-                            if(Ex->Dist2D(unit) <= 550) {
-                                Bilgewater->CastOnTarget(unit); } }
-
-                        if(Botrk->IsOwned() && Botrk->IsReady()) {
-                            if(Ex->Dist2D(unit) <= 550) {
-                                Botrk->CastOnTarget(unit); } } }
-
-                    R->CastOnUnit(unit); } }
+            if(Menu->UseIgnite->Enabled()) {
+                if(Ignite->GetSpellSlot() != kSlotUnknown) {
+                    if(Ex->Dist2D(unit) <= Player->AttackRange() + 25 && Ignite->IsReady()) {
+                        Ignite->CastOnUnit(unit); } } }
 
             for(auto o : Shadows) {
                 auto shadow = o.second;
 
-                if(shadow->HasBuff("zedwshadowbuff") && CanSwap(W) && !HasDeathMark(unit)) {
-                    if(Ex->Dist2D(shadow, unit) <= R->GetSpellRange() + 25) {
-                        W->CastOnPlayer(); } } } }
+                if(shadow->HasBuff("zedwshadowbuff") && Player->GetMana() >= energy) {
+                    if(Ex->Dist2D(shadow, unit) <= Player->AttackRange() + Player->BoundingRadius()) {
+                        if(Menu->SwapForKill->Enabled()) {
 
-        if(beans) {
-            for(auto o : Shadows) {
-                auto shadow = o.second;
+                            W->CastOnPlayer(); } } } } }
 
-                if(shadow->HasBuff("zedwshadowbuff") && CanSwap(W) && !HasDeathMark(unit)) {
-                    if(Ex->Dist2D(shadow, unit) <= Player->AttackRange() + 25) {
-                        if(Botrk->IsOwned() && Botrk->IsReady()) {
-                            if(Ex->Dist2D(unit) <= 550) {
-                                Botrk->CastOnTarget(unit); } }
-
-                        if(Bilgewater->IsOwned() && Bilgewater->IsReady()) {
-                            if(Ex->Dist2D(unit) <= 550) {
-                                Bilgewater->CastOnTarget(unit); } }
+        if(!RShadowExists() && Menu->UseComboR->Enabled()) {
+            if(R->IsReady() && beans) {
+                if(Ex->Dist2D(unit) <= R->GetSpellRange()) {
+                    if(Player->GetMana() >= energy) {
 
                         if(Menu->UseIgnite->Enabled()) {
                             if(Ignite->GetSpellSlot() != kSlotUnknown) {
                                 if(Ex->Dist2D(unit) <= Ignite->GetSpellRange() && Ignite->IsReady()) {
                                     Ignite->CastOnUnit(unit); } } }
 
-                        W->CastOnPlayer(); }
+                        if(Menu->UseItemsCombo->Enabled()) {
+                            if(Bilgewater->IsOwned() && Bilgewater->IsReady()) {
+                                if(Ex->Dist2D(unit) <= 550) {
+                                    Bilgewater->CastOnTarget(unit); } }
 
-                    if(E->IsReady() && Ex->Dist2D(shadow, unit) <= E->GetSpellRange() + 25) {
-                        if(Botrk->IsOwned() && Botrk->IsReady()) {
-                            if(Ex->Dist2D(unit) <= 550) {
-                                Botrk->CastOnTarget(unit); } }
+                            if(Botrk->IsOwned() && Botrk->IsReady()) {
+                                if(Ex->Dist2D(unit) <= 550) {
+                                    Botrk->CastOnTarget(unit); } } }
 
-                        if(Bilgewater->IsOwned() && Bilgewater->IsReady()) {
-                            if(Ex->Dist2D(unit) <= 550) {
-                                Bilgewater->CastOnTarget(unit); } }
+                        R->CastOnUnit(unit); } }
 
-                        if(Menu->UseIgnite->Enabled()) {
-                            if(Ignite->GetSpellSlot() != kSlotUnknown) {
-                                if(Ex->Dist2D(unit) <= Ignite->GetSpellRange() && Ignite->IsReady()) {
-                                    Ignite->CastOnUnit(unit); } } }
+                for(auto o : Shadows) {
+                    auto shadow = o.second;
 
-                        W->CastOnPlayer(); } } } } } }
-
-inline void ZZed::JungleClear(IUnit * unit, bool waveclear, bool kill) {}
-
-inline void ZZed::WaveClear(IUnit * unit, bool waveclear, bool kill) {
-
-}
+                    if(shadow->HasBuff("zedwshadowbuff") && CanSwap(W) && !HasDeathMark(unit)) {
+                        if(Ex->Dist2D(shadow, unit) <= R->GetSpellRange() + 25) {
+                            W->CastOnPlayer(); } } } } } } }
 
 inline bool ZZed::SoloQ(Vec3 sourcepos, IUnit * unit) {
 
@@ -493,6 +468,7 @@ inline double ZZed::QDmg(IUnit * source, IUnit * unit, double & energy) {
 
         // if networkId is me predict extra damage because shadows aren't created yet
         if(source->GetNetworkId() == Player->GetNetworkId()) {
+
             GetBestWPosition(unit, wposition, false, true);
 
             if(W->IsReady() && !WShadowExists()) {

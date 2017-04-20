@@ -59,6 +59,7 @@ class ZZedMenu {
         IMenuOption * UseJungleE;
         IMenuOption * UseJungleWNearEnemy;
         IMenuOption * UseRAvoider;
-        IMenuOption * UseIgnite; };
+        IMenuOption * UseIgnite;
+        IMenuOption * SwapForKill; };
 
 

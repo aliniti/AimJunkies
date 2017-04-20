@@ -23,6 +23,7 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
 
     auto menuiw = menucb->AddMenu("::[W] Living Shadow");
     this->UseComboW = menuiw->CheckBox("Use W in Combo", true);
+    this->SwapForKill = menuiw->CheckBox("- Swap for Kill", true);
     this->UseHarassW = menuiw->CheckBox("Use W in Harass", true);
     this->UseHarassWPF = menuiw->AddSelection("- Shadow Placement:", 2, std::vector<std::string> { "Unit Position (W-Q->E)", "Pathfinding", "Smart (Auto)", });
     this->UseJungleW = menuiw->CheckBox("Use W in Jungle", true);

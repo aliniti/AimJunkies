@@ -53,9 +53,7 @@ PLUGIN_API void OnLoad(IPluginSDK * sdk) {
     ZZedAvoider::GenerateAvoidList();
 
     if(strcmp(ZZed::Player->ChampionName(), "Zed") == 0) {
-
         ZZed::OnBoot();
-
         ZZed::Menu = new ZZedMenu(GPluginSDK->AddMenu("ZZed"));
         GEventManager->AddEventHandler(kEventOnSpellCast, OnCastSpell);
         GEventManager->AddEventHandler(kEventOnSpellCast, OnDoCast);
@@ -63,7 +61,7 @@ PLUGIN_API void OnLoad(IPluginSDK * sdk) {
         GEventManager->AddEventHandler(kEventOnCreateObject, OnCreateObject);
         GEventManager->AddEventHandler(kEventOnGameUpdate, OnGameUpdate);
         GEventManager->AddEventHandler(kEventOnRender, OnRender);
-        GGame->PrintChat("<font color=\"#794DFF\"><b>ZZed</b></font><b><font color=\"#FFFFFF\"> Loaded!</font></b>"); } }
+        GGame->PrintChat("<font color=\"#66CCCC\"><b>ZZed</b></font><b><font color=\"#FFFFFF\"> Loaded!</font> <font color=\"#66CCCC\">(v1.0b) </font></b>"); } }
 
 PLUGIN_API void OnUnload() {
     if(strcmp(ZZed::Player->ChampionName(), "Zed") == 0) {
@@ -73,8 +71,6 @@ PLUGIN_API void OnUnload() {
         GEventManager->RemoveEventHandler(kEventOnBuffAdd, OnBuffAdd);
         GEventManager->RemoveEventHandler(kEventOnCreateObject, OnCreateObject);
         GEventManager->RemoveEventHandler(kEventOnSpellCast, OnCastSpell);
-        GEventManager->RemoveEventHandler(kEventOnRender, OnRender);
-        ZZed::Menu->Menu->SaveSettings();
-        ZZed::Menu->Menu->Remove(); } }
+        GEventManager->RemoveEventHandler(kEventOnRender, OnRender); } }
 
 

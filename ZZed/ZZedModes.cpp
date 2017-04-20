@@ -6,12 +6,13 @@
 void ZZedModes::Combo() {
 
     auto unit = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, ZZed::W->GetSpellRange() * 2);
+    auto canr = ZZed::Menu->UseComboR->Enabled() && ZZed::R->IsReady();
     auto beans = false;
 
     ZZed::CanUlt(unit, beans);
     ZZed::UseR(unit, beans);
 
-    if(!beans || !ZZed::Menu->UseComboR->Enabled() || ZZed::Marked.size() > 0) {
+    if(!beans || !canr || ZZed::Marked.size() > 0) {
         ZZed::UseW(unit, false);
         ZZed::UseE(unit, false);
         ZZed::UseQ(unit, false); } }

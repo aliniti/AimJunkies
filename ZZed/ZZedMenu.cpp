@@ -25,7 +25,7 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
     this->UseComboW = menuiw->CheckBox("Use W in Combo", true);
     this->SwapForKill = menuiw->CheckBox("- Swap for Kill", true);
     this->UseHarassW = menuiw->CheckBox("Use W in Harass", true);
-    this->UseHarassWPF = menuiw->AddSelection("- Shadow Placement:", 2, std::vector<std::string> { "Unit Position (W-Q->E)", "Pathfinding", "Smart (Auto)", });
+    this->UseHarassWPF = menuiw->AddSelection("- Shadow Placement:", 2, std::vector<std::string> { "W-E->Q", "Pathfinding", "Smart", });
     this->UseJungleW = menuiw->CheckBox("Use W in Jungle", true);
     this->UseJungleWNearEnemy = menuiw->CheckBox("- Use Near Enemy", false);
     this->UseFleeW = menuiw->CheckBox("Use W in Flee", true);
@@ -62,15 +62,15 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
 
     auto menurd = this->Menu->AddMenu("::Render");
     this->DrawQ = menurd->CheckBox("Enabled Q Drawings", true);
-    this->DrawQColor = menurd->AddColor("- Color Q", 121, 77, 255, 200);
+    this->DrawQColor = menurd->AddColor("- Color Q", 102, 204, 204, 200);
     this->DrawW = menurd->CheckBox("Enabled W Drawings", true);
-    this->DrawWColor = menurd->AddColor("- Color W", 121, 77, 255, 200);
+    this->DrawWColor = menurd->AddColor("- Color W", 102, 204, 204, 200);
     this->DrawE = menurd->CheckBox("Enabled E Drawings", false);
-    this->DrawEColor = menurd->AddColor("- Color E", 255, 255, 255, 200);
+    this->DrawEColor = menurd->AddColor("- Color E", 102, 204, 204, 200);
     this->DrawR = menurd->CheckBox("Enabled R Drawings", true);
-    this->DrawRColor = menurd->AddColor("- Color R", 255, 255, 255, 200);
+    this->DrawRColor = menurd->AddColor("- Color R", 102, 204, 204, 200);
     this->DrawComboDamage = menurd->CheckBox("Draw Combo Damage", true);
-    this->DrawComboDamageColor = menurd->AddColor("- Color Combo Damage", 121, 77, 255, 200);
+    this->DrawComboDamageColor = menurd->AddColor("- Color Combo Damage", 102, 204, 204, 200);
 
     auto menuav = this->Menu->AddMenu("::Avoider");
     this->UseRAvoider = menuav->CheckBox("R Avoider", true);
@@ -81,7 +81,6 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
             if(strcmp(hero->ChampionName(), i.second->ChampName.c_str()) == 0) {
                 auto uniqueHero = std::string("- ").append(i.second->ChampName).append(" R");
                 this->SpellsToAvoid.insert(std::pair<std::string, IMenuOption *>(i.first, menuav->CheckBox(uniqueHero.c_str(), true))); } } }
-
 
     auto menudb = this->Menu->AddMenu("::Debug");
     this->Debug = menudb->CheckBox("Debug Damage", false);

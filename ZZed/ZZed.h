@@ -97,22 +97,19 @@ inline void ZZed::OnBoot() {
     Youmuus = GPluginSDK->CreateItemForId(3142, 900);
     Bilgewater = GPluginSDK->CreateItemForId(3144, 550);
     Botrk = GPluginSDK->CreateItemForId(3153, 550);
-
     W = GPluginSDK->CreateSpell(kSlotW, 700);
     E = GPluginSDK->CreateSpell(kSlotE, 200);
     R = GPluginSDK->CreateSpell(kSlotR, 625);
 
     Q = GPluginSDK->CreateSpell2(kSlotQ, kLineCast, true, false, kCollidesWithYasuoWall);
-
     Q->SetSkillshot(0.25, 50, 1700, 900);
-
 
     Z = GPluginSDK->CreateSpell2(kSlotQ, kLineCast, true, false, static_cast<eCollisionFlags>(kCollidesWithYasuoWall | kCollidesWithHeroes | kCollidesWithMinions));
     Z->SetSkillshot(0.25, 100, 1700, 900); }
 
 inline void ZZed::OnShutdown() {
-
-}
+    Menu->Menu->SaveSettings();
+    Menu->Menu->Remove(); }
 
 inline bool ZZed::LethalTarget(IUnit * unit) {
     double tacos;
@@ -150,16 +147,14 @@ inline bool ZZed::CanShadowCPA(IUnit * unit, bool harass) {
 
         if(Menu->UseHarassWPF->GetInteger() == 2) {
             if(Ex->Dist2D(unit) > Q->Range() + 400 && !SoloQ(Player->ServerPosition(), unit)) {
-                return  true; } }
-
-    }
+                return  true; } } }
 
     return  false; }
 
 inline void ZZed::CanUlt(IUnit * unit, bool & coolbeans) {
     coolbeans = false;
 
-    if(unit != nullptr && R->IsReady() && unit->IsHero()) {
+    if(unit != nullptr && unit->IsHero()) {
         auto focus = GTargetSelector->GetFocusedTarget();
         double energy = 0;
 
@@ -169,20 +164,22 @@ inline void ZZed::CanUlt(IUnit * unit, bool & coolbeans) {
         if(unit->IsHero() && CDmg(unit, energy) >= unit->GetHealth()) {
             coolbeans = true; }
 
-        // double check if hero is on the menu to stop throwing exceptions on update
-        // for some instance like in proving grounds menu is generated on load.
-        // this is to prevent nullptr's and add any new targets to the menu on the fly (e.g Target Dummy)
+        if(R->IsReady()) {
 
-        if(Menu->AlwaysRTargets.find(unit->GetNetworkId()) == Menu->AlwaysRTargets.end()) {
-            Menu->AlwaysRTargets[unit->GetNetworkId()] = Menu->DeathMarkMenu->CheckBox(std::string("- Always R on").append(" ").append(unit->ChampionName()).c_str(), false);
-            return; }
+            // double check if hero is on the menu to stop throwing exceptions on update
+            // for some instance like in proving grounds menu is generated on load.
+            // this is to prevent nullptr's and add any new targets to the menu on the fly (e.g Target Dummy)
 
-        if(Menu->AlwaysRTargets[unit->GetNetworkId()]->Enabled() && Menu->UseAlwaysR->Enabled()) {
-            coolbeans = true; }
+            if(Menu->AlwaysRTargets.find(unit->GetNetworkId()) == Menu->AlwaysRTargets.end()) {
+                Menu->AlwaysRTargets[unit->GetNetworkId()] = Menu->DeathMarkMenu->CheckBox(std::string("- Always R on").append(" ").append(unit->ChampionName()).c_str(), false);
+                return; }
 
-        if(Menu->UseAlwaysR->Enabled() && Menu->AlwaysRSelected->Enabled()) {
-            if(focus != nullptr && focus->GetNetworkId() == unit->GetNetworkId()) {
-                coolbeans = true; } } } }
+            if(Menu->AlwaysRTargets[unit->GetNetworkId()]->Enabled() && Menu->UseAlwaysR->Enabled()) {
+                coolbeans = true; }
+
+            if(Menu->UseAlwaysR->Enabled() && Menu->AlwaysRSelected->Enabled()) {
+                if(focus != nullptr && focus->GetNetworkId() == unit->GetNetworkId()) {
+                    coolbeans = true; } } } } }
 
 inline bool ZZed::CanSwap(ISpell * spell) {
     return strstr(Player->GetSpellName(spell->GetSpellSlot()), std::to_string(2).c_str()); }
@@ -376,9 +373,8 @@ inline void ZZed::UseR(IUnit * unit, bool beans, bool killsteal) {
     if(unit != nullptr && unit->IsValidTarget()) {
         double energy = 0;
 
-        if(!Ex->IsKeyDown(Menu->ComboKey)) {
-            if(killsteal && CDmg(unit, energy) < unit->GetHealth()) {
-                return; } }
+        if(!Ex->IsKeyDown(Menu->ComboKey) && (killsteal && CDmg(unit, energy) < unit->GetHealth())) {
+            return; }
 
         if(beans && Menu->UseItemsCombo->Enabled() && Youmuus->IsReady() && Ex->IsKeyDown(Menu->ComboKey)) {
             if(Player->GetMana() >= energy && Ex->Dist2D(unit) <= 1200) {

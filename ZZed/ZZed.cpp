@@ -62,7 +62,7 @@ PLUGIN_API void OnLoad(IPluginSDK * sdk) {
         GEventManager->AddEventHandler(kEventOnCreateObject, OnCreateObject);
         GEventManager->AddEventHandler(kEventOnGameUpdate, OnGameUpdate);
         GEventManager->AddEventHandler(kEventOnRender, OnRender);
-        GGame->PrintChat("<font color=\"#66CCCC\"><b>ZZed</b></font><b><font color=\"#FFFFFF\"> Loaded!</font> <font color=\"#66CCCC\">(v1.0b) </font></b>"); } }
+        GGame->PrintChat("<font color=\"#66CCCC\"><b>ZZed</b></font><b><font color=\"#FFFFFF\"> Loaded!</font> <font color=\"#66CCCC\">(v1.1b) </font></b>"); } }
 
 PLUGIN_API void OnUnload() {
     if(strcmp(ZZed::Player->ChampionName(), "Zed") == 0) {

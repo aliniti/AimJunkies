@@ -21,7 +21,9 @@ class ZZed {
         static ISpell * R;
         static ISpell * Ignite;
         static ISpell2 * Q;
+        static ISpell2 * ExQ;
         static ISpell2 * Z;
+
         static IInventoryItem * Tiamat;
         static IInventoryItem * Hydra;
         static IInventoryItem * Titanic;
@@ -31,6 +33,7 @@ class ZZed {
         static std::map<std::string, ZZedAvoider *> AvoidList;
 
         static void UseQ(IUnit * unit, bool harass = false);
+        static void UseQEx(IUnit * unit, bool jungle);
         static void UseW(IUnit * unit, bool harass);
         static void UseWEx(IUnit * unit, bool jungle);
         static void UseE(IUnit * unit, bool harass);
@@ -103,18 +106,19 @@ inline void ZZed::OnBoot() {
 
     Q = GPluginSDK->CreateSpell2(kSlotQ, kLineCast, true, false, kCollidesWithYasuoWall);
     Q->SetSkillshot(0.25, 50, 1700, 900);
-    Q->SetRangeCheckFrom(Player->ServerPosition());
+
+    ExQ = GPluginSDK->CreateSpell2(kSlotQ, kLineCast, true, false, kCollidesWithYasuoWall);
+    ExQ->SetSkillshot(0.25, 50, Q->Speed() * 2, Q->Range() * 2);
 
     Z = GPluginSDK->CreateSpell2(kSlotQ, kLineCast, true, false, static_cast<eCollisionFlags>(kCollidesWithYasuoWall | kCollidesWithHeroes | kCollidesWithMinions));
-    Z->SetSkillshot(0.25, 100, 1700, 900);
-    Z->SetRangeCheckFrom(Player->ServerPosition()); }
+    Z->SetSkillshot(0.25, 100, 1700, 900); }
 
 inline void ZZed::OnShutdown() {
     Menu->Menu->SaveSettings();
     Menu->Menu->Remove();
-
-    Q->SetRangeCheckFrom(Player->ServerPosition());
-    Z->SetRangeCheckFrom(Player->ServerPosition()); }
+    Shadows.clear();
+    Marked.clear();
+    Ticks.clear(); }
 
 inline bool ZZed::LethalTarget(IUnit * unit) {
     double tacos;
@@ -244,34 +248,36 @@ inline void ZZed::UseQ(IUnit * unit, bool harass) {
     if(unit == nullptr || !unit->IsValidTarget() || !Q->IsReady()) {
         return; }
 
-    if(Ex->Dist2D(unit) <= Q->Range() || Ex->Dist2D(unit->ServerPosition(), Q->GetRangeCheckFrom()) <= Q->Range() + 100) {
+    if(Ex->Dist2D(unit) <= Q->Range() <= Q->Range() && unit->IsHero()) {
         if(harass && Menu->UseHarassQ->Enabled() && Player->GetMana() > Menu->MinimumHarassEnergy->GetInteger()) {
             Q->CastOnTarget(unit); }
 
         if(!harass && Menu->UseComboQ->Enabled()) {
-            Q->CastOnTarget(unit); }
+            Q->CastOnTarget(unit); } }
 
-        if(!harass && Menu->UseJungleQ->Enabled() && Ex->IsKeyDown(Menu->ClearKey) && !unit->IsHero()) {
-            Vec3 pos;
-            int numberHit;
-            Q->FindBestCastPosition(true, false, pos, numberHit);
-            Q->CastOnPosition(pos); } }
-
-    if(harass && Ex->Dist2D(unit) > Q->Range() && Menu->UseHarassQ->Enabled()) {
+    if(harass && Ex->Dist2D(unit) > Q->Range() && Menu->UseHarassQ->Enabled() && unit->IsHero()) {
         for(auto z : Shadows) {
             auto shadow = z.second;
 
             if(Ex->Dist2D(shadow, unit) <= Q->Range() + unit->BoundingRadius()) {
                 if(Ex->Dist2D(shadow, unit) <= E->GetSpellRange() + unit->BoundingRadius() || Menu->ExtendedQHarass->Enabled()) {
-                    Q->CastOnTarget(unit); } } } }
+                    ExQ->CastOnTarget(unit); } } } }
 
-    if(!harass && Ex->Dist2D(unit) > Q->Range() && Menu->UseComboQ->Enabled()) {
+    if(!harass && Ex->Dist2D(unit) > Q->Range() && Menu->UseComboQ->Enabled() && unit->IsHero()) {
         for(auto z : Shadows) {
             auto shadow = z.second;
 
             if(Ex->Dist2D(shadow, unit) <= Q->Range() + unit->BoundingRadius()) {
                 if(Ex->Dist2D(shadow, unit) <= E->GetSpellRange() + unit->BoundingRadius() || Menu->ExtendedQCombo->Enabled()) {
-                    Q->CastOnTarget(unit); } } } } }
+                    ExQ->CastOnTarget(unit); } } } } }
+
+inline void ZZed::UseQEx(IUnit * unit, bool jungle) {
+    if(unit == nullptr || !unit->IsValidTarget() || !Q->IsReady()) {
+        return; }
+
+    if(Ex->Dist2D(unit) <= Q->Range() <= Q->Range()) {
+        if(jungle && Menu->UseJungleQ->Enabled() && Player->GetMana() > Menu->MinimumClearEnergy->GetInteger()) {
+            Q->CastOnTarget(unit); } } }
 
 inline void ZZed::UseW(IUnit * unit, bool harass) {
 

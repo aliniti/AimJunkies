@@ -14,6 +14,7 @@ ISpell * ZZed::E;
 ISpell * ZZed::R;
 ISpell * ZZed::Ignite;
 ISpell2 * ZZed::Q;
+ISpell2 * ZZed::ExQ;
 ISpell2 * ZZed::Z;
 
 IInventoryItem * ZZed::Hydra;
@@ -53,7 +54,6 @@ PLUGIN_API void OnLoad(IPluginSDK * sdk) {
     ZZedAvoider::GenerateAvoidList();
 
     if(strcmp(ZZed::Player->ChampionName(), "Zed") == 0) {
-
         ZZed::OnBoot();
         ZZed::Menu = new ZZedMenu(GPluginSDK->AddMenu("ZZed"));
         GEventManager->AddEventHandler(kEventOnSpellCast, OnCastSpell);

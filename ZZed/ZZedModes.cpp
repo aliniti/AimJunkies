@@ -124,6 +124,9 @@ void ZZedModes::OnSpellCast(const CastedSpell & args) {
     if(args.Caster_->GetNetworkId() == player->GetNetworkId()) {
         auto name = std::string(args.Name_);
 
+        if(strcmp("ZedQ", name.c_str()) == 0) {
+            ZZed::Q->SetRangeCheckFrom(ZZed::Player->ServerPosition()); }
+
         if(stamps.find(name) != stamps.end()) {
             stamps[name] = GGame->TickCount(); } }
 
@@ -232,8 +235,17 @@ void ZZedModes::OnCreateObj(IUnit * source) {
                     ZZed::R->CastOnPlayer(); } } } }
 
     if(source != nullptr && source->GetClassId() == kobj_AI_Minion) {
+        auto unit = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, ZZed::W->GetSpellRange() * 2);
+
         if(source->GetTeam() == ZZed::Player->GetTeam()) {
             if(strcmp(source->GetObjectName(), "Shadow") == 0) {
+
+                if(unit != nullptr && !unit->IsDead() && unit->IsValidTarget()) {
+                    if(ZZed::Ex->Dist2D(unit) > ZZed::Q->Range()) {
+                        ZZed::Q->SetRangeCheckFrom(source->ServerPosition()); }
+                    else {
+                        ZZed::Q->SetRangeCheckFrom(ZZed::Player->ServerPosition()); } }
+
                 ZZed::Shadows[GGame->Time()] = source; } } } }
 
 void ZZedModes::OnBuffAdd(IUnit * unit, void * buffdata) {

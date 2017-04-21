@@ -103,13 +103,18 @@ inline void ZZed::OnBoot() {
 
     Q = GPluginSDK->CreateSpell2(kSlotQ, kLineCast, true, false, kCollidesWithYasuoWall);
     Q->SetSkillshot(0.25, 50, 1700, 900);
+    Q->SetRangeCheckFrom(Player->ServerPosition());
 
     Z = GPluginSDK->CreateSpell2(kSlotQ, kLineCast, true, false, static_cast<eCollisionFlags>(kCollidesWithYasuoWall | kCollidesWithHeroes | kCollidesWithMinions));
-    Z->SetSkillshot(0.25, 100, 1700, 900); }
+    Z->SetSkillshot(0.25, 100, 1700, 900);
+    Z->SetRangeCheckFrom(Player->ServerPosition()); }
 
 inline void ZZed::OnShutdown() {
     Menu->Menu->SaveSettings();
-    Menu->Menu->Remove(); }
+    Menu->Menu->Remove();
+
+    Q->SetRangeCheckFrom(Player->ServerPosition());
+    Z->SetRangeCheckFrom(Player->ServerPosition()); }
 
 inline bool ZZed::LethalTarget(IUnit * unit) {
     double tacos;
@@ -179,7 +184,7 @@ inline void ZZed::CanUlt(IUnit * unit, bool & coolbeans) {
 
             if(Menu->UseAlwaysR->Enabled() && Menu->AlwaysRSelected->Enabled()) {
                 if(focus != nullptr && focus->GetNetworkId() == unit->GetNetworkId()) {
-                    coolbeans = true; } } } } }
+                    coolbeans = true;  } } } } }
 
 inline bool ZZed::CanSwap(ISpell * spell) {
     return strstr(Player->GetSpellName(spell->GetSpellSlot()), std::to_string(2).c_str()); }
@@ -239,11 +244,7 @@ inline void ZZed::UseQ(IUnit * unit, bool harass) {
     if(unit == nullptr || !unit->IsValidTarget() || !Q->IsReady()) {
         return; }
 
-    bool somebeans;
-    CanUlt(unit, somebeans);
-
-
-    if(Ex->Dist2D(unit) <= Q->Range()) {
+    if(Ex->Dist2D(unit) <= Q->Range() || Ex->Dist2D(unit->ServerPosition(), Q->GetRangeCheckFrom()) <= Q->Range() + 100) {
         if(harass && Menu->UseHarassQ->Enabled() && Player->GetMana() > Menu->MinimumHarassEnergy->GetInteger()) {
             Q->CastOnTarget(unit); }
 
@@ -262,12 +263,7 @@ inline void ZZed::UseQ(IUnit * unit, bool harass) {
 
             if(Ex->Dist2D(shadow, unit) <= Q->Range() + unit->BoundingRadius()) {
                 if(Ex->Dist2D(shadow, unit) <= E->GetSpellRange() + unit->BoundingRadius() || Menu->ExtendedQHarass->Enabled()) {
-                    Q->SetFrom(shadow->ServerPosition());
-                    Q->SetRangeCheckFrom(shadow->ServerPosition());
-
-                    if(Q->CastOnTarget(unit)) {
-                        Q->SetFrom(Player->ServerPosition());
-                        Q->SetRangeCheckFrom(Player->ServerPosition()); } } } } }
+                    Q->CastOnTarget(unit); } } } }
 
     if(!harass && Ex->Dist2D(unit) > Q->Range() && Menu->UseComboQ->Enabled()) {
         for(auto z : Shadows) {
@@ -275,14 +271,7 @@ inline void ZZed::UseQ(IUnit * unit, bool harass) {
 
             if(Ex->Dist2D(shadow, unit) <= Q->Range() + unit->BoundingRadius()) {
                 if(Ex->Dist2D(shadow, unit) <= E->GetSpellRange() + unit->BoundingRadius() || Menu->ExtendedQCombo->Enabled()) {
-                    Q->SetFrom(shadow->ServerPosition());
-                    Q->SetRangeCheckFrom(shadow->ServerPosition());
-
-                    if(Q->CastOnTarget(unit)) {
-                        Q->SetFrom(Player->ServerPosition());
-                        Q->SetRangeCheckFrom(Player->ServerPosition()); } } } } }
-
-}
+                    Q->CastOnTarget(unit); } } } } }
 
 inline void ZZed::UseW(IUnit * unit, bool harass) {
 
@@ -561,7 +550,6 @@ inline double ZZed::CDmg(IUnit * unit, double & energy) {
 inline void ZZed::GetBestWPosition(IUnit * unit, Vec3 & wpos, bool harass, bool onupdate) {
 
     // if i should enable in harass
-
     if(Beans("ZedR", 1500) || onupdate || CanShadowCPA(unit, harass)) {
 
         if(Menu->ShadowPlacement->GetInteger() == 2 || CanShadowCPA(unit, harass)) {
@@ -642,6 +630,7 @@ inline void ZZed::GetMaxWPositions(IUnit * unit, Vec3 & wpos) {
     // sort by closest to enemy
     std::sort(possiblePositions.begin(), possiblePositions.end(), [&](Vec3 v1, Vec3 v2) {
         return Ex->Dist2D(unit->ServerPosition(), v1) < Ex->Dist2D(unit->ServerPosition(), v2); });
+
     // then by furthest from me
     std::sort(possiblePositions.begin(), possiblePositions.end(), [&](Vec3 v1, Vec3 v2) {
         return Ex->Dist2D(Player->ServerPosition(), v1) > Ex->Dist2D(Player->ServerPosition(), v2); });

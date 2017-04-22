@@ -170,25 +170,29 @@ inline void ZZed::CanUlt(IUnit * unit, bool & coolbeans) {
         if(HasDeathMark(unit)) {
             coolbeans = false; }
 
-        if(unit->IsHero() && CDmg(unit, energy) >= unit->GetHealth()) {
-            coolbeans = true; }
-
         if(R->IsReady()) {
+            if (Menu->AlwaysRSelected->Enabled()) {
+                if (focus != nullptr && focus->GetNetworkId() == unit->GetNetworkId()) {
+                    coolbeans = true;
+                    return; } }
+
+            if (Menu->BlackListRTargets[unit->GetNetworkId()]->Enabled() && Menu->BlackListR->Enabled()) {
+                coolbeans = false;
+                return; }
+
+            if (unit->IsHero() && /*CDmg(unit, energy)*/ 1000001 >= unit->GetHealth()) {
+                coolbeans = true; }
 
             // double check if hero is on the menu to stop throwing exceptions on update
             // for some instance like in proving grounds menu is generated on load.
             // this is to prevent nullptr's and add any new targets to the menu on the fly (e.g Target Dummy)
 
-            if(Menu->AlwaysRTargets.find(unit->GetNetworkId()) == Menu->AlwaysRTargets.end()) {
-                Menu->AlwaysRTargets[unit->GetNetworkId()] = Menu->DeathMarkMenu->CheckBox(std::string("- Always R on").append(" ").append(unit->ChampionName()).c_str(), false);
-                return; }
-
-            if(Menu->AlwaysRTargets[unit->GetNetworkId()]->Enabled() && Menu->UseAlwaysR->Enabled()) {
-                coolbeans = true; }
-
-            if(Menu->UseAlwaysR->Enabled() && Menu->AlwaysRSelected->Enabled()) {
-                if(focus != nullptr && focus->GetNetworkId() == unit->GetNetworkId()) {
-                    coolbeans = true;  } } } } }
+            if(Menu->BlackListRTargets.find(unit->GetNetworkId()) == Menu->BlackListRTargets.end()) {
+                Menu->BlackListRTargets[unit->GetNetworkId()] = Menu->DeathMarkMenu->CheckBox(std::string("- Dont R on").append(" ").append(unit->ChampionName()).c_str(), false);
+                return; } }
+        else {
+            if (unit->IsHero() && CDmg(unit, energy) >= unit->GetHealth()) {
+                coolbeans = true; } } } }
 
 inline bool ZZed::CanSwap(ISpell * spell) {
     return strstr(Player->GetSpellName(spell->GetSpellSlot()), std::to_string(2).c_str()); }

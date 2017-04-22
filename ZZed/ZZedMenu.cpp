@@ -14,10 +14,10 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
 
     auto menuiq = menucb->AddMenu("::[Q] Razor Shuriken");
     this->UseComboQ = menuiq->CheckBox("Use Q in Combo", true);
-    this->ExtendedQCombo = menuiq->CheckBox("- Use Extended Q", false);
+    this->ExtendedQCombo = menuiq->CheckBox("- Use Extended Q", true);
     //this->ExComboQMaxDamage = menuiq->CheckBox("- Only Max Damage Q", false);
     this->UseHarassQ = menuiq->CheckBox("Use Q in Harass", true);
-    this->ExtendedQHarass = menuiq->CheckBox("- Use Extended Q", true);
+    this->ExtendedQHarass = menuiq->CheckBox("- Use Extended Q", false);
     //this->ExHarassQMaxDamage = menuiq->CheckBox("- Only Max Damage Q", false);
     this->UseJungleQ = menuiq->CheckBox("Use Q in Jungle", true);
 
@@ -25,9 +25,9 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
     this->UseComboW = menuiw->CheckBox("Use W in Combo", true);
     this->SwapForKill = menuiw->CheckBox("- Swap for Kill", true);
     this->UseHarassW = menuiw->CheckBox("Use W in Harass", true);
-    this->UseHarassWPF = menuiw->AddSelection("- Shadow Placement:", 2, std::vector<std::string> { "W-E->Q", "Pathfinding", "Smart", });
+    this->UseHarassWPF = menuiw->AddSelection("- Shadow Placement:", 0, std::vector<std::string> { "Unit Position", "Pathfinding", "Auto", });
     this->UseJungleW = menuiw->CheckBox("Use W in Jungle", true);
-    this->UseJungleWNearEnemy = menuiw->CheckBox("- Use Near Enemy", false);
+    this->DontWJungleNearEnemy = menuiw->CheckBox("- Dont Use Near Enemy", true);
     this->UseFleeW = menuiw->CheckBox("Use W in Flee", true);
 
     auto menuie = menucb->AddMenu("::[E] Shadow Slash");
@@ -42,12 +42,12 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
     this->SwapRIfDead = this->DeathMarkMenu->CheckBox("- Swap Back if Dead", true);
     this->AutoR = this->DeathMarkMenu->CheckBox("- Killsteal", true);
 
-    this->UseAlwaysR = this->DeathMarkMenu->CheckBox("Enable Always R", true);
     this->AlwaysRSelected = this->DeathMarkMenu->CheckBox("- Always R on Focus Target", true);
+    this->BlackListR = this->DeathMarkMenu->CheckBox("Blacklist R", true);
 
     for(auto i : GEntityList->GetAllHeros(false, true)) {
         if(!i->IsDead()) {
-            this->AlwaysRTargets[i->GetNetworkId()] = this->DeathMarkMenu->CheckBox(std::string("- Always R on").append(" ").append(i->ChampionName()).c_str(), false); } }
+            this->BlackListRTargets[i->GetNetworkId()] = this->DeathMarkMenu->CheckBox(std::string("- Dont R on").append(" ").append(i->ChampionName()).c_str(), false); } }
 
     auto menuem = this->Menu->AddMenu("::Energy");
     this->MinimumHarassEnergy = menuem->AddInteger("Minimum Harass Energy", 0, 200, 100);

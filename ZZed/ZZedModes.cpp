@@ -48,7 +48,7 @@ void ZZedModes::Jungling() {
         for(auto unit : mobs) {
             if(unit->IsJungleCreep() && ZZed::Ex->Dist(unit) <= 655) {
                 if(unit->IsValidObject() && !unit->IsDead() && unit->IsVisible()) {
-                    if(menu->UseJungleWNearEnemy->Enabled() || exten->CountInRange(player, 1000, GEntityList->GetAllHeros(false, true)) < 1) {
+                    if(!menu->DontWJungleNearEnemy->Enabled() || exten->CountInRange(player, 1000, GEntityList->GetAllHeros(false, true)) < 1) {
                         if(menu->UseJungleW->Enabled()) {
                             ZZed::UseWEx(unit, true); } }
 

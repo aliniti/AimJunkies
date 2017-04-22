@@ -5,7 +5,7 @@ class ZZedMenu {
     public:
         explicit ZZedMenu(IMenu * menu);
 
-        std::map<int, IMenuOption *> AlwaysRTargets;
+        std::map<int, IMenuOption *> BlackListRTargets;
         std::map<std::basic_string<char>, IMenuOption *> SpellsToAvoid;
 
         // root;
@@ -38,7 +38,7 @@ class ZZedMenu {
         IMenuOption * ExComboQMaxDamage;
         IMenuOption * DrawPredictedShadow;
         IMenuOption * DebugPathfinding;
-        IMenuOption * UseAlwaysR;
+        IMenuOption * BlackListR;
         IMenuOption * MinimumClearEnergy;
         IMenuOption * AutoR;
         IMenuOption * ClearKey;
@@ -57,7 +57,7 @@ class ZZedMenu {
         IMenuOption * UseJungleQ;
         IMenuOption * UseJungleW;
         IMenuOption * UseJungleE;
-        IMenuOption * UseJungleWNearEnemy;
+        IMenuOption * DontWJungleNearEnemy;
         IMenuOption * UseRAvoider;
         IMenuOption * UseIgnite;
         IMenuOption * SwapForKill; };

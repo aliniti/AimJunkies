@@ -168,7 +168,8 @@ inline void ZZed::CanUlt(IUnit * unit, bool & coolbeans) {
         double energy = 0;
 
         if(HasDeathMark(unit)) {
-            coolbeans = false; }
+            coolbeans = false;
+            return; }
 
         if(R->IsReady()) {
             if (Menu->AlwaysRSelected->Enabled()) {
@@ -180,7 +181,7 @@ inline void ZZed::CanUlt(IUnit * unit, bool & coolbeans) {
                 coolbeans = false;
                 return; }
 
-            if (unit->IsHero() && /*CDmg(unit, energy)*/ 1000001 >= unit->GetHealth()) {
+            if (unit->IsHero() && CDmg(unit, energy) >= unit->GetHealth()) {
                 coolbeans = true; }
 
             // double check if hero is on the menu to stop throwing exceptions on update
@@ -398,7 +399,8 @@ inline void ZZed::UseR(IUnit * unit, bool beans, bool killsteal) {
                 if(shadow->HasBuff("zedwshadowbuff")) {
                     if(Ex->Dist2D(shadow, unit) <= Player->AttackRange() + Player->BoundingRadius()) {
                         if(Menu->SwapForKill->Enabled() && CDmg(unit, energy) >= unit->GetHealth() && Player->GetMana() >= energy) {
-                            W->CastOnPlayer(); } } } } }
+                            if (!GUtility->IsPositionInFountain(shadow->ServerPosition(), false, true)) {
+                                W->CastOnPlayer(); } } } } } }
 
         if(!RShadowExists() && Menu->UseComboR->Enabled()) {
             if(R->IsReady() && beans) {
@@ -426,7 +428,8 @@ inline void ZZed::UseR(IUnit * unit, bool beans, bool killsteal) {
 
                     if(shadow->HasBuff("zedwshadowbuff") && CanSwap(W) && !HasDeathMark(unit)) {
                         if(Ex->Dist2D(shadow, unit) <= R->GetSpellRange() + 25) {
-                            W->CastOnPlayer(); } } } } } } }
+                            if (!GUtility->IsPositionInFountain(shadow->ServerPosition(), false, true)) {
+                                W->CastOnPlayer(); } } } } } } } }
 
 inline bool ZZed::SoloQ(Vec3 sourcepos, IUnit * unit) {
 

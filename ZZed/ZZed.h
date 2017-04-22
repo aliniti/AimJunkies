@@ -155,7 +155,7 @@ inline bool ZZed::CanShadowCPA(IUnit * unit, bool harass) {
             return  true; }
 
         if(Menu->UseHarassWPF->GetInteger() == 2) {
-            if(Ex->Dist2D(unit) > Q->Range() + 400 && !SoloQ(Player->ServerPosition(), unit)) {
+            if(Ex->Dist2D(unit) > Q->Range() + 300) {
                 return  true; } } }
 
     return  false; }
@@ -248,11 +248,8 @@ inline void ZZed::UseQ(IUnit * unit, bool harass) {
     if(unit == nullptr || !unit->IsValidTarget() || !Q->IsReady()) {
         return; }
 
-    if(Ex->Dist2D(unit) <= Q->Range() <= Q->Range() && unit->IsHero()) {
-        if(harass && Menu->UseHarassQ->Enabled() && Player->GetMana() > Menu->MinimumHarassEnergy->GetInteger()) {
-            Q->CastOnTarget(unit); }
-
-        if(!harass && Menu->UseComboQ->Enabled()) {
+    if (Ex->Dist2D(unit) <= Q->Range() <= Q->Range() && unit->IsHero()) {
+        if (harass && Menu->UseHarassQ->Enabled() || !harass && Menu->UseComboQ->Enabled()) {
             Q->CastOnTarget(unit); } }
 
     if(harass && Ex->Dist2D(unit) > Q->Range() && Menu->UseHarassQ->Enabled() && unit->IsHero()) {
@@ -260,7 +257,10 @@ inline void ZZed::UseQ(IUnit * unit, bool harass) {
             auto shadow = z.second;
 
             if(Ex->Dist2D(shadow, unit) <= Q->Range() + unit->BoundingRadius()) {
-                if(Ex->Dist2D(shadow, unit) <= E->GetSpellRange() + unit->BoundingRadius() || Menu->ExtendedQHarass->Enabled()) {
+                if(Ex->Dist2D(shadow, unit) <= E->GetSpellRange() + unit->BoundingRadius()) {
+                    ExQ->CastOnTarget(unit); }
+
+                if (Menu->ExtendedQHarass->Enabled() && Menu->UseHarassWPF->GetInteger() != 0) {
                     ExQ->CastOnTarget(unit); } } } }
 
     if(!harass && Ex->Dist2D(unit) > Q->Range() && Menu->UseComboQ->Enabled() && unit->IsHero()) {
@@ -301,7 +301,7 @@ inline void ZZed::UseW(IUnit * unit, bool harass) {
         if(Ex->Dist2D(unit) <= W->GetSpellRange() * 2) {
 
             // combo check if extended position has enemy near e, or if extended q is enabled. Go full yolo if we have a marked target
-            if(!harass) {
+            if(!harass && Menu->UseComboW->Enabled()) {
                 if(Ex->Dist2D(unit) <= W->GetSpellRange() + E->GetSpellRange() || Menu->ExtendedQCombo->Enabled()) {
                     if(Q->IsReady() && Player->GetMana() >= Q->ManaCost() + W->GetManaCost()) {
                         W->CastOnPosition(castposition); }
@@ -310,7 +310,7 @@ inline void ZZed::UseW(IUnit * unit, bool harass) {
                         W->CastOnPosition(castposition); } } }
 
             // harass check if extended position has enemy near e, or if extended q is enabled. Go full yolo if we have a marked target
-            if(harass & Player->GetMana() >= Menu->MinimumHarassEnergy->GetInteger()) {
+            if(harass & Player->GetMana() >= Menu->MinimumHarassEnergy->GetInteger() && Menu->UseHarassW->Enabled()) {
                 if(Ex->Dist2D(unit) <= W->GetSpellRange() + E->GetSpellRange() ||  Menu->ExtendedQHarass->Enabled()) {
                     if(Q->IsReady() && Player->GetMana() >= Q->ManaCost() + W->GetManaCost()) {
                         W->CastOnPosition(castposition); }
@@ -336,17 +336,16 @@ inline void ZZed::UseE(IUnit * unit, bool harass) {
         return; }
 
     if(Player->GetMana() >= E->GetManaCost()) {
-        if(Ex->Dist2D(unit) <= E->GetSpellRange()) {
-            if(!harass && Menu->UseComboE->Enabled() ||
-                harass && Menu->UseHarassE->Enabled() && Player->GetMana() >= Menu->MinimumHarassEnergy->GetInteger()) {
-                E->CastOnPlayer(); } } }
+        if(Ex->Dist2D(unit) <= E->GetSpellRange() + 55) {
+            if(harass && Menu->UseHarassE->Enabled() || !harass && Menu->UseComboE->Enabled()) {
+                E->CastOnPlayer(); } }
 
-    for(auto o : Shadows) {
-        auto shadow = o.second;
+        for(auto o : Shadows) {
+            auto shadow = o.second;
 
-        if(Ex->Dist2D(unit, shadow) <= E->GetSpellRange()) {
-            if(!harass && Menu->UseComboE->Enabled() || harass && Menu->UseHarassE->Enabled()) {
-                E->CastOnPlayer(); } } } }
+            if (Ex->Dist2D(unit, shadow) <= E->GetSpellRange() + unit->BoundingRadius()) {
+                if (harass && Menu->UseHarassE->Enabled() || !harass && Menu->UseComboE->Enabled()) {
+                    E->CastOnPlayer(); } } } } }
 
 inline void ZZed::UseEEx(IUnit * unit, bool jungle) {
     if(unit == nullptr || !unit->IsValidTarget() || !E->IsReady()) {
@@ -556,9 +555,9 @@ inline double ZZed::CDmg(IUnit * unit, double & energy) {
 inline void ZZed::GetBestWPosition(IUnit * unit, Vec3 & wpos, bool harass, bool onupdate) {
 
     // if i should enable in harass
-    if(Beans("ZedR", 1500) || onupdate || CanShadowCPA(unit, harass)) {
+    if(Beans("ZedR", 1500) || onupdate || CanShadowCPA(unit, true)) {
 
-        if(Menu->ShadowPlacement->GetInteger() == 2 || CanShadowCPA(unit, harass)) {
+        if(Menu->ShadowPlacement->GetInteger() == 2 || CanShadowCPA(unit, true)) {
             GetMaxWPositions(unit, wpos);
             return; }
 

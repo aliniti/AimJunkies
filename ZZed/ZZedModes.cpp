@@ -201,7 +201,7 @@ void ZZedModes::OnRender() {
     if(menu->DrawPredictedShadow->Enabled() && unit != nullptr) {
         Vec3 wpos;
         ZZed::GetBestWPosition(unit, wpos, false, true);
-        GRender->DrawCircle(wpos, ZZed::Player->BoundingRadius(), Vec4(255, 0, 0, 255), 4, false, true); }
+        GRender->DrawCircle(wpos, ZZed::Player->BoundingRadius(), Vec4(255, 0, 0, 255), 5, false, true); }
 
     if(menu->DrawComboDamage->Enabled()) {
         Vec4 bb;
@@ -209,7 +209,7 @@ void ZZedModes::OnRender() {
         menu->DrawComboDamageColor->GetColor(&bb);
 
         for(auto i : GEntityList->GetAllHeros(false, true)) {
-            if(i->IsOnScreen() && i->IsVisible() && i->IsValidTarget()) {
+            if(i != nullptr && i->IsOnScreen() && i->IsVisible() && i->IsValidTarget()) {
                 menu->Debug->Enabled()
                 ? ZZed::Ex->DrawDamageOnChampionHPBar(i, ZZed::CDmg(i, energy), std::to_string(ZZed::CDmg(i, energy)).c_str(), bb)
                 : ZZed::Ex->DrawDamageOnChampionHPBar(i, ZZed::CDmg(i, energy), bb); } } }
@@ -217,18 +217,18 @@ void ZZedModes::OnRender() {
     for(auto u : ZZed::Shadows) {
         auto shadow = u.second;
 
-        GRender->DrawCircle(shadow->GetPosition(), shadow->BoundingRadius() + 35, Vec4(121, 77, 255, 155)); } }
+        GRender->DrawCircle(shadow->GetPosition(), shadow->BoundingRadius() + 35, Vec4(102, 204, 204, 200), 9, false, true); } }
 
 void ZZedModes::OnCreateObj(IUnit * source) {
     if(source != nullptr && source->GetClassId() == kobj_GeneralParticleEmitter) {
         if(strcmp(source->GetObjectName(), "Zed_Base_R_buf_tell.troy") == 0) {
             if(ZZed::CanSwap(ZZed::R) && ZZed::Menu->SwapRIfDead->Enabled()) {
 
-                if(ZZed::Ex->Dist2D(ZZed::RShadow()) > 550) {
+                if (ZZed::Ex->UnderEnemyTurret(ZZed::RShadow()) == false &&
+                    ZZed::Ex->UnderEnemyTurret(ZZed::Player)) {
                     ZZed::R->CastOnPlayer(); }
 
-                if(!ZZed::Ex->UnderEnemyTurret(ZZed::RShadow()) &&
-                    ZZed::Ex->UnderEnemyTurret(ZZed::Player)) {
+                if(ZZed::Ex->Dist2D(ZZed::RShadow()) > ZZed::W->GetSpellRange()) {
                     ZZed::R->CastOnPlayer(); } } } }
 
     if(source != nullptr && source->GetClassId() == kobj_AI_Minion) {
@@ -249,13 +249,13 @@ void ZZedModes::OnDoCast(const CastedSpell & args) {
             if(args.Target_ != nullptr && args.Target_->IsValidTarget() && !args.Target_->IsDead()) {
                 if(args.Target_->IsHero() && (!ZZed::Ex->UnderEnemyTurret(args.Target_) || ZZed::Ex->IsKeyDown(ZZed::Menu->ComboKey))) {
                     if(ZZed::Tiamat->IsOwned() && ZZed::Tiamat->IsReady()) {
-                        ZZed::Tiamat->CastOnPlayer(); }
+                        GPluginSDK->DelayFunctionCall(100 + GGame->Latency(), [&]() {ZZed::Tiamat->CastOnPlayer(); }); }
 
                     if(ZZed::Hydra->IsOwned() && ZZed::Hydra->IsReady()) {
-                        ZZed::Hydra->CastOnPlayer(); }
+                        GPluginSDK->DelayFunctionCall(100 + GGame->Latency(), [&]() {ZZed::Hydra->CastOnPlayer(); }); }
 
                     if(ZZed::Titanic->IsOwned() && ZZed::Titanic->IsReady()) {
-                        ZZed::Titanic->CastOnPlayer(); } } } } } }
+                        GPluginSDK->DelayFunctionCall(100 + GGame->Latency(), [&]() {ZZed::Titanic->CastOnPlayer(); }); } } } } } }
 
 void ZZedModes::Auto() {
 

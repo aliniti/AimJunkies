@@ -12,6 +12,7 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
 
     auto menucb = this->Menu->AddMenu("::Main");
 
+
     auto menuiq = menucb->AddMenu("::[Q] Razor Shuriken");
     this->UseComboQ = menuiq->CheckBox("Use Q in Combo", true);
     this->ExtendedQCombo = menuiq->CheckBox("- Use Extended Q", true);
@@ -53,9 +54,11 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
     this->MinimumHarassEnergy = menuem->AddInteger("Minimum Harass Energy", 0, 200, 100);
     this->MinimumClearEnergy = menuem->AddInteger("Minimum Clear Energy", 0, 200, 50);
 
+
     auto menumc = this->Menu->AddMenu("::Mechanics");
     this->UseItemsCombo = menumc->CheckBox("Use Items", true);
     this->UseIgnite = menumc->CheckBox("Use Ignite", true);
+    this->LowFPSMode = menumc->CheckBox("Use Low FPS Mode", false);
     this->AutoEUnitInRage = menumc->CheckBox("Auto E Enemies", true);
     this->AutoEUnitInRagePct = menumc->AddInteger("- If Energy >", 0, 200, 100);
     this->JungleOrderPriority = menumc->AddSelection("Jungle Target Priority:", 1, std::vector<std::string> {"Low Health", "Max Health", "Closest to Cursor" });

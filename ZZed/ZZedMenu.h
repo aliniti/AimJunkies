@@ -60,6 +60,7 @@ class ZZedMenu {
         IMenuOption * DontWJungleNearEnemy;
         IMenuOption * UseRAvoider;
         IMenuOption * UseIgnite;
-        IMenuOption * SwapForKill; };
+        IMenuOption * SwapForKill;
+        IMenuOption * LowFPSMode; };
 
 

@@ -171,6 +171,14 @@ inline void ZZed::CanUlt(IUnit * unit, bool & coolbeans) {
             coolbeans = false;
             return; }
 
+        // double check if hero is on the menu to stop throwing exceptions on update
+        // for some instance like in proving grounds menu is generated on load.
+        // this is to prevent nullptr's and add any new targets to the menu on the fly (e.g Target Dummy)
+
+        if (Menu->BlackListRTargets.find(unit->GetNetworkId()) == Menu->BlackListRTargets.end()) {
+            Menu->BlackListRTargets[unit->GetNetworkId()] = Menu->DeathMarkMenu->CheckBox(std::string("- Dont R on").append(" ").append(unit->ChampionName()).c_str(), false);
+            return; }
+
         if(R->IsReady()) {
             if (Menu->AlwaysRSelected->Enabled()) {
                 if (focus != nullptr && focus->GetNetworkId() == unit->GetNetworkId()) {
@@ -182,15 +190,7 @@ inline void ZZed::CanUlt(IUnit * unit, bool & coolbeans) {
                 return; }
 
             if (unit->IsHero() && CDmg(unit, energy) >= unit->GetHealth()) {
-                coolbeans = true; }
-
-            // double check if hero is on the menu to stop throwing exceptions on update
-            // for some instance like in proving grounds menu is generated on load.
-            // this is to prevent nullptr's and add any new targets to the menu on the fly (e.g Target Dummy)
-
-            if(Menu->BlackListRTargets.find(unit->GetNetworkId()) == Menu->BlackListRTargets.end()) {
-                Menu->BlackListRTargets[unit->GetNetworkId()] = Menu->DeathMarkMenu->CheckBox(std::string("- Dont R on").append(" ").append(unit->ChampionName()).c_str(), false);
-                return; } }
+                coolbeans = true; } }
         else {
             if (unit->IsHero() && CDmg(unit, energy) >= unit->GetHealth()) {
                 coolbeans = true; } } } }
@@ -305,7 +305,7 @@ inline void ZZed::UseW(IUnit * unit, bool harass) {
     if(!WShadowExists()) {
         if(Ex->Dist2D(unit) <= W->GetSpellRange() * 2) {
 
-            // combo check if extended position has enemy near e, or if extended q is enabled. Go full yolo if we have a marked target
+            // combo check if extended position has enemy near e, or if extended q is enabled.
             if(!harass && Menu->UseComboW->Enabled()) {
                 if(Ex->Dist2D(unit) <= W->GetSpellRange() + E->GetSpellRange() || Menu->ExtendedQCombo->Enabled()) {
                     if(Q->IsReady() && Player->GetMana() >= Q->ManaCost() + W->GetManaCost()) {
@@ -314,7 +314,7 @@ inline void ZZed::UseW(IUnit * unit, bool harass) {
                     if(E->IsReady() && Player->GetMana() >= E->GetManaCost() + W->GetManaCost()) {
                         W->CastOnPosition(castposition); } } }
 
-            // harass check if extended position has enemy near e, or if extended q is enabled. Go full yolo if we have a marked target
+            // harass check if extended position has enemy near e, or if extended q is enabled.
             if(harass & Player->GetMana() >= Menu->MinimumHarassEnergy->GetInteger() && Menu->UseHarassW->Enabled()) {
                 if(Ex->Dist2D(unit) <= W->GetSpellRange() + E->GetSpellRange() ||  Menu->ExtendedQHarass->Enabled()) {
                     if(Q->IsReady() && Player->GetMana() >= Q->ManaCost() + W->GetManaCost()) {
@@ -369,69 +369,76 @@ inline void ZZed::UseEEx(IUnit * unit, bool jungle) {
                 E->CastOnPlayer(); } } } }
 
 inline void ZZed::UseR(IUnit * unit, bool beans, bool killsteal) {
-    if(unit != nullptr && unit->IsValidTarget()) {
+    if (unit != nullptr && unit->IsValidTarget()) {
         double energy = 0;
 
-        if(!Ex->IsKeyDown(Menu->ComboKey) && (killsteal && CDmg(unit, energy) < unit->GetHealth())) {
+        if (!Ex->IsKeyDown(Menu->ComboKey) && (killsteal && CDmg(unit, energy) < unit->GetHealth())) {
             return; }
 
-        if(beans && Menu->UseItemsCombo->Enabled() && Youmuus->IsReady() && Ex->IsKeyDown(Menu->ComboKey)) {
-            if(Player->GetMana() >= energy && Ex->Dist2D(unit) <= 1200) {
+        if (beans && Menu->UseItemsCombo->Enabled() && Youmuus->IsReady() && Ex->IsKeyDown(Menu->ComboKey)) {
+            if (Player->GetMana() >= energy && Ex->Dist2D(unit) <= 1200) {
                 Youmuus->CastOnPlayer(); } }
 
-        if(beans && CanSwap(W) && !HasDeathMark(unit) && !killsteal) {
-            if(Botrk->IsOwned() && Botrk->IsReady()) {
-                if(Ex->Dist2D(unit) <= 550) {
+        if (beans && CanSwap(W) && !HasDeathMark(unit) && !killsteal) {
+            if (Botrk->IsOwned() && Botrk->IsReady()) {
+                if (Ex->Dist2D(unit) <= 550) {
                     Botrk->CastOnTarget(unit); } }
 
-            if(Bilgewater->IsOwned() && Bilgewater->IsReady()) {
-                if(Ex->Dist2D(unit) <= 550) {
+            if (Bilgewater->IsOwned() && Bilgewater->IsReady()) {
+                if (Ex->Dist2D(unit) <= 550) {
                     Bilgewater->CastOnTarget(unit); } }
 
-            if(Menu->UseIgnite->Enabled()) {
-                if(Ignite->GetSpellSlot() != kSlotUnknown) {
-                    if(Ex->Dist2D(unit) <= Player->AttackRange() + 25 && Ignite->IsReady()) {
+            if (Menu->UseIgnite->Enabled()) {
+                if (Ignite->GetSpellSlot() != kSlotUnknown) {
+                    if (Ex->Dist2D(unit) <= Player->AttackRange() + 25 && Ignite->IsReady()) {
                         Ignite->CastOnUnit(unit); } } }
 
-            for(auto o : Shadows) {
+            for (auto o : Shadows) {
                 auto shadow = o.second;
 
-                if(shadow->HasBuff("zedwshadowbuff")) {
-                    if(Ex->Dist2D(shadow, unit) <= Player->AttackRange() + Player->BoundingRadius()) {
-                        if(Menu->SwapForKill->Enabled() && CDmg(unit, energy) >= unit->GetHealth() && Player->GetMana() >= energy) {
+                if (shadow->HasBuff("zedwshadowbuff")) {
+                    if (Ex->Dist2D(shadow, unit) <= Player->AttackRange() + Player->BoundingRadius()) {
+                        if (Menu->SwapForKill->Enabled() && CDmg(unit, energy) >= unit->GetHealth() && Player->GetMana() >= energy) {
                             if (!GUtility->IsPositionInFountain(shadow->ServerPosition(), false, true)) {
                                 W->CastOnPlayer(); } } } } } }
 
-        if(!RShadowExists() && Menu->UseComboR->Enabled()) {
-            if(R->IsReady() && beans) {
-                if(Ex->Dist2D(unit) <= R->GetSpellRange()) {
-                    if(Player->GetMana() >= energy) {
+        if (!RShadowExists() && Menu->UseComboR->Enabled()) {
+            if (R->IsReady() && beans) {
+                if (Ex->Dist2D(unit) <= R->GetSpellRange()) {
+                    if (Player->GetMana() >= energy) {
 
-                        if(Menu->UseIgnite->Enabled()) {
-                            if(Ignite->GetSpellSlot() != kSlotUnknown) {
-                                if(Ex->Dist2D(unit) <= Ignite->GetSpellRange() && Ignite->IsReady()) {
+                        if (Menu->UseIgnite->Enabled()) {
+                            if (Ignite->GetSpellSlot() != kSlotUnknown) {
+                                if (Ex->Dist2D(unit) <= Ignite->GetSpellRange() && Ignite->IsReady()) {
                                     Ignite->CastOnUnit(unit); } } }
 
-                        if(Menu->UseItemsCombo->Enabled()) {
-                            if(Bilgewater->IsOwned() && Bilgewater->IsReady()) {
-                                if(Ex->Dist2D(unit) <= 550) {
+                        if (Menu->UseItemsCombo->Enabled()) {
+                            if (Bilgewater->IsOwned() && Bilgewater->IsReady()) {
+                                if (Ex->Dist2D(unit) <= 550) {
                                     Bilgewater->CastOnTarget(unit); } }
 
-                            if(Botrk->IsOwned() && Botrk->IsReady()) {
-                                if(Ex->Dist2D(unit) <= 550) {
+                            if (Botrk->IsOwned() && Botrk->IsReady()) {
+                                if (Ex->Dist2D(unit) <= 550) {
                                     Botrk->CastOnTarget(unit); } } }
 
                         R->CastOnUnit(unit); } }
 
-                for(auto o : Shadows) {
+                for (auto o : Shadows) {
                     auto shadow = o.second;
 
-                    if(shadow->HasBuff("zedwshadowbuff") && CanSwap(W) && !HasDeathMark(unit)) {
-                        if(Ex->Dist2D(shadow, unit) <= R->GetSpellRange() + 25) {
-                            if (!GUtility->IsPositionInFountain(shadow->ServerPosition(), false, true)) {
-                                W->CastOnPlayer(); } } } } } } } }
+                    if (shadow->HasBuff("zedwshadowbuff") && CanSwap(W) && !HasDeathMark(unit)) {
+                        if (Ex->Dist2D(shadow, unit) <= R->GetSpellRange() + 25) {
+                            if (Menu->SwapForKill->Enabled() && CDmg(unit, energy) >= unit->GetHealth() && Player->GetMana() >= energy) {
+                                if (!GUtility->IsPositionInFountain(shadow->ServerPosition(), false, true)) {
+                                    W->CastOnPlayer(); } } } } } } } } }
 
 inline bool ZZed::SoloQ(Vec3 sourcepos, IUnit * unit) {
+
+    if (Menu->LowFPSMode->Enabled()) {
+        return true; }
+
+    // normalize start position
+    sourcepos = unit->ServerPosition().Extend(sourcepos, Q->Range());
 
     // set new source position
     Z->SetFrom(sourcepos);
@@ -635,7 +642,11 @@ inline void ZZed::GetMaxWPositions(IUnit * unit, Vec3 & wpos) {
             if(SoloQ(position, unit)) {
 
                 if(Menu->DebugPathfinding->Enabled()) {
-                    GRender->DrawCircle(position, posRadius, Vec4(255, 0, 255, 255), 2, false, true); }
+                    auto target = GTargetSelector->FindTarget(QuickestKill, PhysicalDamage, W->GetSpellRange());
+
+                    if (target != nullptr && !target->IsDead() && target->IsVisible()) {
+                        if (target->GetNetworkId() == unit->GetNetworkId()) {
+                            GRender->DrawCircle(position, posRadius, Vec4(255, 0, 255, 255), 2, false, true); } } }
 
                 possiblePositions.push_back(position); } } }
 

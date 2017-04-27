@@ -55,14 +55,13 @@ ZCamilleMenu::ZCamilleMenu(IMenu * menu) {
     this->MagnetWClear = menumg->CheckBox("- Clear", true);
     auto menurd = this->Menu->AddMenu("::Render");
     this->DrawW = menurd->CheckBox("Enabled W Drawings", false);
-    this->DrawWColor = menurd->AddColor("- Color W", 121, 77, 255, 200);
+    this->DrawWColor = menurd->AddColor("- Color W", 102, 204, 204, 200);
     this->DrawE = menurd->CheckBox("Enabled E Drawings", true);
-    this->DrawEColor = menurd->AddColor("- Color E", 121, 77, 255, 200);
+    this->DrawEColor = menurd->AddColor("- Color E", 102, 204, 204, 200);
     this->DrawR = menurd->CheckBox("Enabled R Drawings", true);
     this->DrawRColor = menurd->AddColor("- Color R", 255, 255, 255, 200);
-    this->DrawComboDamage = menurd->CheckBox("Enabled R Drawings", true);
-    this->DrawComboDamageColor = menurd->AddColor("- Color R", 121, 77, 255, 200);
-
+    this->DrawComboDamage = menurd->CheckBox("Draw Combo Damage", true);
+    this->DrawComboDamageColor = menurd->AddColor("- Color Combo Damage", 102, 204, 204, 200);
 
     auto menuav = this->Menu->AddMenu("::Avoider");
     this->DontEUnderTurret = menuav->CheckBox("Avoid E Into Turret", true);

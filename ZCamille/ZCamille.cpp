@@ -64,7 +64,7 @@ PLUGIN_API void OnLoad(IPluginSDK * sdk) {
         GEventManager->AddEventHandler(kEventOnDoCast, OnDoCast);
         GEventManager->AddEventHandler(kEventOnCreateObject, OnCreateObject);
         GEventManager->AddEventHandler(kEventOnRender, OnRender);
-        GGame->PrintChat("<font color=\"#794DFF\"><b>ZCamille</b></font><b><font color=\"#FFFFFF\"> Loaded!</font></b>"); } }
+        GGame->PrintChat("<font color=\"#66CCCC\"><b>ZCamille</b></font><b><font color=\"#FFFFFF\"> Loaded!</font> <font color=\"#66CCCC\">(v1.1b) </font></b>"); } }
 
 PLUGIN_API void OnUnload() {
     if(strcmp(ZCamille::Player->ChampionName(), "Camille") == 0) {

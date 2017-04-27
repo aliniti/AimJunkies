@@ -380,6 +380,7 @@ inline double ZCamille::RDmg(double dmg, IUnit * unit) {
     if(R->IsReady() || unit->HasBuff("camillertether")) {
         auto xtra = std::vector<double> { 5, 10, 15, 15 } [Player->GetSpellLevel(kSlotR) - 1] +
                     std::vector<double> { 4, 6, 8, 8 } [Player->GetSpellLevel(kSlotR) - 1] * (unit->GetHealth() / 100);
+
         return dmg + xtra; }
 
     return dmg; }

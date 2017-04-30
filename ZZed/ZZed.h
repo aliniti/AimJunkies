@@ -179,7 +179,8 @@ inline void ZZed::CanUlt(IUnit * unit, bool & coolbeans) {
             Menu->BlackListRTargets[unit->GetNetworkId()] = Menu->DeathMarkMenu->CheckBox(std::string("- Dont R on").append(" ").append(unit->ChampionName()).c_str(), false);
             return; }
 
-        if(R->IsReady()) {
+        // if ult is ready everything is k
+        if(R->IsReady() && unit->IsHero()) {
             if (Menu->AlwaysRSelected->Enabled()) {
                 if (focus != nullptr && focus->GetNetworkId() == unit->GetNetworkId()) {
                     coolbeans = true;
@@ -189,11 +190,14 @@ inline void ZZed::CanUlt(IUnit * unit, bool & coolbeans) {
                 coolbeans = false;
                 return; }
 
-            if (unit->IsHero() && CDmg(unit, energy) >= unit->GetHealth()) {
+            if (CDmg(unit, energy) >= unit->GetHealth()) {
                 coolbeans = true; } }
-        else {
-            if (unit->IsHero() && CDmg(unit, energy) >= unit->GetHealth()) {
-                coolbeans = true; } } } }
+
+        // if ult is not ready everything is not k :c
+        if (!R->IsReady() && unit->IsHero()) {
+            if (!Ex->UnderEnemyTurret(unit) && Ex->CountInRange(unit, 900, GEntityList->GetAllHeros(false, true)) <= 2) {
+                if (CDmg(unit, energy) >= unit->GetHealth()) {
+                    coolbeans = true; } } } } }
 
 inline bool ZZed::CanSwap(ISpell * spell) {
     return strstr(Player->GetSpellName(spell->GetSpellSlot()), std::to_string(2).c_str()); }
@@ -399,7 +403,7 @@ inline void ZZed::UseR(IUnit * unit, bool beans, bool killsteal) {
                 if (shadow->HasBuff("zedwshadowbuff")) {
                     if (Ex->Dist2D(shadow, unit) <= Player->AttackRange() + Player->BoundingRadius()) {
                         if (Menu->SwapForKill->Enabled() && CDmg(unit, energy) >= unit->GetHealth() && Player->GetMana() >= energy) {
-                            if (!GUtility->IsPositionInFountain(shadow->ServerPosition(), false, true)) {
+                            if (!Ex->IsInEnemyFountain(shadow->ServerPosition())) {
                                 W->CastOnPlayer(); } } } } } }
 
         if (!RShadowExists() && Menu->UseComboR->Enabled()) {

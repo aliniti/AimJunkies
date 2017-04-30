@@ -249,13 +249,13 @@ void ZZedModes::OnDoCast(const CastedSpell & args) {
             if(args.Target_ != nullptr && args.Target_->IsValidTarget() && !args.Target_->IsDead()) {
                 if(args.Target_->IsHero() && (!ZZed::Ex->UnderEnemyTurret(args.Target_) || ZZed::Ex->IsKeyDown(ZZed::Menu->ComboKey))) {
                     if(ZZed::Tiamat->IsOwned() && ZZed::Tiamat->IsReady()) {
-                        GPluginSDK->DelayFunctionCall(100 + GGame->Latency(), [&]() {ZZed::Tiamat->CastOnPlayer(); }); }
+                        GPluginSDK->DelayFunctionCall(100 + GGame->Latency(), [&]() { ZZed::Tiamat->CastOnPlayer(); }); }
 
                     if(ZZed::Hydra->IsOwned() && ZZed::Hydra->IsReady()) {
-                        GPluginSDK->DelayFunctionCall(100 + GGame->Latency(), [&]() {ZZed::Hydra->CastOnPlayer(); }); }
+                        GPluginSDK->DelayFunctionCall(100 + GGame->Latency(), [&]() { ZZed::Hydra->CastOnPlayer(); }); }
 
                     if(ZZed::Titanic->IsOwned() && ZZed::Titanic->IsReady()) {
-                        GPluginSDK->DelayFunctionCall(100 + GGame->Latency(), [&]() {ZZed::Titanic->CastOnPlayer(); }); } } } } } }
+                        GPluginSDK->DelayFunctionCall(100 + GGame->Latency(), [&]() { ZZed::Titanic->CastOnPlayer(); }); } } } } } }
 
 void ZZedModes::Auto() {
 

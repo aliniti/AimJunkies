@@ -38,6 +38,8 @@ class ZZedExtensions {
         bool UnderEnemyTurret(Vec2 pos);
         bool UnderEnemyTurret(IUnit * unit);
         bool UnderAllyTurret(IUnit * unit);
+        bool IsInEnemyFountain(Vec3 pos);
+        bool IsInAllyFountain(Vec3 pos);
         bool IsKeyDown(IMenuOption * menuOption);
         std::vector<Vec2> CircleCircleIntersection(Vec2 center1, Vec2 center2, float radius1, float radius2);
         void DrawDamageOnChampionHPBar(IUnit * Hero, double Damage, const char * Text, Vec4 BarColor);

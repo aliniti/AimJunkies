@@ -62,6 +62,12 @@ bool ZZedExtensions::UnderEnemyTurret(IUnit * unit) {
 bool ZZedExtensions::UnderAllyTurret(IUnit * unit) {
     return GUtility->IsPositionUnderTurret(unit->ServerPosition(), true, false); }
 
+bool ZZedExtensions::IsInEnemyFountain(Vec3 pos) {
+    return GUtility->IsPositionInFountain(pos, false, true); }
+
+bool ZZedExtensions::IsInAllyFountain(Vec3 pos) {
+    return GUtility->IsPositionInFountain(pos, true, false); }
+
 bool ZZedExtensions::IsKeyDown(IMenuOption * menuOption) {
     return (GetAsyncKeyState(menuOption->GetInteger()) & 0x8000) != 0; }
 
@@ -118,24 +124,21 @@ double ZZedExtensions::AmplifyDamage(IUnit * source, IUnit * target)  {
         for(auto mastery : masteryPtr) {
             if(mastery.MasteryId == 40) {
                 modifier += (0.4 * mastery.Points) / 100; }
-            else
-                if(mastery.MasteryId == 12) {
-                    modifier += 0.03; }
-                else
-                    if(mastery.MasteryId == 186) {
-                        bool active = true;
+            else if(mastery.MasteryId == 12) {
+                modifier += 0.03; }
+            else if(mastery.MasteryId == 186) {
+                bool active = true;
 
-                        for(auto ally : GEntityList->GetAllHeros(true, false)) {
-                            if(ally != source && (source->GetPosition() - ally->GetPosition()).Length2D() <= 800) {
-                                active = false;
-                                break; } }
+                for(auto ally : GEntityList->GetAllHeros(true, false)) {
+                    if(ally != source && (source->GetPosition() - ally->GetPosition()).Length2D() <= 800) {
+                        active = false;
+                        break; } }
 
-                        if(active) {
-                            modifier += 0.02; } }
-                    else
-                        if(mastery.MasteryId == 232) {
-                            if(target->HealthPercent() < 40) {
-                                modifier += (0.6 * mastery.Points) / 100; } } } }
+                if(active) {
+                    modifier += 0.02; } }
+            else if(mastery.MasteryId == 232) {
+                if(target->HealthPercent() < 40) {
+                    modifier += (0.6 * mastery.Points) / 100; } } } }
 
     std::vector<HeroMastery> enemymasteryPtr;
 
@@ -180,12 +183,11 @@ ProjectionInfo * ZZedExtensions::ProjectOn(Vec2 point, Vec2 start, Vec2 end) {
     if(rL < 0) {
         rS = 0; }
 
-    else
-        if(rL > 1) {
-            rS = 1; }
+    else if(rL > 1) {
+        rS = 1; }
 
-        else {
-            rS = rL; }
+    else {
+        rS = rL; }
 
     auto isOnSegment = rS == rL || isnan(rL);
     auto pointSegment = isOnSegment ? pointLine : Vec2(ax + rS * (bx - ax), ay + rS * (by - ay));

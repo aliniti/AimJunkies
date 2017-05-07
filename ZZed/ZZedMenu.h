@@ -61,6 +61,10 @@ class ZZedMenu {
         IMenuOption * UseRAvoider;
         IMenuOption * UseIgnite;
         IMenuOption * SwapForKill;
-        IMenuOption * LowFPSMode; };
+        IMenuOption * LowFPSMode;
+        IMenuOption * AssassinRange;
+        IMenuOption * DrawAssassinRange;
+        IMenuOption * DrawAssassinRangeColor;
+        IMenuOption * LaughIfDead; };
 
 

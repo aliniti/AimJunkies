@@ -23,6 +23,7 @@ IInventoryItem * ZZed::Titanic;
 IInventoryItem * ZZed::Youmuus;
 IInventoryItem * ZZed::Bilgewater;
 IInventoryItem * ZZed::Botrk;
+IInventoryItem * ZZed::Edgeofnight;
 
 std::map<float, IUnit *> ZZed::Marked;
 std::map<float, IUnit *> ZZed::Shadows;
@@ -53,7 +54,7 @@ PLUGIN_API void OnLoad(IPluginSDK * sdk) {
     ZZed::Player = GEntityList->Player();
     ZZedAvoider::GenerateAvoidList();
 
-    if(strcmp(ZZed::Player->ChampionName(), "Zed") == 0) {
+    if (strcmp(ZZed::Player->ChampionName(), "Zed") == 0) {
         ZZed::OnBoot();
         ZZed::Menu = new ZZedMenu(GPluginSDK->AddMenu("ZZed"));
         GEventManager->AddEventHandler(kEventOnSpellCast, OnCastSpell);
@@ -62,10 +63,10 @@ PLUGIN_API void OnLoad(IPluginSDK * sdk) {
         GEventManager->AddEventHandler(kEventOnCreateObject, OnCreateObject);
         GEventManager->AddEventHandler(kEventOnGameUpdate, OnGameUpdate);
         GEventManager->AddEventHandler(kEventOnRender, OnRender);
-        GGame->PrintChat("<font color=\"#66CCCC\"><b>ZZed</b></font><b><font color=\"#FFFFFF\"> Loaded!</font> <font color=\"#66CCCC\">(v1.0c) </font></b>"); } }
+        GGame->PrintChat("<font color=\"#66CCCC\"><b>ZZed</b></font><b><font color=\"#FFFFFF\"> Loaded!</font>"); } }
 
 PLUGIN_API void OnUnload() {
-    if(strcmp(ZZed::Player->ChampionName(), "Zed") == 0) {
+    if (strcmp(ZZed::Player->ChampionName(), "Zed") == 0) {
         ZZed::OnShutdown();
         GEventManager->RemoveEventHandler(kEventOnGameUpdate, OnGameUpdate);
         GEventManager->RemoveEventHandler(kEventOnSpellCast, OnDoCast);

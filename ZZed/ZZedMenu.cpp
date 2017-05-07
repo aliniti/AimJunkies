@@ -37,18 +37,22 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
     this->UseJungleE = menuie->CheckBox("Use E in Jungle", true);
 
     this->DeathMarkMenu = menucb->AddMenu("::[R] Death Mark");
+    auto menubl = this->DeathMarkMenu->AddMenu("::[R] Blacklist");
+
+    this->BlackListR = menubl->CheckBox("Blacklist R", true);
+
+    for (auto i : GEntityList->GetAllHeros(false, true)) {
+        if (!i->IsDead()) {
+            this->BlackListRTargets[i->GetNetworkId()] = menubl->CheckBox(std::string("- Dont R on").append(" ").append(i->ChampionName()).c_str(), false); } }
+
     this->UseComboR = this->DeathMarkMenu->CheckBox("Use R in Combo", true);
+    this->AlwaysRSelected = this->DeathMarkMenu->CheckBox("- Always R on Focus Target", true);
     this->UltMode = this->DeathMarkMenu->AddSelection("- Mode:", 0, std::vector<std::string> {"Only Kill", "Duel" });
     this->ShadowPlacement = this->DeathMarkMenu->AddSelection("- Shadow Placement:", 0, std::vector<std::string> {"Line", "Triangle", "Pathfinder" });
+    this->AssassinRange = this->DeathMarkMenu->AddInteger("- Assasination Range", int(ZZed::R->GetSpellRange()), int(ZZed::Q->Range() * 3), int(ZZed::Q->Range() + 500));
     this->SwapRIfDead = this->DeathMarkMenu->CheckBox("- Swap Back if Dead", true);
+    this->LaughIfDead = this->DeathMarkMenu->CheckBox("- Laugh if Dead", true);
     this->AutoR = this->DeathMarkMenu->CheckBox("- Killsteal", true);
-
-    this->AlwaysRSelected = this->DeathMarkMenu->CheckBox("- Always R on Focus Target", true);
-    this->BlackListR = this->DeathMarkMenu->CheckBox("Blacklist R", true);
-
-    for(auto i : GEntityList->GetAllHeros(false, true)) {
-        if(!i->IsDead()) {
-            this->BlackListRTargets[i->GetNetworkId()] = this->DeathMarkMenu->CheckBox(std::string("- Dont R on").append(" ").append(i->ChampionName()).c_str(), false); } }
 
     auto menuem = this->Menu->AddMenu("::Energy");
     this->MinimumHarassEnergy = menuem->AddInteger("Minimum Harass Energy", 0, 200, 100);
@@ -72,6 +76,8 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
     this->DrawEColor = menurd->AddColor("- Color E", 102, 204, 204, 200);
     this->DrawR = menurd->CheckBox("Enabled R Drawings", true);
     this->DrawRColor = menurd->AddColor("- Color R", 102, 204, 204, 200);
+    this->DrawAssassinRange = menurd->CheckBox("Enable Assassin Range Drawings", true);
+    this->DrawAssassinRangeColor = menurd->AddColor("- Color Assassin Range", 255, 102, 0, 200);
     this->DrawComboDamage = menurd->CheckBox("Draw Combo Damage", true);
     this->DrawComboDamageColor = menurd->AddColor("- Color Combo Damage", 102, 204, 204, 200);
 
@@ -79,9 +85,9 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
     this->UseRAvoider = menuav->CheckBox("R Avoider", true);
     this->SpellsToAvoid = std::map<std::string, IMenuOption *>();
 
-    for(auto hero : GEntityList->GetAllHeros(false, true)) {
-        for(auto i : ZZed::AvoidList) {
-            if(strcmp(hero->ChampionName(), i.second->ChampName.c_str()) == 0) {
+    for (auto hero : GEntityList->GetAllHeros(false, true)) {
+        for (auto i : ZZed::AvoidList) {
+            if (strcmp(hero->ChampionName(), i.second->ChampName.c_str()) == 0) {
                 auto uniqueHero = std::string("- ").append(i.second->ChampName).append(" R");
                 this->SpellsToAvoid.insert(std::pair<std::string, IMenuOption *>(i.first, menuav->CheckBox(uniqueHero.c_str(), true))); } } }
 

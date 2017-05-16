@@ -7,8 +7,8 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
     auto menuhk = this->Menu->AddMenu("::Keys");
     this->ComboKey = menuhk->AddKey("Combo [active]", 32);
     this->HarassKey = menuhk->AddKey("Harass [active]", 'G');
-    this->ClearKey = menuhk->AddKey("Clear [active]", 'V');
-    this->FleeKey = menuhk->AddKey("Flee ", 'A');
+    this->ClearKey = menuhk->AddKey("Clear/Last Hit [active]", 'V');
+    this->FleeKey = menuhk->AddKey("Flee [active]", 'A');
 
     auto menucb = this->Menu->AddMenu("::Main");
 
@@ -21,10 +21,15 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
     this->ExtendedQHarass = menuiq->CheckBox("- Use Extended Q", false);
     //this->ExHarassQMaxDamage = menuiq->CheckBox("- Only Max Damage Q", false);
     this->UseJungleQ = menuiq->CheckBox("Use Q in Jungle", true);
+    this->LastHitQ = menuiq->CheckBox("Use Q in Last Hit", true);
+    this->LastHitQCount = menuiq->AddInteger("- If Can Kill >", 1, 6, 2);
+    this->LastHitQUnderTower = menuiq->CheckBox("- Any Under Tower", true);
+    this->LastHitQUnkillable = menuiq->CheckBox("- On Unkillable Minion", true);
 
     auto menuiw = menucb->AddMenu("::[W] Living Shadow");
     this->UseComboW = menuiw->CheckBox("Use W in Combo", true);
     this->SwapForKill = menuiw->CheckBox("- Swap for Kill", true);
+    this->GapcloseAfterR = menuiw->CheckBox("- Gapclose after R", false);
     this->UseHarassW = menuiw->CheckBox("Use W in Harass", true);
     this->UseHarassWPF = menuiw->AddSelection("- Shadow Placement:", 0, std::vector<std::string> { "Unit Position", "Pathfinding", "Auto", });
     this->UseJungleW = menuiw->CheckBox("Use W in Jungle", true);
@@ -35,6 +40,10 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
     this->UseComboE = menuie->CheckBox("Use E in Combo", true);
     this->UseHarassE = menuie->CheckBox("Use E in Harass", true);
     this->UseJungleE = menuie->CheckBox("Use E in Jungle", true);
+    this->LastHitE = menuie->CheckBox("Use E in Last Hit", true);
+    this->LastHitECount = menuie->AddInteger("- If Can Kill >", 1, 6, 2);
+    this->LastHitEUnderTower = menuie->CheckBox("- Any Under Tower", true);
+    this->LastHitEUnkillable = menuie->CheckBox("- On Unkillable Minion", true);
 
     this->DeathMarkMenu = menucb->AddMenu("::[R] Death Mark");
     auto menubl = this->DeathMarkMenu->AddMenu("::[R] Blacklist");
@@ -55,9 +64,10 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
     this->AutoR = this->DeathMarkMenu->CheckBox("- Killsteal", true);
 
     auto menuem = this->Menu->AddMenu("::Energy");
-    this->MinimumHarassEnergy = menuem->AddInteger("Minimum Harass Energy", 0, 200, 100);
-    this->MinimumClearEnergy = menuem->AddInteger("Minimum Clear Energy", 0, 200, 50);
-
+    this->MinimumHarassEnergy = menuem->AddInteger("Min Harass Energy", 0, 200, 100);
+    this->MinimumClearEnergy = menuem->AddInteger("Min Clear Energy", 0, 200, 100);
+    this->MinimumLastHitEnergy = menuem->AddInteger("Min Last Hit Energy", 0, 200, 145);
+    this->MinimumLastHitEnergyTower = menuem->AddInteger("Min Last Hit Energy Under Tower", 0, 200, 50);
 
     auto menumc = this->Menu->AddMenu("::Mechanics");
     this->UseItemsCombo = menumc->CheckBox("Use Items", true);

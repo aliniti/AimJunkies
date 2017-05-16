@@ -34,8 +34,59 @@ void ZZedModes::Flee() {
         ZZed::W->CastOnPosition(GGame->CursorPosition()); } }
 
 void ZZedModes::WaveClear() {
+    auto menu = ZZed::Menu;
+    auto player = ZZed::Player;
+    auto utils = ZZed::Ex;
 
-}
+    if (menu->LastHitQ->Enabled() && menu->LastHitQCount->GetInteger() > 1) {
+
+        //if (ZZed::Q->IsReady()) {
+        //    double energy = 0;
+
+        //    Vec3 castposition;
+        //    std::vector<IUnit *> v;
+
+        //    GPrediction->FindBestCastPositionEx(player->ServerPosition(), 0.25, ZZed::Q->Range(), ZZed::Q->Radius(), true, true, false, castposition, v);
+
+        //    v.erase(std::remove_if(v.begin(), v.end(), [&](IUnit * u) { return ZZed::QDmg(player, u, energy) < u->GetHealth(); }));
+        //    v.erase(std::remove_if(v.begin(), v.end(), [&](IUnit * u) { return !u->IsValidTarget() || u->IsDead(); }));
+
+        //    if (v.size() > 0) {
+
+        //        if (v.size() >= menu->LastHitQCount->GetInteger()) {
+        //            if (utils->UnderAllyTurret(player) && player->GetMana() >= menu->MinimumLastHitEnergyTower->GetInteger()) {
+        //                ZZed::Q->CastOnPosition(castposition); }
+
+        //            if (utils->UnderAllyTurret(player) == false && player->GetMana() >= menu->MinimumLastHitEnergy->GetInteger()) {
+        //                ZZed::Q->CastOnPosition(castposition); } } } }
+    }
+
+    if (menu->LastHitE->Enabled() && menu->LastHitECount->GetInteger() > 1) {
+        double energy = 0;
+        auto v = GEntityList->GetAllMinions(false, true, false);
+
+        v.erase(std::remove_if(v.begin(), v.end(), [&](IUnit * u) {
+            return ZZed::EDmg(u, energy) < u->GetHealth() || !u->IsValidTarget() || u->IsDead();; }));
+
+        if (utils->CountInRange(player, ZZed::E->GetSpellRange(), v) >= menu->LastHitECount->GetInteger()) {
+            if (ZZed::Ex->UnderEnemyTurret(player) == false) {
+                ZZed::E->CastOnPlayer(); } } }
+
+    if (menu->LastHitEUnderTower->Enabled()) {
+        double energy = 0;
+
+        if (utils->UnderAllyTurret(player)) {
+            for (auto m : GEntityList->GetAllMinions(false, true, false)) {
+                if (ZZed::EDmg(m, energy) >= m->GetHealth()) {
+                    ZZed::UseEEx(m, false); } } } }
+
+    if (menu->LastHitQUnderTower->Enabled()) {
+        double energy = 0;
+
+        if (utils->UnderAllyTurret(player)) {
+            for (auto m : GEntityList->GetAllMinions(false, true, false)) {
+                if (ZZed::QDmg(player, m, energy) >= m->GetHealth()) {
+                    ZZed::UseQEx(m, false); } } } } }
 
 void ZZedModes::Jungling() {
     auto menu = ZZed::Menu;
@@ -47,7 +98,7 @@ void ZZedModes::Jungling() {
         std::sort(mobs.begin(), mobs.end(), [&](IUnit * a, IUnit * b) { return ZZed::GetPriorityJungleTarget(a, b); });
 
         for (auto unit : mobs) {
-            if (unit->IsJungleCreep() && ZZed::Ex->Dist(unit) <= 655) {
+            if (unit->IsJungleCreep() && exten->Dist(unit) <= 655) {
                 if (unit->IsValidObject() && !unit->IsDead() && unit->IsVisible()) {
                     if (!menu->DontWJungleNearEnemy->Enabled() || exten->CountInRange(player, 1000, GEntityList->GetAllHeros(false, true)) < 1) {
                         if (menu->UseJungleW->Enabled()) {
@@ -61,20 +112,22 @@ void ZZedModes::Jungling() {
 
 void ZZedModes::OnUpdate() {
 
-    // itterrate marked targets
+    // iterate marked targets
     for (auto i : ZZed::Marked) {
         auto key = i.first;
         auto unit = i.second;
 
+        // remove invalid marked units
         if (unit->IsDead() || unit == nullptr || !unit->IsValidTarget()) {
             ZZed::Marked.erase(key);
             break; }
 
+        // removed marked targets after 6 seconds
         if (GGame->Time() - key > 6) {
             ZZed::Marked.erase(key);
             break; } }
 
-    // itterate shadows
+    // iterate shadows
     for (auto i : ZZed::Shadows) {
         auto key = i.first;
         auto shadow = i.second;
@@ -233,6 +286,8 @@ void ZZedModes::OnRender() {
 void ZZedModes::OnCreateObj(IUnit * source) {
     if (source != nullptr && source->GetClassId() == kobj_GeneralParticleEmitter) {
         if (strcmp(source->GetObjectName(), "Zed_Base_R_buf_tell.troy") == 0) {
+            ZZed::Ticks["Lethal"] = GGame->TickCount();
+
             if (ZZed::CanSwap(ZZed::R) && ZZed::Menu->SwapRIfDead->Enabled()) {
                 if (ZZed::Ex->UnderEnemyTurret(ZZed::RShadow()) == false &&
                     ZZed::Ex->UnderEnemyTurret(ZZed::Player)) {
@@ -293,13 +348,33 @@ void ZZedModes::Auto() {
         && ZZed::Player->GetMana() > ZZed::Menu->AutoEUnitInRagePct->GetInteger()) {
 
         if (ZZed::Ex->CountInRange(ZZed::Player, ZZed::E->GetSpellRange() + ZZed::Player->BoundingRadius(), GEntityList->GetAllHeros(false, true)) > 0) {
-            if (!ZZed::Ex->UnderEnemyTurret(ZZed::Player)) {
+            if (ZZed::Ex->UnderEnemyTurret(ZZed::Player) == false) {
                 ZZed::E->CastOnPlayer(); } }
 
         for (auto entry : ZZed::Shadows) {
             auto shadow = entry.second;
 
             if (ZZed::Ex->CountInRange(shadow, ZZed::E->GetSpellRange() + ZZed::Player->BoundingRadius(), GEntityList->GetAllHeros(false, true)) > 0) {
-                if (!ZZed::Ex->UnderEnemyTurret(ZZed::Player)) {
+                if (ZZed::Ex->UnderEnemyTurret(ZZed::Player) == false) {
                     ZZed::E->CastOnPlayer(); } } } } }
+
+void ZZedModes::OnNonKillableMinion(IUnit * unit) {
+
+    if (ZZed::Menu->LastHitE->Enabled() && ZZed::E->IsReady()) {
+        double energy = 0;
+
+        if (ZZed::Menu->LastHitEUnkillable->Enabled() && ZZed::EDmg(unit, energy) >= unit->GetHealth()) {
+            if (ZZed::Ex->IsKeyDown(ZZed::Menu->ClearKey)) {
+                if (ZZed::Ex->UnderEnemyTurret(ZZed::Player) == false) {
+                    ZZed::UseEEx(unit, false); } } } }
+
+    else if (ZZed::Menu->LastHitQ->Enabled() && ZZed::Q->IsReady()) {
+        double energy = 0;
+
+        if (ZZed::Menu->LastHitQUnkillable->Enabled() && ZZed::QDmg(ZZed::Player, unit, energy) >= unit->GetHealth()) {
+            if (ZZed::Ex->IsKeyDown(ZZed::Menu->ClearKey) && (ZZed::Ex->Dist2D(unit) > ZZed::E->GetSpellRange()
+                    || !ZZed::E->IsReady()
+                    || !ZZed::Menu->LastHitEUnkillable->Enabled())) {
+                if (ZZed::Ex->UnderEnemyTurret(ZZed::Player) == false) {
+                    ZZed::UseQEx(unit, false); } } } } }
 

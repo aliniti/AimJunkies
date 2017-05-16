@@ -16,7 +16,6 @@ class ZZedModes {
         void OnBuffAdd(IUnit * unit, void * buffdata);
         void OnDoCast(const CastedSpell & args);
         void Auto();
-
-};
+        void OnNonKillableMinion(IUnit * unit); };
 
 

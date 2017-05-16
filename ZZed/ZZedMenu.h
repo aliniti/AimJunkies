@@ -65,6 +65,17 @@ class ZZedMenu {
         IMenuOption * AssassinRange;
         IMenuOption * DrawAssassinRange;
         IMenuOption * DrawAssassinRangeColor;
-        IMenuOption * LaughIfDead; };
+        IMenuOption * LaughIfDead;
+        IMenuOption * LastHitEUnkillable;
+        IMenuOption * LastHitE;
+        IMenuOption * LastHitECount;
+        IMenuOption * LastHitEUnderTower;
+        IMenuOption * LastHitQ;
+        IMenuOption * LastHitQCount;
+        IMenuOption * LastHitQUnderTower;
+        IMenuOption * LastHitQUnkillable;
+        IMenuOption * MinimumLastHitEnergy;
+        IMenuOption * MinimumLastHitEnergyTower;
+        IMenuOption * GapcloseAfterR; };
 
 

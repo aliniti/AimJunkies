@@ -85,6 +85,7 @@ inline void ZZed::OnBoot() {
     Ticks["ZedR"] = 0;
     Ticks["ZedR2"] = 0;
     Ticks["Engage"] = 0;
+    Ticks["Lethal"] = 0;
 
     Ignite = GPluginSDK->CreateSpell(kSlotUnknown);
 
@@ -304,9 +305,16 @@ inline void ZZed::UseQEx(IUnit * unit, bool jungle) {
     if (unit == nullptr || !unit->IsValidTarget() || !Q->IsReady()) {
         return; }
 
-    if (Ex->Dist2D(unit) <= Q->Range() <= Q->Range()) {
+    if (Ex->Dist2D(unit) <= Q->Range()) {
         if (jungle && Menu->UseJungleQ->Enabled() && Player->GetMana() > Menu->MinimumClearEnergy->GetInteger()) {
-            Q->CastOnTarget(unit); } } }
+            Q->CastOnTarget(unit); }
+
+        if (unit->IsCreep() && Menu->LastHitQ->Enabled()) {
+            if (Ex->UnderAllyTurret(Player) && Player->GetMana() >= Menu->MinimumLastHitEnergyTower->GetInteger()) {
+                Q->CastOnTarget(unit); }
+
+            if (Ex->UnderAllyTurret(Player) == false && Player->GetMana() >= Menu->MinimumLastHitEnergy->GetInteger()) {
+                Q->CastOnTarget(unit); } } } }
 
 inline void ZZed::UseW(IUnit * unit, bool harass) {
 
@@ -323,8 +331,19 @@ inline void ZZed::UseW(IUnit * unit, bool harass) {
     // update the cast position via our method
     GetBestWPosition(unit, castposition, harass);
 
+    // debug circles
     if (Menu->DebugPathfinding->Enabled()) {
         GRender->DrawCircle(castposition, 50, Vec4(255, 255, 255, 255), 10, false, true); }
+
+    // gapclose after ult if target gets out of range
+    if (WShadowExists() && WShadow() != nullptr && Marked.size() > 0 && Menu->GapcloseAfterR->Enabled()) {
+        if (CanSwap(W) && Ex->Dist2D(unit) > Player->AttackRange() + 100) {
+            if (Ex->Dist2D(WShadow()->ServerPosition(), unit->ServerPosition()) < Ex->Dist2D(unit)) {
+                if (Ex->Dist2D(WShadow()) > E->GetSpellRange() + 55) {
+
+                    // but not right after we swapped back with R
+                    if (Recent("Lethal", 2000) == false) {
+                        W->CastOnPlayer(); } } } } }
 
     if (!WShadowExists()) {
         if (Ex->Dist2D(unit) <= W->GetSpellRange() * 2) {
@@ -383,6 +402,9 @@ inline void ZZed::UseEEx(IUnit * unit, bool jungle) {
     if (Player->GetMana() >= E->GetManaCost()) {
         if (Ex->Dist2D(unit) <= E->GetSpellRange()) {
             if (jungle && Menu->UseJungleE->Enabled() && Player->GetMana() >= Menu->MinimumClearEnergy->GetInteger()) {
+                E->CastOnPlayer(); }
+
+            if (unit->IsCreep() && Menu->LastHitE->Enabled() && Player->GetMana() >= Menu->MinimumLastHitEnergy->GetInteger()) {
                 E->CastOnPlayer(); } } }
 
     for (auto o : Shadows) {
@@ -390,7 +412,14 @@ inline void ZZed::UseEEx(IUnit * unit, bool jungle) {
 
         if (Ex->Dist2D(unit, shadow) <= E->GetSpellRange()) {
             if (jungle && Menu->UseJungleE->Enabled() && Player->GetMana() >= Menu->MinimumClearEnergy->GetInteger()) {
-                E->CastOnPlayer(); } } } }
+                E->CastOnPlayer(); }
+
+            if (unit->IsCreep() && Menu->LastHitE->Enabled()) {
+                if (Ex->UnderAllyTurret(Player) && Player->GetMana() >= Menu->MinimumLastHitEnergyTower->GetInteger()) {
+                    E->CastOnPlayer(); }
+
+                if (Ex->UnderAllyTurret(Player) == false && Player->GetMana() >= Menu->MinimumLastHitEnergy->GetInteger()) {
+                    E->CastOnPlayer(); } } } } }
 
 inline void ZZed::UseR(IUnit * unit, bool engage, bool killsteal) {
     if (unit != nullptr && unit->IsValidTarget()) {

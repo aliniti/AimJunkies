@@ -36,6 +36,9 @@ PLUGIN_EVENT(void) OnGameUpdate() {
 PLUGIN_EVENT(void) OnCreateObject(IUnit * source) {
     ZZed::Modes->OnCreateObj(source); }
 
+PLUGIN_EVENT(void) OnNonKillableMinion(IUnit * source) {
+    ZZed::Modes->OnNonKillableMinion(source); }
+
 PLUGIN_EVENT(void) OnCastSpell(CastedSpell & args) {
     ZZed::Modes->OnSpellCast(args); }
 
@@ -60,6 +63,7 @@ PLUGIN_API void OnLoad(IPluginSDK * sdk) {
         GEventManager->AddEventHandler(kEventOnSpellCast, OnCastSpell);
         GEventManager->AddEventHandler(kEventOnSpellCast, OnDoCast);
         GEventManager->AddEventHandler(kEventOnBuffAdd, OnBuffAdd);
+        GEventManager->AddEventHandler(kEventOrbwalkNonKillableMinion, OnNonKillableMinion);
         GEventManager->AddEventHandler(kEventOnCreateObject, OnCreateObject);
         GEventManager->AddEventHandler(kEventOnGameUpdate, OnGameUpdate);
         GEventManager->AddEventHandler(kEventOnRender, OnRender);
@@ -71,6 +75,7 @@ PLUGIN_API void OnUnload() {
         GEventManager->RemoveEventHandler(kEventOnGameUpdate, OnGameUpdate);
         GEventManager->RemoveEventHandler(kEventOnSpellCast, OnDoCast);
         GEventManager->RemoveEventHandler(kEventOnBuffAdd, OnBuffAdd);
+        GEventManager->RemoveEventHandler(kEventOrbwalkNonKillableMinion, OnNonKillableMinion);
         GEventManager->RemoveEventHandler(kEventOnCreateObject, OnCreateObject);
         GEventManager->RemoveEventHandler(kEventOnSpellCast, OnCastSpell);
         GEventManager->RemoveEventHandler(kEventOnRender, OnRender); } }

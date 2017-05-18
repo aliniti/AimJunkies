@@ -20,11 +20,11 @@ Vec2 ZCamilleExtensions::Perp(Vec2 v) {
 
 float ZCamilleExtensions::Dist(IUnit * to) {
     return (ZCamille::Player->ServerPosition() - to->ServerPosition()).Length() -
-           (ZCamille::Player->BoundingRadius() + to->BoundingRadius()); }
+        (ZCamille::Player->BoundingRadius() + to->BoundingRadius()); }
 
 float ZCamilleExtensions::Dist2D(IUnit * to) {
     return (ZCamille::Player->ServerPosition() - to->ServerPosition()).Length2D() -
-           (ZCamille::Player->BoundingRadius() + to->BoundingRadius()); }
+        (ZCamille::Player->BoundingRadius() + to->BoundingRadius()); }
 
 float ZCamilleExtensions::Dist(IUnit * from, IUnit * to) {
     return (from->ServerPosition() - to->ServerPosition()).Length(); }
@@ -54,7 +54,7 @@ std::vector<Vec2> ZCamilleExtensions::CircleCircleIntersection(Vec2 center1, Vec
     auto D = Dist2D(center1, center2);
 
     //The Circles dont intersect:
-    if(D > radius1 + radius2 || (D <= std::abs(radius1 - radius2))) {
+    if (D > radius1 + radius2 || (D <= std::abs(radius1 - radius2))) {
         return std::vector<Vec2>(); }
 
     auto A = (radius1 * radius1 - radius2 * radius2 + D * D) / (2 * D);
@@ -78,16 +78,16 @@ bool ZCamilleExtensions::UnderAllyTurret(IUnit * unit) {
     return GUtility->IsPositionUnderTurret(unit->ServerPosition(), true, false); }
 
 bool ZCamilleExtensions::IsKeyDown(IMenuOption * menuOption) {
-    return (GetAsyncKeyState(menuOption->GetInteger()) & 0x8000) != 0; }
+    return GUtility->IsKeyDown(menuOption->GetInteger()); }
 
 std::vector<IUnit *> ZCamilleExtensions::GetInRange(IUnit * unit, float range, std::vector<IUnit *> group) {
     std::vector<IUnit *> list;
 
-    if(group.empty()) {
+    if (group.empty()) {
         return list; }
 
-    for(auto o : group) {
-        if(o != nullptr && o->IsValidTarget() && Dist2D(o, unit) <= range) {
+    for (auto o : group) {
+        if (o != nullptr && o->IsValidTarget() && Dist2D(o, unit) <= range) {
             list.push_back(o); } }
 
     return list; }
@@ -106,15 +106,14 @@ ProjectionInfo * ZCamilleExtensions::ProjectOn(Vec2 point, Vec2 start, Vec2 end)
     auto pointLine = Vec2(ax + rL * (bx - ax), ay + rL * (by - ay));
     float rS;
 
-    if(rL < 0) {
+    if (rL < 0) {
         rS = 0; }
 
-    else
-        if(rL > 1) {
-            rS = 1; }
+    else if (rL > 1) {
+        rS = 1; }
 
-        else {
-            rS = rL; }
+    else {
+        rS = rL; }
 
     auto isOnSegment = rS == rL || isnan(rL);
     auto pointSegment = isOnSegment ? pointLine : Vec2(ax + rS * (bx - ax), ay + rS * (by - ay));
@@ -122,29 +121,29 @@ ProjectionInfo * ZCamilleExtensions::ProjectOn(Vec2 point, Vec2 start, Vec2 end)
 
 bool ZCamilleExtensions::CanCombo() {
     return IsKeyDown(ZCamille::Menu->ComboKey) && ZCamille::Menu->ComboMana->GetInteger() <
-           ZCamille::Player->GetMana(); }
+        ZCamille::Player->GetMana(); }
 
 bool ZCamilleExtensions::CanHarass() {
     return IsKeyDown(ZCamille::Menu->HarassKey) && ZCamille::Menu->HarassMana->GetInteger() <
-           ZCamille::Player->GetMana(); }
+        ZCamille::Player->GetMana(); }
 
 bool ZCamilleExtensions::CanJungleClear() {
     bool nearEnemy = CountInRange(GEntityList->Player(), 1000, GEntityList->GetAllHeros(false, true)) > 0;
 
-    if(!IsKeyDown(ZCamille::Menu->JungleClearKey)) {
+    if (!IsKeyDown(ZCamille::Menu->JungleClearKey)) {
         return false; }
 
     return IsKeyDown(ZCamille::Menu->JungleClearKey) && ZCamille::Player->GetMana() > nearEnemy
-           ? ZCamille::Menu->WaveClearOverride->GetInteger() : ZCamille::Menu->JungleClearMana->GetInteger(); }
+        ? ZCamille::Menu->WaveClearOverride->GetInteger() : ZCamille::Menu->JungleClearMana->GetInteger(); }
 
 bool ZCamilleExtensions::CanWaveClear() {
     bool nearEnemy = CountInRange(GEntityList->Player(), 1000, GEntityList->GetAllHeros(false, true)) > 0;
 
-    if(!IsKeyDown(ZCamille::Menu->WaveClearKey)) {
+    if (!IsKeyDown(ZCamille::Menu->WaveClearKey)) {
         return false; }
 
     return IsKeyDown(ZCamille::Menu->WaveClearKey) && ZCamille::Player->GetMana() > nearEnemy
-           ? ZCamille::Menu->WaveClearOverride->GetInteger() : ZCamille::Menu->WaveClearMana->GetInteger(); }
+        ? ZCamille::Menu->WaveClearOverride->GetInteger() : ZCamille::Menu->WaveClearMana->GetInteger(); }
 
 bool ZCamilleExtensions::CanFlee() {
     return IsKeyDown(ZCamille::Menu->FleeKey); }

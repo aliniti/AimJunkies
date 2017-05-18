@@ -1,69 +1,41 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\Core">
+    <Filter Include="Core">
       <UniqueIdentifier>{5f979995-cdf3-43a0-8756-f6e7e1e29a70}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LPPConstants.h">
-      <Filter>Header Files\Core</Filter>
+      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="PluginData.h">
-      <Filter>Header Files\Core</Filter>
+      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="PluginSDK.h">
-      <Filter>Header Files\Core</Filter>
+      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Vector3.h">
-      <Filter>Header Files\Core</Filter>
+      <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="ZCamille.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ZCamilleAvoider.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ZCamilleExtensions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ZCamilleMenu.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ZCamilleModes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClInclude Include="ZCamille.h" />
+    <ClInclude Include="ZCamilleAvoider.h" />
+    <ClInclude Include="ZCamilleExtensions.h" />
+    <ClInclude Include="ZCamilleMenu.h" />
+    <ClInclude Include="ZCamilleModes.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ZCamille.cpp" />
+    <ClCompile Include="ZCamilleAvoider.cpp" />
+    <ClCompile Include="ZCamilleExtensions.cpp" />
+    <ClCompile Include="ZCamilleMenu.cpp" />
+    <ClCompile Include="ZCamilleModes.cpp" />
     <ClCompile Include="PluginSDK.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ZCamille.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ZCamilleAvoider.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ZCamilleExtensions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ZCamilleModes.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ZCamilleMenu.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

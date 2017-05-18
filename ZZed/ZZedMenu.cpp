@@ -28,9 +28,9 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
     auto menuiw = menucb->AddMenu("::[W] Living Shadow");
     this->UseComboW = menuiw->CheckBox("Use W in Combo", true);
     this->SwapForKill = menuiw->CheckBox("- Swap for Kill", true);
-    this->GapcloseAfterR = menuiw->CheckBox("- Gapclose after R", false);
+    this->GapcloseAfterR = menuiw->CheckBox("- Gapclose W on Marked", false);
     this->UseHarassW = menuiw->CheckBox("Use W in Harass", true);
-    this->UseHarassWPF = menuiw->AddSelection("- Shadow Placement:", 0, std::vector<std::string> { "Unit Position", "Pathfinding", "Auto", });
+    this->UseHarassWPF = menuiw->AddSelection("Harass Shadow Combo:", 0, std::vector<std::string> { "W->E->Q", "Pathfinder", "Auto", });
     this->UseJungleW = menuiw->CheckBox("Use W in Jungle", true);
     this->DontWJungleNearEnemy = menuiw->CheckBox("- Dont Use Near Enemy", true);
     this->UseFleeW = menuiw->CheckBox("Use W in Flee", true);
@@ -56,7 +56,7 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
     this->UseComboR = this->DeathMarkMenu->CheckBox("Use R in Combo", true);
     this->AlwaysRSelected = this->DeathMarkMenu->CheckBox("- Always R on Focus Target", true);
     this->UltMode = this->DeathMarkMenu->AddSelection("- Mode:", 0, std::vector<std::string> {"Only Kill", "Duel" });
-    this->ShadowPlacement = this->DeathMarkMenu->AddSelection("- Shadow Placement:", 0, std::vector<std::string> {"Line", "Triangle", "Pathfinder" });
+    this->ShadowPlacement = this->DeathMarkMenu->AddSelection("- Shadow Combo:", 0, std::vector<std::string> {"Line", "Triangle", "Pathfinder", "None" });
     this->AssassinRange = this->DeathMarkMenu->AddInteger("- Assasination Range", int(ZZed::R->GetSpellRange()), int(ZZed::Q->Range() * 3), int(ZZed::Q->Range() + 500));
     this->SwapRIfDead = this->DeathMarkMenu->CheckBox("- Swap Back if Dead", true);
     this->LaughIfDead = this->DeathMarkMenu->CheckBox("- Laugh if Dead", true);

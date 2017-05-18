@@ -433,7 +433,7 @@ inline void ZZed::UseEEx(IUnit * unit, bool jungle) {
     for (auto pair : WPositions) {
         auto position = pair.second;
 
-        if (Ex->Dist2D(unit->ServerPosition(), position) <= E->GetSpellRange()) {
+        if (Ex->Dist2D(unit->ServerPosition(), position) <= E->GetSpellRange() + unit->BoundingRadius()) {
             if (jungle && Menu->UseJungleE->Enabled() && Player->GetMana() >= Menu->MinimumClearEnergy->GetInteger()) {
                 E->CastOnPlayer(); }
 
@@ -667,6 +667,10 @@ inline void ZZed::GetBestWPosition(IUnit * unit, Vec3 & wpos, bool harass, bool 
 
         if (Menu->ShadowPlacement->GetInteger() == 2 || CanShadowCPA(unit, true)) {
             GetMaxWPositions(unit, wpos);
+            return; }
+
+        if (Menu->ShadowPlacement->GetInteger() == 3) {
+            wpos = unit->ServerPosition();
             return; }
 
         // get w position using r shadow position

@@ -12,7 +12,6 @@ ZZedMenu::ZZedMenu(IMenu * menu) {
 
     auto menucb = this->Menu->AddMenu("::Main");
 
-
     auto menuiq = menucb->AddMenu("::[Q] Razor Shuriken");
     this->UseComboQ = menuiq->CheckBox("Use Q in Combo", true);
     this->ExtendedQCombo = menuiq->CheckBox("- Use Extended Q", true);

@@ -1,5 +1,6 @@
 #pragma once
 #include "PluginSDK.h"
+#include <map>
 
 class ZZedMenu {
     public:

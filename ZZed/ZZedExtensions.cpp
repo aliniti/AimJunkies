@@ -69,13 +69,13 @@ bool ZZedExtensions::IsInAllyFountain(Vec3 pos) {
     return GUtility->IsPositionInFountain(pos, true, false); }
 
 bool ZZedExtensions::IsKeyDown(IMenuOption * menuOption) {
-    return (GetAsyncKeyState(menuOption->GetInteger()) & 0x8000) != 0; }
+    return GUtility->IsKeyDown(menuOption->GetInteger()); }
 
 std::vector<Vec2> ZZedExtensions::CircleCircleIntersection(Vec2 center1, Vec2 center2, float radius1, float radius2) {
     auto D = Dist2D(center1, center2);
 
     //The Circles dont intersect:
-    if(D > radius1 + radius2 || (D <= std::abs(radius1 - radius2))) {
+    if (D > radius1 + radius2 || (D <= std::abs(radius1 - radius2))) {
         return std::vector<Vec2>(); }
 
     auto A = (radius1 * radius1 - radius2 * radius2 + D * D) / (2 * D);
@@ -90,7 +90,7 @@ std::vector<Vec2> ZZedExtensions::CircleCircleIntersection(Vec2 center1, Vec2 ce
 void ZZedExtensions::DrawDamageOnChampionHPBar(IUnit * unit, double damage, const char * text, Vec4 color) {
     Vec2 barpos;
 
-    if(unit->GetHPBarPosition(barpos)) {
+    if (unit->GetHPBarPosition(barpos)) {
         Vec2 barsize = Vec2(103 * (min(damage, unit->GetHealth()) / unit->GetMaxHealth()), 8);
         barpos = Vec2(barpos.x + 10, barpos.y += 20);
 
@@ -106,7 +106,7 @@ void ZZedExtensions::DrawDamageOnChampionHPBar(IUnit * unit, double damage, cons
 void ZZedExtensions::DrawDamageOnChampionHPBar(IUnit * unit, double damage, Vec4 color) {
     Vec2 barpos;
 
-    if(unit->GetHPBarPosition(barpos)) {
+    if (unit->GetHPBarPosition(barpos)) {
         Vec2 barsize = Vec2(103 * (min(damage, unit->GetHealth()) / unit->GetMaxHealth()), 8);
         barpos = Vec2(barpos.x + 10, barpos.y += 20);
 
@@ -120,32 +120,32 @@ double ZZedExtensions::AmplifyDamage(IUnit * source, IUnit * target)  {
     double modifier = 1;
     std::vector<HeroMastery> masteryPtr;
 
-    if(source->GetMasteries(masteryPtr)) {
-        for(auto mastery : masteryPtr) {
-            if(mastery.MasteryId == 40) {
+    if (source->GetMasteries(masteryPtr)) {
+        for (auto mastery : masteryPtr) {
+            if (mastery.MasteryId == 40) {
                 modifier += (0.4 * mastery.Points) / 100; }
-            else if(mastery.MasteryId == 12) {
+            else if (mastery.MasteryId == 12) {
                 modifier += 0.03; }
-            else if(mastery.MasteryId == 186) {
+            else if (mastery.MasteryId == 186) {
                 bool active = true;
 
-                for(auto ally : GEntityList->GetAllHeros(true, false)) {
-                    if(ally != source && (source->GetPosition() - ally->GetPosition()).Length2D() <= 800) {
+                for (auto ally : GEntityList->GetAllHeros(true, false)) {
+                    if (ally != source && (source->GetPosition() - ally->GetPosition()).Length2D() <= 800) {
                         active = false;
                         break; } }
 
-                if(active) {
+                if (active) {
                     modifier += 0.02; } }
-            else if(mastery.MasteryId == 232) {
-                if(target->HealthPercent() < 40) {
+            else if (mastery.MasteryId == 232) {
+                if (target->HealthPercent() < 40) {
                     modifier += (0.6 * mastery.Points) / 100; } } } }
 
     std::vector<HeroMastery> enemymasteryPtr;
 
-    if(target->GetMasteries(enemymasteryPtr)) {
-        for(auto mastery : enemymasteryPtr) {
+    if (target->GetMasteries(enemymasteryPtr)) {
+        for (auto mastery : enemymasteryPtr) {
 
-            if(mastery.MasteryId == 12) {
+            if (mastery.MasteryId == 12) {
                 modifier += 0.015;
                 break; } } }
 
@@ -154,11 +154,11 @@ double ZZedExtensions::AmplifyDamage(IUnit * source, IUnit * target)  {
 std::vector<IUnit *> ZZedExtensions::GetInRange(Vec2 pos, float range, std::vector<IUnit *> group) {
     std::vector<IUnit *> list;
 
-    if(group.empty()) {
+    if (group.empty()) {
         return list; }
 
-    for(auto o : group) {
-        if(o != nullptr && o->IsValidTarget() && Dist2D(pos, o->ServerPosition()) <= range) {
+    for (auto o : group) {
+        if (o != nullptr && o->IsValidTarget() && Dist2D(pos, o->ServerPosition()) <= range) {
             list.push_back(o); } }
 
     return list; }
@@ -180,10 +180,10 @@ ProjectionInfo * ZZedExtensions::ProjectOn(Vec2 point, Vec2 start, Vec2 end) {
     auto pointLine = Vec2(ax + rL * (bx - ax), ay + rL * (by - ay));
     float rS;
 
-    if(rL < 0) {
+    if (rL < 0) {
         rS = 0; }
 
-    else if(rL > 1) {
+    else if (rL > 1) {
         rS = 1; }
 
     else {

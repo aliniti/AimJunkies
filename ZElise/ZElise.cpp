@@ -40,7 +40,7 @@ PLUGIN_API void OnLoad(IPluginSDK * sdk) {
     ZElise::Player = GEntityList->Player();
     ZEliseAvoider::GenerateAvoidList();
 
-    if(strcmp(ZElise::Player->ChampionName(), "Elise") == 0) {
+    if (strcmp(ZElise::Player->ChampionName(), "Elise") == 0) {
         ZElise::OnBoot();
         ZElise::Menu = new ZEliseMenu(GPluginSDK->AddMenu("ZElise"));
         GEventManager->AddEventHandler(kEventOnSpellCast, OnCastSpell);
@@ -50,7 +50,7 @@ PLUGIN_API void OnLoad(IPluginSDK * sdk) {
         GGame->PrintChat("<font color=\"#794DFF\"><b>ZElise</b></font><b><font color=\"#FFFFFF\"> Loaded!</font></b>"); } }
 
 PLUGIN_API void OnUnload() {
-    if(strcmp(ZElise::Player->ChampionName(), "Elise") == 0) {
+    if (strcmp(ZElise::Player->ChampionName(), "Elise") == 0) {
         ZElise::OnShutdown();
         GEventManager->RemoveEventHandler(kEventOnGameUpdate, OnGameUpdate);
         GEventManager->RemoveEventHandler(kEventOnPlayAnimation, OnPlayAnimation);

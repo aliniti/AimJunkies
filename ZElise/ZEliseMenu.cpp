@@ -93,9 +93,9 @@ ZEliseMenu::ZEliseMenu(IMenu * menu) {
     SpiderEMap.insert(std::pair<std::string, std::pair<IMenuOption *, float>>("rapellaz", std::make_pair(avoidMenu->CheckBox("- Auto Switch Form", true), 0)));
     this->SpellsToAvoid = std::map<std::string, IMenuOption *>();
 
-    for(auto hero : GEntityList->GetAllHeros(false, true)) {
-        for(auto i : ZElise::AvoidList) {
-            if(strcmp(hero->ChampionName(), i.second->ChampName.c_str()) == 0) {
+    for (auto hero : GEntityList->GetAllHeros(false, true)) {
+        for (auto i : ZElise::AvoidList) {
+            if (strcmp(hero->ChampionName(), i.second->ChampName.c_str()) == 0) {
                 auto uniqueHero = std::string("- ").append(i.second->ChampName).append(" R");
                 this->SpellsToAvoid.insert(std::pair<std::string, IMenuOption *>(i.first, avoidMenu->CheckBox(uniqueHero.c_str(), true))); } } }
 

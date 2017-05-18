@@ -106,74 +106,74 @@ inline bool ZNidalee::CompareDistanceToCursor(IUnit * a, IUnit * b) {
 
 inline bool ZNidalee::CanUse(ISpell * spell, bool human, std::string mode, int time = 1) {
 
-    if(Player->GetSpellLevel(spell->GetSpellSlot()) < 1) {
+    if (Player->GetSpellLevel(spell->GetSpellSlot()) < 1) {
         return false; }
 
-    if(spell->GetSpellSlot() == kSlotQ && human) {
+    if (spell->GetSpellSlot() == kSlotQ && human) {
         auto name = std::string("Javelin");
         auto key = name.append(mode);
 
-        if(Menu->HumanQMap.at(key).first->Enabled() &&
-                Menu->HumanQMap.at(key).second <= time) {
+        if (Menu->HumanQMap.at(key).first->Enabled() &&
+            Menu->HumanQMap.at(key).second <= time) {
             return true; } }
 
-    if(spell->GetSpellSlot() == kSlotW && human) {
+    if (spell->GetSpellSlot() == kSlotW && human) {
         auto name = std::string("Bushwhack");
         auto key = name.append(mode);
 
-        if(Menu->HumanWMap.at(key).first->Enabled() &&
-                Menu->HumanWMap.at(key).second <= time) {
+        if (Menu->HumanWMap.at(key).first->Enabled() &&
+            Menu->HumanWMap.at(key).second <= time) {
             return true; } }
 
-    if(spell->GetSpellSlot() == kSlotE && human) {
+    if (spell->GetSpellSlot() == kSlotE && human) {
         auto name = std::string("Primalsurge");
         auto key = name.append(mode);
 
-        if(Menu->HumanEMap.at(key).first->Enabled() &&
-                Menu->HumanEMap.at(key).second <= time) {
+        if (Menu->HumanEMap.at(key).first->Enabled() &&
+            Menu->HumanEMap.at(key).second <= time) {
             return true; } }
 
-    if(spell->GetSpellSlot() == kSlotQ && !human) {
+    if (spell->GetSpellSlot() == kSlotQ && !human) {
         auto name = std::string("Takedown");
         auto key = name.append(mode);
 
-        if(Menu->CougarQMap.at(key).first->Enabled() &&
-                Menu->CougarQMap.at(key).second <= time) {
+        if (Menu->CougarQMap.at(key).first->Enabled() &&
+            Menu->CougarQMap.at(key).second <= time) {
             return true; } }
 
-    if(spell->GetSpellSlot() == kSlotW && !human) {
+    if (spell->GetSpellSlot() == kSlotW && !human) {
         auto name = std::string("Pounce");
         auto key = name.append(mode);
 
-        if(Menu->CougarWMap.at(key).first->Enabled() &&
-                Menu->CougarWMap.at(key).second <= time) {
+        if (Menu->CougarWMap.at(key).first->Enabled() &&
+            Menu->CougarWMap.at(key).second <= time) {
             return true; } }
 
-    if(spell->GetSpellSlot() == kSlotE && !human) {
+    if (spell->GetSpellSlot() == kSlotE && !human) {
         auto name = std::string("Swipe");
         auto key = name.append(mode);
 
-        if(Menu->CougarEMap.at(key).first->Enabled() &&
-                Menu->CougarEMap.at(key).second <= time) {
+        if (Menu->CougarEMap.at(key).first->Enabled() &&
+            Menu->CougarEMap.at(key).second <= time) {
             return true; } }
 
-    if(spell->GetSpellSlot() == kSlotR) {
+    if (spell->GetSpellSlot() == kSlotR) {
         std::string n = human ? "human" : "cougar";
         auto key = "Aspect" + n.append(mode);
 
-        if(human) {
-            if(Menu->HumanRMap.at(key).first->Enabled() &&
-                    Menu->HumanRMap.at(key).second <= time) {
+        if (human) {
+            if (Menu->HumanRMap.at(key).first->Enabled() &&
+                Menu->HumanRMap.at(key).second <= time) {
                 return true; } }
         else {
-            if(Menu->CougarRMap.at(key).first->Enabled() &&
-                    Menu->CougarRMap.at(key).second <= time) {
+            if (Menu->CougarRMap.at(key).first->Enabled() &&
+                Menu->CougarRMap.at(key).second <= time) {
                 return true; } } }
 
     return  false; }
 
 inline bool ZNidalee::GetPriorityHealTarget(IUnit * a, IUnit * b) {
-    switch(Menu->AllyHealPriroty->GetInteger()) {
+    switch (Menu->AllyHealPriroty->GetInteger()) {
         case 0:
             return CompareLowHealth(a, b);
 
@@ -186,7 +186,7 @@ inline bool ZNidalee::GetPriorityHealTarget(IUnit * a, IUnit * b) {
     return false; }
 
 inline bool ZNidalee::GetPriorityJungleTarget(IUnit * a, IUnit * b) {
-    switch(Menu->AllyHealPriroty->GetInteger()) {
+    switch (Menu->AllyHealPriroty->GetInteger()) {
         case 0:
             return CompareLowHealth(a, b);
 
@@ -201,22 +201,22 @@ inline bool ZNidalee::GetPriorityJungleTarget(IUnit * a, IUnit * b) {
 inline void ZNidalee::CastSpear(IUnit * unit, std::string mode) {
     auto jungle = strcmp("jg", mode.c_str()) == 0;
 
-    if(!CatForm() && CanUse(SpellQ, true, mode)) {
-        if(strcmp(mode.c_str(), "ha") == 0 && Player->ManaPercent() <= 65) {
+    if (!CatForm() && CanUse(SpellQ, true, mode)) {
+        if (strcmp(mode.c_str(), "ha") == 0 && Player->ManaPercent() <= 65) {
             return; }
 
-        if(unit == nullptr || !unit->IsValidTarget()) {
+        if (unit == nullptr || !unit->IsValidTarget()) {
             return; }
 
-        if(Ex->Dist2D(unit) <= SJavelin->Range()) {
-            if(unit->IsHero()) {
-                if(Menu->CheckSpearHitChance->Enabled()) {
-                    switch(Menu->PredictionSelection->GetInteger()) {
+        if (Ex->Dist2D(unit) <= SJavelin->Range()) {
+            if (unit->IsHero()) {
+                if (Menu->CheckSpearHitChance->Enabled()) {
+                    switch (Menu->PredictionSelection->GetInteger()) {
                         case 0:
                             auto pred = new AdvPredictionOutput();
 
-                            if(SJavelin->RunPrediction(unit, false, QCollisionFlags, pred)) {
-                                if(pred->HitChance >= Menu->CheckSpearHitChance->GetInteger() + 3) {
+                            if (SJavelin->RunPrediction(unit, false, QCollisionFlags, pred)) {
+                                if (pred->HitChance >= Menu->CheckSpearHitChance->GetInteger() + 3) {
                                     SJavelin->CastOnPosition(pred->CastPosition); } } } }
                 else {
                     SJavelin->CastOnPosition(unit->ServerPosition()); } }
@@ -224,32 +224,32 @@ inline void ZNidalee::CastSpear(IUnit * unit, std::string mode) {
                 SJavelin->CastOnTarget(unit, kHitChanceHigh); } } } }
 
 inline void ZNidalee::PlaceTrap(IUnit * unit, std::string mode) {
-    if(!CatForm() && CanUse(SpellW, true, mode)) {
-        if(unit == nullptr || !unit->IsValidTarget()) {
+    if (!CatForm() && CanUse(SpellW, true, mode)) {
+        if (unit == nullptr || !unit->IsValidTarget()) {
             return; }
 
-        if(Ex->Dist2D(unit) <= SBushwhack->Range()) {
-            if(Menu->BushwhackLocation->GetInteger() == 0) {
-                if(unit->IsHero()) {
+        if (Ex->Dist2D(unit) <= SBushwhack->Range()) {
+            if (Menu->BushwhackLocation->GetInteger() == 0) {
+                if (unit->IsHero()) {
                     Vec3 pos;
                     GPrediction->GetFutureUnitPosition(unit, 1, true, pos);
 
                     //  todo: prediction
-                    if(Ex->IsValid(pos)) {
+                    if (Ex->IsValid(pos)) {
                         SBushwhack->CastOnPosition(pos.Extend(Player->ServerPosition(), -75)); } }
                 else {
-                    if(CanUse(SpellQ, true, mode)) {
-                        if(Ex->Dist2D(unit) > 265) {
+                    if (CanUse(SpellQ, true, mode)) {
+                        if (Ex->Dist2D(unit) > 265) {
                             SBushwhack->CastOnPosition(unit->ServerPosition().Extend(Player->ServerPosition(), 305)); }
                         else {} SBushwhack->CastOnPosition(unit->ServerPosition().Extend(Player->ServerPosition(), 100)); } } } } } }
 
 
 inline void ZNidalee::Bite(IUnit * unit, std::string mode) {
-    if(CatForm() && CanUse(SpellQ, false, mode)) {
-        if(unit == nullptr || !unit->IsValidTarget()) {
+    if (CatForm() && CanUse(SpellQ, false, mode)) {
+        if (unit == nullptr || !unit->IsValidTarget()) {
             return; }
 
-        if(Ex->Dist2D(unit) <= SpellQ->GetSpellRange() + Player->AttackRange() - 75) {
+        if (Ex->Dist2D(unit) <= SpellQ->GetSpellRange() + Player->AttackRange() - 75) {
             SpellQ->CastOnPlayer(); } } }
 
 inline void ZNidalee::Pounce(IUnit * unit, std::string mode) {
@@ -257,34 +257,34 @@ inline void ZNidalee::Pounce(IUnit * unit, std::string mode) {
     auto waveclear = strcmp("wc", mode.c_str()) == 0;
     auto combo = strcmp("co", mode.c_str()) == 0;
 
-    if(CatForm() && CanUse(SpellW, false, mode)) {
-        if(unit == nullptr || !unit->IsValidTarget()) {
+    if (CatForm() && CanUse(SpellW, false, mode)) {
+        if (unit == nullptr || !unit->IsValidTarget()) {
             return; }
 
-        if(IsHunted(unit) && Ex->Dist2D(unit) <= SPounce->Range() * 2) {
-            if(Menu->IgnorePounceChecksOnHuntedTarget->Enabled() ||
-                    Ex->Dist2D(unit) > Player->AttackRange() + 35 || jungle ||
-                    waveclear && !Menu->CheckPounceMinRangeWaveClear->Enabled() ||
-                    combo && !Menu->CheckPounceMinRangeCombo->Enabled()) {
+        if (IsHunted(unit) && Ex->Dist2D(unit) <= SPounce->Range() * 2) {
+            if (Menu->IgnorePounceChecksOnHuntedTarget->Enabled() ||
+                Ex->Dist2D(unit) > Player->AttackRange() + 35 || jungle ||
+                waveclear && !Menu->CheckPounceMinRangeWaveClear->Enabled() ||
+                combo && !Menu->CheckPounceMinRangeCombo->Enabled()) {
                 SPounce->CastOnPosition(unit->ServerPosition()); }  }
         else {
-            if(Ex->Dist2D(unit) <= SPounce->Range()) {
-                if(Ex->Dist2D(unit) > Player->AttackRange() + 35 || jungle ||
-                        waveclear && !Menu->CheckPounceMinRangeWaveClear->Enabled() ||
-                        combo && !Menu->CheckPounceMinRangeCombo->Enabled()) {
-                    if(unit->IsHero()) {
-                        if(Menu->CheckPounceHitChance->Enabled()) {
+            if (Ex->Dist2D(unit) <= SPounce->Range()) {
+                if (Ex->Dist2D(unit) > Player->AttackRange() + 35 || jungle ||
+                    waveclear && !Menu->CheckPounceMinRangeWaveClear->Enabled() ||
+                    combo && !Menu->CheckPounceMinRangeCombo->Enabled()) {
+                    if (unit->IsHero()) {
+                        if (Menu->CheckPounceHitChance->Enabled()) {
                             // todo: prediction
                             SPounce->CastOnPosition(unit->ServerPosition()); }
                         else {
                             SPounce->CastOnPosition(unit->ServerPosition()); } }
                     else {
-                        if(waveclear && Menu->CheckPounceIntoEnemiesWaveClear->Enabled() &&
-                                Ex->CountInRange(Player, 750, GEntityList->GetAllHeros(false, true)) > 0) {
+                        if (waveclear && Menu->CheckPounceIntoEnemiesWaveClear->Enabled() &&
+                            Ex->CountInRange(Player, 750, GEntityList->GetAllHeros(false, true)) > 0) {
                             return; }
 
-                        if(waveclear && Menu->CheckPounceIntoTurretWaveClear->Enabled() &&
-                                Ex->UnderEnemyTurret(unit)) {
+                        if (waveclear && Menu->CheckPounceIntoTurretWaveClear->Enabled() &&
+                            Ex->UnderEnemyTurret(unit)) {
                             return; }
 
                         SPounce->CastOnPosition(unit->ServerPosition()); } } } }  } }
@@ -293,17 +293,17 @@ inline void ZNidalee::Swipe(IUnit * unit, std::string mode) {
     auto jungle = strcmp("jg", mode.c_str()) == 0;
     auto waveclear = strcmp("wc", mode.c_str()) == 0;
 
-    if(CatForm() && CanUse(SpellE, false, mode)) {
-        if(unit == nullptr || !unit->IsValidTarget()) {
+    if (CatForm() && CanUse(SpellE, false, mode)) {
+        if (unit == nullptr || !unit->IsValidTarget()) {
             return; }
 
-        if(Ex->Dist2D(unit) <= SSwipe->Range()) {
-            if(unit->IsHero()) {
-                if(Menu->CheckSwipeHitchange->Enabled()) {
+        if (Ex->Dist2D(unit) <= SSwipe->Range()) {
+            if (unit->IsHero()) {
+                if (Menu->CheckSwipeHitchange->Enabled()) {
                     auto pred = new AdvPredictionOutput();
 
-                    if(SSwipe->RunPrediction(unit, true, kCollidesWithNothing, pred)) {
-                        if(pred->HitChance >= Menu->CheckSwipeHitChanceMin->GetInteger() + 3) {
+                    if (SSwipe->RunPrediction(unit, true, kCollidesWithNothing, pred)) {
+                        if (pred->HitChance >= Menu->CheckSwipeHitChanceMin->GetInteger() + 3) {
                             SSwipe->CastOnPosition(pred->CastPosition); } } }
                 else {
                     SSwipe->CastOnPosition(unit->ServerPosition()); } }
@@ -311,10 +311,10 @@ inline void ZNidalee::Swipe(IUnit * unit, std::string mode) {
                 Vec3 pos;
                 int numberHit;
 
-                if(waveclear) {
+                if (waveclear) {
                     SSwipe->FindBestCastPosition(true, false, pos, numberHit);
 
-                    if(numberHit >= Menu->CheckSwipeMinimumHitWaveClear->GetInteger()) {
+                    if (numberHit >= Menu->CheckSwipeMinimumHitWaveClear->GetInteger()) {
                         SSwipe->CastOnPosition(pos); } }
                 else {
                     SSwipe->CastOnPosition(unit->ServerPosition()); } } } } }
@@ -324,73 +324,73 @@ inline void ZNidalee::SwitchForm(IUnit * unit, std::string mode) {
     auto waveclear = strcmp("wc", mode.c_str()) == 0;
     auto combo = strcmp("co", mode.c_str()) == 0;
 
-    if(CatForm() && CanUse(SpellR, false, mode)) {
-        if(unit == nullptr || !unit->IsValidTarget()) {
+    if (CatForm() && CanUse(SpellR, false, mode)) {
+        if (unit == nullptr || !unit->IsValidTarget()) {
             return; }
 
-        if(CanUse(SpellQ, false, mode)) {
-            if(Player->HasBuff("Takedown") && Ex->Dist2D(unit) <= SPounce->Range()) {
+        if (CanUse(SpellQ, false, mode)) {
+            if (Player->HasBuff("Takedown") && Ex->Dist2D(unit) <= SPounce->Range()) {
                 return; } }
 
-        if(unit->IsHero()) {
-            if(CanUse(SpellQ, true, mode)) {
-                switch(Menu->PredictionSelection->GetInteger()) {
+        if (unit->IsHero()) {
+            if (CanUse(SpellQ, true, mode)) {
+                switch (Menu->PredictionSelection->GetInteger()) {
                     case 0:
                         auto pred = new AdvPredictionOutput();
 
-                        if(SJavelin->RunPrediction(unit, false, QCollisionFlags, pred)) {
-                            if(pred->HitChance >= Menu->CheckSpearHitChanceMin->GetInteger() + 3) {
+                        if (SJavelin->RunPrediction(unit, false, QCollisionFlags, pred)) {
+                            if (pred->HitChance >= Menu->CheckSpearHitChanceMin->GetInteger() + 3) {
                                 SpellR->CastOnPlayer(); } } } }
             else {
-                if(!CanUse(SpellW, false, mode) && !CanUse(SpellQ, false, mode)
-                        || CanUse(SpellQ, true, mode) && Ex->Dist2D(unit) > SPounce->Range() + 100) {
-                    if(Ex->Dist2D(unit) > SpellW->GetSpellRange() + 25) {
+                if (!CanUse(SpellW, false, mode) && !CanUse(SpellQ, false, mode)
+                    || CanUse(SpellQ, true, mode) && Ex->Dist2D(unit) > SPounce->Range() + 100) {
+                    if (Ex->Dist2D(unit) > SpellW->GetSpellRange() + 25) {
                         SpellR->CastOnPlayer(); } } } }
 
         else {
-            if(!CanUse(SpellW, false, mode) && !CanUse(SpellE, false, mode) && !CanUse(SpellQ, false, mode)
-                    || CanUse(SpellW, false, mode, 3) && CanUse(SpellQ, true, mode) && (Ex->Dist2D(unit) > SPounce->Range() || jungle)) {
-                if(CanUse(SpellQ, true, mode)) {
+            if (!CanUse(SpellW, false, mode) && !CanUse(SpellE, false, mode) && !CanUse(SpellQ, false, mode)
+                || CanUse(SpellW, false, mode, 3) && CanUse(SpellQ, true, mode) && (Ex->Dist2D(unit) > SPounce->Range() || jungle)) {
+                if (CanUse(SpellQ, true, mode)) {
                     auto pred = new AdvPredictionOutput();
 
-                    if(SJavelin->RunPrediction(unit, false, QCollisionFlags, pred)) {
-                        if(pred->HitChance != kHitChanceCollision) {
+                    if (SJavelin->RunPrediction(unit, false, QCollisionFlags, pred)) {
+                        if (pred->HitChance != kHitChanceCollision) {
                             SpellR->CastOnPlayer(); } } }
                 else {
                     SpellR->CastOnPlayer(); } } } }
 
-    if(!CatForm() && CanUse(SpellR, true, mode)) {
-        if(unit == nullptr || !unit->IsValidTarget()) {
+    if (!CatForm() && CanUse(SpellR, true, mode)) {
+        if (unit == nullptr || !unit->IsValidTarget()) {
             return; }
 
-        if(IsHunted(unit)) {
-            if(Menu->IgnorePounceChecksOnHuntedTarget->Enabled() && combo || jungle) {
-                if(combo || jungle) {
+        if (IsHunted(unit)) {
+            if (Menu->IgnorePounceChecksOnHuntedTarget->Enabled() && combo || jungle) {
+                if (combo || jungle) {
                     SpellR->CastOnPlayer(); } }
 
-            if(CanUse(SpellW, false, mode) || Ex->Dist2D(unit) <= SpellQ->GetSpellRange() * 2) {
-                if(Ex->Dist2D(unit) <= SpellW->GetSpellRange() * 2) {
-                    if(CanUse(SpellQ, false, mode) || CanUse(SpellE, false, mode) || !Menu->RequireSwipeTakedownCombo->Enabled()) {
+            if (CanUse(SpellW, false, mode) || Ex->Dist2D(unit) <= SpellQ->GetSpellRange() * 2) {
+                if (Ex->Dist2D(unit) <= SpellW->GetSpellRange() * 2) {
+                    if (CanUse(SpellQ, false, mode) || CanUse(SpellE, false, mode) || !Menu->RequireSwipeTakedownCombo->Enabled()) {
                         SpellR->CastOnPlayer(); } } } }
         else {
-            if(waveclear && Menu->CheckCatSwitchNearEnemies->Enabled() &&
-                    Ex->CountInRange(Player, 750, GEntityList->GetAllHeros(false, true)) > 0) {
+            if (waveclear && Menu->CheckCatSwitchNearEnemies->Enabled() &&
+                Ex->CountInRange(Player, 750, GEntityList->GetAllHeros(false, true)) > 0) {
                 return; }
 
-            if(waveclear && Menu->CheckCatSwitchNearTurret->Enabled() &&
-                    Ex->UnderEnemyTurret(unit)) {
+            if (waveclear && Menu->CheckCatSwitchNearTurret->Enabled() &&
+                Ex->UnderEnemyTurret(unit)) {
                 return; }
 
-            if(Ex->Dist2D(unit) <= SpellW->GetSpellRange() + 35 || !IsHunted(unit) && Menu->CurrentPlayStyle->GetInteger() == 1 &&
-                    Ex->CountInRange(Player, SpellE->GetSpellRange() + 35, GEntityList->GetAllHeros(false, true)) > 1) {
+            if (Ex->Dist2D(unit) <= SpellW->GetSpellRange() + 35 || !IsHunted(unit) && Menu->CurrentPlayStyle->GetInteger() == 1 &&
+                Ex->CountInRange(Player, SpellE->GetSpellRange() + 35, GEntityList->GetAllHeros(false, true)) > 1) {
                 auto pred = new AdvPredictionOutput();
 
-                if(SJavelin->RunPrediction(unit, false, QCollisionFlags, pred)) {
-                    if(CanUse(SpellQ, true, mode) && pred->HitChance == kHitChanceCollision) {
+                if (SJavelin->RunPrediction(unit, false, QCollisionFlags, pred)) {
+                    if (CanUse(SpellQ, true, mode) && pred->HitChance == kHitChanceCollision) {
                         SpellR->CastOnPlayer(); } }
 
-                if(!CanUse(SpellQ, true, mode) && !jungle ||
-                        !CanUse(SpellQ, true, mode) && !CanUse(SpellW, true, mode)) {
+                if (!CanUse(SpellQ, true, mode) && !jungle ||
+                    !CanUse(SpellQ, true, mode) && !CanUse(SpellW, true, mode)) {
                     SpellR->CastOnPlayer(); }  } } }  }
 
 inline void ZNidalee::Flee() {

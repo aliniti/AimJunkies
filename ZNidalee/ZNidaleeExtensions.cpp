@@ -16,12 +16,10 @@ Vec3 ZNidaleeExtensions::To3D(Vec2 p) {
     return Vec3(p.x, 0, p.y); }
 
 float ZNidaleeExtensions::Dist(IUnit * to) {
-    return (ZNidalee::Player->ServerPosition() - to->ServerPosition()).Length() -
-           (ZNidalee::Player->BoundingRadius() + to->BoundingRadius()); }
+    return (ZNidalee::Player->ServerPosition() - to->ServerPosition()).Length(); }
 
 float ZNidaleeExtensions::Dist2D(IUnit * to) {
-    return (ZNidalee::Player->ServerPosition() - to->ServerPosition()).Length2D() -
-           (ZNidalee::Player->BoundingRadius() + to->BoundingRadius()); }
+    return (ZNidalee::Player->ServerPosition() - to->ServerPosition()).Length2D(); }
 
 float ZNidaleeExtensions::Dist(IUnit * from, IUnit * to) {
     return (from->ServerPosition() - to->ServerPosition()).Length(); }
@@ -51,16 +49,16 @@ bool ZNidaleeExtensions::UnderAllyTurret(IUnit * unit) {
     return GUtility->IsPositionUnderTurret(unit->ServerPosition(), true, false); }
 
 bool ZNidaleeExtensions::IsKeyDown(IMenuOption * menuOption) {
-    return (GetAsyncKeyState(menuOption->GetInteger()) & 0x8000) != 0; }
+    return GUtility->IsKeyDown(menuOption->GetInteger()); }
 
 std::vector<IUnit *> ZNidaleeExtensions::GetInRange(IUnit * unit, float range, std::vector<IUnit *> group) {
     std::vector<IUnit *> list;
 
-    if(group.empty()) {
+    if (group.empty()) {
         return list; }
 
-    for(auto o : group) {
-        if(o != nullptr && o->IsValidTarget() && Dist2D(o, unit) <= range) {
+    for (auto o : group) {
+        if (o != nullptr && o->IsValidTarget() && Dist2D(o, unit) <= range) {
             list.push_back(o); } }
 
     return list; }
@@ -79,15 +77,14 @@ ProjectionInfo * ZNidaleeExtensions::ProjectOn(Vec2 point, Vec2 start, Vec2 end)
     auto pointLine = Vec2(ax + rL * (bx - ax), ay + rL * (by - ay));
     float rS;
 
-    if(rL < 0) {
+    if (rL < 0) {
         rS = 0; }
 
-    else
-        if(rL > 1) {
-            rS = 1; }
+    else if (rL > 1) {
+        rS = 1; }
 
-        else {
-            rS = rL; }
+    else {
+        rS = rL; }
 
     auto isOnSegment = rS == rL || isnan(rL);
     auto pointSegment = isOnSegment ? pointLine : Vec2(ax + rS * (bx - ax), ay + rS * (by - ay));

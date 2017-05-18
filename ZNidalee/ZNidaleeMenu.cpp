@@ -33,7 +33,7 @@ ZNidaleeMenu::ZNidaleeMenu(IMenu * menu) {
     this->AllyHealPriroty = primalsurgeMenu->AddSelection("Ally Priority: ", 0, std::vector<std::string>({ "Low HP", "Most AD/AP", "Max Health" }));
     this->HealingManaPct = primalsurgeMenu->AddInteger("Minimum Mana %", 1, 100, 55);
 
-    for(auto hero : GEntityList->GetAllHeros(true, false)) {
+    for (auto hero : GEntityList->GetAllHeros(true, false)) {
         auto uniqueStr = std::string("Use on ").append(hero->ChampionName());
         this->AllyHealMap.insert(std::pair<std::string, IMenuOption *>(hero->ChampionName() + std::string("on"), primalsurgeMenu->CheckBox(uniqueStr.c_str(), true)));
 

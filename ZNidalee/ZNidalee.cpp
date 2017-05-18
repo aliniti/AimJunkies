@@ -47,7 +47,7 @@ PLUGIN_API void OnLoad(IPluginSDK * sdk) {
     ZNidalee::Delay = new DelayAction;
     ZNidalee::Player = GEntityList->Player();
 
-    if(strcmp(ZNidalee::Player->ChampionName(), "Nidalee") == 0) {
+    if (strcmp(ZNidalee::Player->ChampionName(), "Nidalee") == 0) {
         ZNidalee::OnBoot();
         ZNidalee::Menu = new ZNidaleeMenu(GPluginSDK->AddMenu("ZNidalee"));
         GEventManager->AddEventHandler(kEventOnSpellCast, OnCastSpell);
@@ -58,7 +58,7 @@ PLUGIN_API void OnLoad(IPluginSDK * sdk) {
         GGame->PrintChat("<font color=\"#794DFF\"><b>ZNidalee</b></font><b><font color=\"#FFFFFF\"> Loaded!</font></b>"); } }
 
 PLUGIN_API void OnUnload() {
-    if(strcmp(ZNidalee::Player->ChampionName(), "Nidalee") == 0) {
+    if (strcmp(ZNidalee::Player->ChampionName(), "Nidalee") == 0) {
         GEventManager->RemoveEventHandler(kEventOnGameUpdate, OnGameUpdate);
         GEventManager->RemoveEventHandler(kEventOnBuffAdd, OnBuffAdd);
         GEventManager->RemoveEventHandler(kEventOnGapCloser, OnGapCloser);

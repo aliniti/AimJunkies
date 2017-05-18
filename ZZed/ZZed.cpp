@@ -27,6 +27,7 @@ IInventoryItem * ZZed::Edgeofnight;
 
 std::map<float, IUnit *> ZZed::Marked;
 std::map<float, IUnit *> ZZed::Shadows;
+std::map<float, Vec3> ZZed::WPositions;
 std::map<std::string, float> ZZed::Ticks;
 std::map<std::string, ZZedAvoider *> ZZed::AvoidList;
 

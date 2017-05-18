@@ -31,7 +31,6 @@ class ZZed {
         static IInventoryItem * Bilgewater;
         static IInventoryItem * Botrk;
         static IInventoryItem * Edgeofnight;
-        static std::map<std::string, ZZedAvoider *> AvoidList;
 
         static void UseQ(IUnit * unit, bool harass = false);
         static void UseQEx(IUnit * unit, bool jungle);
@@ -58,15 +57,17 @@ class ZZed {
 
         static bool CanSwap(ISpell * spell);
         static bool HasDeathMark(IUnit * unit);
-        static bool WShadowExists();
-        static bool RShadowExists();
+        static bool WShadowExists(bool strict = false);
+        static bool RShadowExists(bool strict = false);
 
         static IUnit * RShadow();
         static IUnit * WShadow();
 
         static std::map<float, IUnit *> Marked;
         static std::map<float, IUnit *> Shadows;
+        static std::map<float, Vec3> WPositions;
         static std::map<std::string, float> Ticks;
+        static std::map<std::string, ZZedAvoider *> AvoidList;
 
         // damage
         static double QDmg(IUnit * source, IUnit * unit, double & energy);
@@ -120,6 +121,7 @@ inline void ZZed::OnBoot() {
 inline void ZZed::OnShutdown() {
     Menu->Menu->SaveSettings();
     Menu->Menu->Remove();
+    WPositions.clear();
     Shadows.clear();
     Marked.clear();
     Ticks.clear(); }
@@ -223,8 +225,8 @@ inline bool ZZed::HasDeathMark(IUnit * unit) {
 
     return false; }
 
-inline bool ZZed::WShadowExists() {
-    if (Recent("ZedW", 500 + GGame->Latency())) {
+inline bool ZZed::WShadowExists(bool strict) {
+    if (!strict && Recent("ZedW", 500 + GGame->Latency())) {
         return true; }
 
     for (auto z : Shadows) {
@@ -235,8 +237,8 @@ inline bool ZZed::WShadowExists() {
 
     return  false; }
 
-inline bool ZZed::RShadowExists() {
-    if (Recent("ZedR", 500 + GGame->Latency())) {
+inline bool ZZed::RShadowExists(bool strict) {
+    if (!strict && Recent("ZedR", 500 + GGame->Latency())) {
         return true; }
 
     for (auto z : Shadows) {
@@ -388,10 +390,17 @@ inline void ZZed::UseE(IUnit * unit, bool harass) {
             if (harass && Menu->UseHarassE->Enabled() || !harass && Menu->UseComboE->Enabled()) {
                 E->CastOnPlayer(); } }
 
-        for (auto o : Shadows) {
-            auto shadow = o.second;
+        for (auto pair : Shadows) {
+            auto shadow = pair.second;
 
             if (Ex->Dist2D(unit, shadow) <= E->GetSpellRange() + unit->BoundingRadius()) {
+                if (harass && Menu->UseHarassE->Enabled() || !harass && Menu->UseComboE->Enabled()) {
+                    E->CastOnPlayer(); } } }
+
+        for (auto pair : WPositions) {
+            auto position = pair.second;
+
+            if (Ex->Dist2D(unit->ServerPosition(), position) <= E->GetSpellRange() + unit->BoundingRadius()) {
                 if (harass && Menu->UseHarassE->Enabled() || !harass && Menu->UseComboE->Enabled()) {
                     E->CastOnPlayer(); } } } } }
 
@@ -411,6 +420,20 @@ inline void ZZed::UseEEx(IUnit * unit, bool jungle) {
         auto shadow = o.second;
 
         if (Ex->Dist2D(unit, shadow) <= E->GetSpellRange()) {
+            if (jungle && Menu->UseJungleE->Enabled() && Player->GetMana() >= Menu->MinimumClearEnergy->GetInteger()) {
+                E->CastOnPlayer(); }
+
+            if (unit->IsCreep() && Menu->LastHitE->Enabled()) {
+                if (Ex->UnderAllyTurret(Player) && Player->GetMana() >= Menu->MinimumLastHitEnergyTower->GetInteger()) {
+                    E->CastOnPlayer(); }
+
+                if (Ex->UnderAllyTurret(Player) == false && Player->GetMana() >= Menu->MinimumLastHitEnergy->GetInteger()) {
+                    E->CastOnPlayer(); } } } }
+
+    for (auto pair : WPositions) {
+        auto position = pair.second;
+
+        if (Ex->Dist2D(unit->ServerPosition(), position) <= E->GetSpellRange()) {
             if (jungle && Menu->UseJungleE->Enabled() && Player->GetMana() >= Menu->MinimumClearEnergy->GetInteger()) {
                 E->CastOnPlayer(); }
 

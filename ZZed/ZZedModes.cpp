@@ -127,6 +127,15 @@ void ZZedModes::OnUpdate() {
             ZZed::Marked.erase(key);
             break; } }
 
+    // iterate shadow positions
+    for (auto i : ZZed::WPositions) {
+        auto timestamp = i.first;
+
+        // remove shadows after casts
+        if (GGame->Time() - timestamp - ZZed::Q->GetDelay() > 1 + GGame->Latency() / 1000) {
+            ZZed::WPositions.erase(timestamp);
+            break; } }
+
     // iterate shadows
     for (auto i : ZZed::Shadows) {
         auto key = i.first;
@@ -179,7 +188,25 @@ void ZZedModes::OnSpellCast(const CastedSpell & args) {
         auto name = std::string(args.Name_);
 
         if (stamps.find(name) != stamps.end()) {
-            stamps[name] = GGame->TickCount(); } }
+            stamps[name] = GGame->TickCount(); }
+
+        // store shadow position temporarily for slightly faster combo.
+        // slightly faster than waiting for on object create (usefull for zed W->E)
+        if (name == "ZedW") {
+
+            auto end = args.EndPosition_;
+            auto start = args.Caster_->ServerPosition();
+
+            auto dir = (end - start).VectorNormalize();
+
+            if (ZZed::Ex->Dist2D(start, end) > ZZed::W->GetSpellRange()) {
+                end = start + dir * ZZed::W->GetSpellRange(); }
+
+            if (ZZed::Ex->Dist2D(args.Caster_->ServerPosition(), end) < 350) {
+                if (!ZZed::WShadowExists(true)) {
+                    end = start + dir * 350; } }
+
+            ZZed::WPositions[GGame->Time()] = end; } }
 
     // recycle op :^)
     if (args.Caster_ != nullptr) {

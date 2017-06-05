@@ -188,7 +188,7 @@ inline void ZZed::CanUlt(IUnit * unit, bool & engage) {
         // for some instance like in proving grounds menu is generated on load.
         // this is to prevent nullptr's and add any new targets to the menu on the fly (e.g Target Dummy)
         if (Menu->BlackListRTargets.find(unit->GetNetworkId()) == Menu->BlackListRTargets.end()) {
-            Menu->BlackListRTargets[unit->GetNetworkId()] = Menu->DeathMarkMenu->CheckBox(std::string("- Dont R on").append(" ").append(unit->ChampionName()).c_str(), false);
+            Menu->BlackListRTargets[unit->GetNetworkId()] = Menu->ComboMenu->CheckBox(std::string("- Dont R on").append(" ").append(unit->ChampionName()).c_str(), false);
             return; }
 
         // if ult is ready everything is k
@@ -199,7 +199,7 @@ inline void ZZed::CanUlt(IUnit * unit, bool & engage) {
                     Ticks["Engage"] = GGame->TickCount();
                     return; } }
 
-            if (Menu->BlackListRTargets[unit->GetNetworkId()]->Enabled() && Menu->BlackListR->Enabled()) {
+            if (Menu->BlackListRTargets[unit->GetNetworkId()]->Enabled() && Menu->UseBlackList->Enabled()) {
                 engage = false;
                 return; }
 

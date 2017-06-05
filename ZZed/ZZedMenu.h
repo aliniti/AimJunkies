@@ -11,7 +11,7 @@ class ZZedMenu {
 
         // root;
         IMenu * Menu;
-        IMenu * DeathMarkMenu;
+        IMenu * ComboMenu;
         IMenuOption * Debug;
 
         IMenuOption * UseComboQ;
@@ -39,7 +39,7 @@ class ZZedMenu {
         IMenuOption * ExComboQMaxDamage;
         IMenuOption * DrawPredictedShadow;
         IMenuOption * DebugPathfinding;
-        IMenuOption * BlackListR;
+        IMenuOption * UseBlackList;
         IMenuOption * MinimumClearEnergy;
         IMenuOption * AutoR;
         IMenuOption * ClearKey;

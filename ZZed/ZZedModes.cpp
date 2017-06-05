@@ -63,12 +63,14 @@ void ZZedModes::WaveClear() {
 
     if (menu->LastHitE->Enabled() && menu->LastHitECount->GetInteger() > 1) {
         double energy = 0;
-        auto v = GEntityList->GetAllMinions(false, true, false);
+        std::vector<IUnit *> units = std::vector<IUnit *>();
 
-        v.erase(std::remove_if(v.begin(), v.end(), [&](IUnit * u) {
-            return ZZed::EDmg(u, energy) < u->GetHealth() || !u->IsValidTarget() || u->IsDead();; }));
+        for (auto v : GEntityList->GetAllMinions(false, true, false)) {
+            if (utils->Dist2D(v) < ZZed::E->GetSpellRange()) {
+                if (ZZed::EDmg(v, energy) >= v->GetHealth() && v->IsValidTarget() && !v->IsDead()) {
+                    units.push_back(v); } } }
 
-        if (utils->CountInRange(player, ZZed::E->GetSpellRange(), v) >= menu->LastHitECount->GetInteger()) {
+        if (utils->CountInRange(player, ZZed::E->GetSpellRange(), units) >= menu->LastHitECount->GetInteger()) {
             if (ZZed::Ex->UnderEnemyTurret(player) == false) {
                 ZZed::E->CastOnPlayer(); } } }
 
